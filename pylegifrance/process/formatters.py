@@ -3,85 +3,133 @@
 """
 Created on Mon Jun 19 11:57:20 2023
 
-@author: raphael
+@author: Raphaël d'Assignies
+
 """
-from models.models import * 
+# TODO : à mettre dans une fichier de configuration (YAML)
+ARTICLE_KEYS = ('pathTitle', 'content', 'num', 'fullSectionsTitre', 
+                'texte','etat','VersionArticle' )
+ROOT_KEYS = ('cid', 'title')
+SECTION_KEYS = ('title', 'cid')
 
 
-texte = []
-def process_articles(articles) : 
-   
-    
-    texte.append(articles)
-    for art in articles : 
-        #print(art['cid'], ' / ', art['etat'])
-        print("-----------------------")
+def formate_text_response(data,
+                          root_keys=ROOT_KEYS, 
+                          section_keys=SECTION_KEYS, 
+                          article_keys=ARTICLE_KEYS):
+    """
+    Cette fonction extrait les données du modèle de réponse ConsultTextResponse
+    (LegiPart)
+
+    Parameters
+    ----------
+    data : List
+        DESCRIPTION.
+    root_keys : Tuple
+       liste des clés à la racine de la structure
+    article_keys : Tuple
+        liste des clés spécifiques à un article
+    section_keys : Tuple
+       liste des clés spécifiques à section
+
+    Returns
+    -------
+    TYPE : Dict
+       Dictionnaire représentant une structure simplifiée de la structure originale
+
+    """
+    # Fonction interne pour traiter récursivement les sections et articles
+    def process_section(section_data):
+        section_result = {}
+
+        # Extraire les données des articles dans la section
+        if 'articles' in section_data:
+            section_result['articles'] = [
+                {key: article[key] for key in article_keys if key in article}
+                for article in section_data['articles']
+            ]
+
+        # Extraire les données de la section elle-même
+        section_result['section_data'] = {key: section_data[key] for key in section_keys if key in section_data}
+
+        # Traiter les sous-sections récursivement
+        if 'sections' in section_data:
+            section_result['subsections'] = [
+                process_section(subsection) for subsection in section_data['sections']
+            ]
+
+        return section_result
+
+    # Extraction des métadonnées de la racine
+    root_data = {key: data[key] for key in root_keys if key in data}
+
+    # Traitement du contenu principal (sections à la racine)
+    content = []
+    if 'sections' in data:
+        content = [process_section(section) for section in data['sections']]
+
+    # Assembler le résultat final
+    return {"root": root_data, "content": content}
+
+def formate_article_response(data, article_keys=ARTICLE_KEYS): 
+    """
+    Cette fonction extrait les données du modèle de réponse GetArticleResponse
+    (GetArticle)
+
+    Parameters
+    ----------
+    data : Dict
+        Dictionnaire comprenant l'intégralité de la réponse
+    article_keys : Tuple
+        liste des clés spécifiques à un article
+
+    Returns
+    -------
+    simplified_dict : Dict
+        Dictionnaire représentant une structure simplifiée de la structure originale
+
+    """
+    # TODO: Vérifier si la valeur de la clé est none et l'exclure
+    simplified_dict = {}
+    # Accès à la sous-structure 'article'
+    article = data.get("article", {})
+    for key in article_keys:
+        try:
+            # Extraction de la valeur pour chaque clé
+            value = article[key]
+            simplified_dict[key] = value
+        except KeyError:
+            # Gestion du cas où la clé n'est pas trouvée
+            simplified_dict[key] = None  # ou 'raise KeyError' pour signaler l'absence de la clé
+    return simplified_dict
 
 
-def process_sections(sections, depth=3):
-    
-    for section in sections:
-        if section['etat'] == 'VIGUEUR':
-            if 'articles' in section:
-                print(section['title'])
-                process_articles(section['articles'])
-            if 'sections' in section and len(section['sections']) > 0:
-                process_sections(section['sections'], depth + 1)
-                
-   
-def display(sections) : 
-    for items in sections : 
-        print(items['title'])
-        
-        for item in items['articles'] : 
-            print(item['cid'])
-            #for art in item : 
-            #    print(art)
-            #print(items['title'])
-            #print("______________________ ______________")
-            #print(f"Articles : {item['articles']}")
-            #print(f"{item['title']}")
 
-def extract_data(results):
-    extracted_data = []
+def print_legal_hierarchy(legal_list):
+    for item in legal_list:
+        if 'title_id' in item:
+            print(f"Title ID: {item['title_id']}")
+            print(f"  Title CID: {item['title_cid']}")
+            print(f"  Title: {item['title']}\n")
+        elif 'section_id' in item:
+            print(f"  Section ID: {item['section_id']}")
+            print(f"    Title: {item['title']}\n")
+        elif 'extract_id' in item:
+            print(f"    Extract ID: {item['extract_id']}")
+            print(f"      Number: {item['num']}")
+            print(f"      Legal Status: {item['legal_status']}")
+            print(f"      Date Version: {item['date_version']}")
+            print(f"      Title: {item['title']}")
+            print(f"      Values: {item['values']}\n")
+            
 
-    # Fonction récursive pour parcourir les éléments
-    def extract_recursive(element):
-        # Extraire les données de 'titles' si elles existent
-        if 'titles' in element:
-            for title in element['titles']:
-                extracted_data.append({
-                    'title_id': title.get('id', ''),
-                    'title_cid': title.get('cid', ''),
-                    'title': title.get('title', '')
-                })
-
-        # Extraire les données de 'sections' si elles existent
-        if 'sections' in element:
-            for section in element['sections']:
-                extracted_data.append({
-                    'section_id': section.get('id', ''),
-                    'title': section.get('title', ''),
-                })
-                # Appel récursif pour les extracts dans les sections
-                if 'extracts' in section:
-                    for extract in section['extracts']:
-                        extracted_data.append({
-                            'extract_id': extract.get('id', ''), 
-                            'num': extract.get('num', ''), 
-                            'title': extract.get('title', ''), 
-                            'values' : extract.get('values', '') 
-                        })
-
-    # Appel initial sur les résultats
-    for result in results:
-        extract_recursive(result)
-
-    return extracted_data
-
-def create_get_article_instances(data):
-    get_article_instances = []
-    for item in data:
-        if 'extract_id' in item and item['extract_id'].startswith('LEGIARTI'):
-            get_article_instances.append(GetArticle(id=item['extract_id']))
-    return get_article_instances.model_dump(mode='json')
+def print_article(data) : 
+    for item in data : 
+        extracted_data = {
+        'fullSectionTitre': item['article']['fullSectionsTitre'],
+        'etat': item['article']['etat'],
+        'num':  item['article']['num'],
+        'texte': item['article']['texte'][:30]
+        }
+        print(extracted_data)
+        print("----------------------------------")
