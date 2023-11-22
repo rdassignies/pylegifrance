@@ -2,42 +2,43 @@
 # -*- coding: utf-8 -*-
 """
 Created on Mon Jun 19 11:57:20 2023
-
+Fonctions qui formatte les sorties d'une recherche en ne sélectionnant 
+que les clés choisie. Le paramètre de recherche doit être à formatter='True'
 @author: Raphaël d'Assignies
 
 """
+from typing import List, Union, Dict
+
 # TODO : à mettre dans une fichier de configuration (YAML)
-ARTICLE_KEYS = ('pathTitle', 'content', 'num', 'fullSectionsTitre', 
-                'texte','etat','VersionArticle' )
+ARTICLE_KEYS = ('pathTitle', 'content', 'num', 'fullSectionsTitre',
+                'texte', 'etat', 'VersionArticle')
 ROOT_KEYS = ('cid', 'title')
 SECTION_KEYS = ('title', 'cid')
 
 
 def formate_text_response(data,
-                          root_keys=ROOT_KEYS, 
-                          section_keys=SECTION_KEYS, 
+                          root_keys=ROOT_KEYS,
+                          section_keys=SECTION_KEYS,
                           article_keys=ARTICLE_KEYS):
     """
-    Cette fonction extrait les données du modèle de réponse ConsultTextResponse
-    (LegiPart)
+        Extrait les données de ConsultTextResponse model (LegiPart).
 
-    Parameters
-    ----------
-    data : List
-        DESCRIPTION.
-    root_keys : Tuple
-       liste des clés à la racine de la structure
-    article_keys : Tuple
-        liste des clés spécifiques à un article
-    section_keys : Tuple
-       liste des clés spécifiques à section
+        Args:
+            data (dict): dict contenant le texte et les méta données recherchés 
+            root_keys (Tuple): Liste des clés de la racine
+            section_keys (Tuple): Liste des clés pour la section
+            article_keys (Tuple): Liste des clés pour les articles.
 
-    Returns
-    -------
-    TYPE : Dict
-       Dictionnaire représentant une structure simplifiée de la structure originale
-
+        Returns:
+            Dict: Dictionnaire simplifiée, selon les clés retenues, 
+            du dictionnaire initial
     """
+    # Check if data is a list and contains more than one item
+    if isinstance(data, list):
+        if len(data) == 1:
+            data = data[0]
+    else: raise TypeError("Data must be a list or a list with a single item")
+
     # Fonction interne pour traiter récursivement les sections et articles
     def process_section(section_data):
         section_result = {}
@@ -50,12 +51,16 @@ def formate_text_response(data,
             ]
 
         # Extraire les données de la section elle-même
-        section_result['section_data'] = {key: section_data[key] for key in section_keys if key in section_data}
+        section_result['section_data'] = {key: section_data[key]
+                                          for key in section_keys
+                                          if key in section_data}
 
         # Traiter les sous-sections récursivement
         if 'sections' in section_data:
             section_result['subsections'] = [
-                process_section(subsection) for subsection in section_data['sections']
+                process_section(subsection) for subsection
+                in section_data['sections'
+                                ]
             ]
 
         return section_result
@@ -71,38 +76,39 @@ def formate_text_response(data,
     # Assembler le résultat final
     return {"root": root_data, "content": content}
 
-def formate_article_response(data, article_keys=ARTICLE_KEYS): 
+
+def formate_article_response(data: Union[List, Dict], article_keys=ARTICLE_KEYS)-> Dict:
     """
-    Cette fonction extrait les données du modèle de réponse GetArticleResponse
-    (GetArticle)
+    Extrait les données de the GetArticleResponse model (GetArticle).
 
-    Parameters
-    ----------
-    data : Dict
-        Dictionnaire comprenant l'intégralité de la réponse
-    article_keys : Tuple
-        liste des clés spécifiques à un article
+    Args:
+        data (Dict, List): Dict ou liste de dict contenant les articles et les données associées
+        article_keys (Tuple): Liste des clés spécifiques à un article à extraire
 
-    Returns
-    -------
-    simplified_dict : Dict
-        Dictionnaire représentant une structure simplifiée de la structure originale
-
+    Returns:
+        Dict: Dictionnaire simplifiée, selon les clés retenues, 
+        du dictionnaire initial
     """
-    # TODO: Vérifier si la valeur de la clé est none et l'exclure
-    simplified_dict = {}
-    # Accès à la sous-structure 'article'
-    article = data.get("article", {})
-    for key in article_keys:
-        try:
-            # Extraction de la valeur pour chaque clé
-            value = article[key]
-            simplified_dict[key] = value
-        except KeyError:
-            # Gestion du cas où la clé n'est pas trouvée
-            simplified_dict[key] = None  # ou 'raise KeyError' pour signaler l'absence de la clé
-    return simplified_dict
 
+    # Function to process a single item (used for both single items and list elements)
+    def formate_article_single(item, article_keys):
+        simplified_dict = {}
+        article = item.get("article", {})
+        for key in article_keys:
+            simplified_dict[key] = article.get(key)
+        return simplified_dict
+
+    # Check if data is a list and contains more than one item
+    if isinstance(data, list):
+        if len(data) > 1:
+            # If there are multiple items, process each one
+            return [formate_article_single(item, article_keys) for item in data]
+        elif data:
+            # If there's only one item in the list, use that
+            data = data[0]
+
+
+    return formate_article_single(data, article_keys)
 
 
 def print_legal_hierarchy(legal_list):

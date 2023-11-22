@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 Created on Mon Jun 19 11:57:20 2023
-
+Fonctions qui traite les résultats renvoyés par l'API legifrance
 @author: Raphaël d'Assignies
 """
 
@@ -12,67 +12,68 @@ from models.consult import GetArticle, LegiPart
 import logging
 
 
-logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.DEBUG, format="%(asctime)s - %(name)s -"
+                                                " %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 
-def search_response_DTO(results:Union[dict, str]):
+def search_response_DTO(results: Union[dict, str]):
     """
-    Cette fonction extrait les données du modèle de réponse SearchResponseDTO
-    (RechercheFinal)
+    Cette fonction extrait les données de SearchResponseDTO model
+    (RechercheFinal).
 
-    Parameters
-    ----------
-    results : Dict
-        Dictionnaire des résultats (clé 'results') renvoyé par l'API Legifrance
+    Args:
+        results (Dict): Dict de résultats (clé 'results') renvoyé 
+        par l'API Legifrance
 
-    Returns
-    -------
-    extracted_data : List
-        Retourne une liste à plat des différents ids (text, section, article)
-
+    Returns:
+        extracted_data (List): renvoir une liste (text, section, article).
     """
+
     if isinstance(results, str):
-       try:
-           # Essayer de parser data en tant que JSON
-           results = json.loads(results)
-       except json.JSONDecodeError:
-           raise ValueError("La chaîne 'results' n'est pas un JSON valide.")
+        try:
+            # Essayer de parser data en tant que JSON
+            results = json.loads(results)
+        except json.JSONDecodeError:
+            raise ValueError("results must be a valid JSON.")
 
     elif not isinstance(results, dict):
-       raise TypeError("Le paramètre 'results' doit être un dictionnaire ou une chaîne JSON.")
+        raise TypeError("results must be a valid dict")
+    
+    def get_with_default(dictionary, key, default=''):
+        value = dictionary.get(key)
+        return value if value is not None else default
 
-    
     extracted_data = []
-    
+
     # Fonction récursive pour parcourir les éléments
     def extract_recursive(element):
         # Extraire les données de 'titles' si elles existent
         if 'titles' in element:
             for title in element['titles']:
                 extracted_data.append({
-                    'title_id': title.get('id', ''),
-                    'title_cid': title.get('cid', ''),
-                    'title': title.get('title', '')
+                    'title_id': get_with_default(title, 'id'),
+                    'title_cid': get_with_default(title, 'cid'),
+                    'title': get_with_default(title, 'title')
                 })
 
         # Extraire les données de 'sections' si elles existent
         if 'sections' in element:
             for section in element['sections']:
                 extracted_data.append({
-                    'section_id': section.get('id', ''),
-                    'title': section.get('title', ''),
+                    'section_id': get_with_default(section, 'id'),
+                    'title': (section, 'title'),
                 })
                 # Appel récursif pour les extracts dans les sections
                 if 'extracts' in section:
                     for extract in section['extracts']:
                         extracted_data.append({
-                            'extract_id': extract.get('id', ''),
-                            'num': extract.get('num', ''),
-                            'legal_status': extract.get('legalStatus', ''),
-                            'date_version': extract.get('dateVersion', ''),
-                            'title': extract.get('title', ''),
-                            'values': extract.get('values', '')
+                            'extract_id': get_with_default(extract, 'id'),
+                            'num': get_with_default(extract, 'num'),
+                            'legal_status': get_with_default(extract, 'legalStatus'),
+                            'date_version': get_with_default(extract, 'dateVersion'),
+                            'title': get_with_default(extract, 'title'),
+                            'values': get_with_default(extract, 'values')
                         })
 
     # Appel initial sur les résultats
@@ -81,67 +82,79 @@ def search_response_DTO(results:Union[dict, str]):
 
     return extracted_data
 
-def get_text_id(data) : 
+
+def get_text_id(data):
     """
-    
+    Cette fonction extrait le ou les identifiant d'un texte (LEGITEXT)
+    des résultats d'une recherche.
 
-    Parameters
-    ----------
-    data : TYPE
-        DESCRIPTION.
+    Args:
+        data (Dict): Résultat de la recherche de l'API Legifrance
+        (ExtractSearchResult from search_response_DTO).
 
-    Raises
-    ------
-    GetTextIdError
-        DESCRIPTION.
+    Raises:
+        GetTextIdError: Renvoi une exception si aucun LEGITEXT trouvé
 
-    Returns
-    -------
-    None.
-
+    Returns:
+        LegiPart(BaseModel): Les ids LEGITEXT.
     """
-    # Log des informations de traitement
-    logger.debug("GetArticleInstances : RECUPERATION DES LEGIARTI -------------")
-    
+    # Logging processing information
+    logger.debug("get_text_id: RETRIEVING LEGITEXT --------")
     text_ids = []
     for item in data:
 
         if 'title_id' in item and item['title_id'].startswith('LEGITEXT'):
             text_ids.append(LegiPart(textId=item['title_id']))
-    
-    logger.debug(f"Taille des données contenant les LEGITEXT :{len(text_ids)}")
-    
+
+    logger.debug(f"Size of data containing LEGITEXT: {len(text_ids)}")
+
     if not text_ids:
-        raise GetTextIdError("La liste GetText est vide" 
-                             "- Aucun LEGITEXT trouvé dans les données."
-                             "Vérifier les critères de recherche.")
+        raise GetTextIdError("The GetText list is empty"
+                             "- No LEGITEXT found in the data."
+                             "Check search criteria.")
     return text_ids
 
-def get_article_id(data): 
-       # Log des informations de traitement
-    logger.debug("GetArticleInstances : RECUPERATION DES LEGIARTI -------------")
-    
+
+def get_article_id(data):
+    """
+    Cette fonction extrait les identifiants des articles (LEGIARTI)
+    des résultats d'une recherche.
+
+    Args:
+        data (Dict): Résultat de la recherche de l'API Legifrance
+        (ExtractSearchResult from search_response_DTO).
+
+    Raises:
+        GetArticleIdError: Renvoi une exception si aucun LEGIARTI trouvé
+
+    Returns:
+        LegiPart(BaseModel): Les ids LEGIARTI.
+    """
+
+    # Logging processing information
+    logger.debug("get_article_id: RETRIEVING LEGIARTI ---------")
+
     article_ids = []
     for item in data:
         if 'extract_id' in item and item['extract_id'].startswith('LEGIARTI'):
             article_ids.append(GetArticle(id=item['extract_id']))
-       
-    logger.debug(f"Taille des données contenant les LEGIARTI : {len(article_ids)}")
-    
+
+    logger.debug("Size of data containing "
+                 f"LEGIARTI: {len(article_ids)}")
+
     if not article_ids:
-        raise GetArticleIdError("La liste GetArticle est vide" 
-                                       "- Aucun LEGIARTI trouvé dans les données."
-                                       "Vérifier les critères de recherche.")
-    
+        raise GetArticleIdError("The GetArticle list is empty"
+                                "- No LEGIARTI found in the data."
+                                "Check search criteria.")
+
     return article_ids
 
 
 class GetArticleIdError(Exception):
-    """Exception levée lorsque la liste GetArticle est vide."""
+    """Lève une exception si LEGIARTI list est vide."""
     pass
+
 
 class GetTextIdError(Exception):
-    """Exception levée lorsque la liste GetLegiPart est vide."""
+    """Lève une exception si LEGITEXT list est vide."""
     pass
-
-    
