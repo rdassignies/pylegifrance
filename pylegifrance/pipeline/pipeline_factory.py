@@ -8,7 +8,7 @@ Ce script créé les pipelines associés aux recherches
 from typing import Union, List
 import logging
 
-from pipeline import (
+from .pipeline import (
     Pipeline, CallApiStep, ExtractSearchResult,
     GetArticleId, GetTextId, Formatters
     )
