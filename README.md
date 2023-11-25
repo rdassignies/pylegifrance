@@ -119,8 +119,7 @@ client = LegiHandler(legifrance_api_key=os.getenv("LEGIFRANCE_CLIENT_ID"), legif
 art_7_cciv = recherche_CODE(client=client, code_name="Code civil", search="7")
 
 # Obtenir l'article 7 du Code civil en ne sélectionnant que certains champs spécifiques
-
-art_7_cciv = recherche_CODE(client=client, code_name="Code civil", search="7", formatter=True)
+art_7_cciv_abstract = recherche_CODE(client=client, code_name="Code civil", search="7", formatter=True)
 
 
 # Obtenir l'intégralité du Code civil
@@ -161,8 +160,7 @@ loi_7817 = recherche_LODA(client=client, text="78-17")
 art_surete = recherche_LODA(client=client,  text="78-17", search="autorité", champ="ALL")
 
 # Rechercher le mot "autorité" dans tous les contenus de la loi informatique et libertés en ne sélectionnant que certains champs spécifiques (formatter=True)
-
-art_surete = recherche_LODA(client=client,  text="78-17", search="autorité", champ="ALL", formatter=True)
+art_surete_abstract = recherche_LODA(client=client,  text="78-17", search="autorité", champ="ALL", formatter=True)
 ```
 La fonction recherche LODA permt la recherche dans le fond LODA (LODA_DATE, LODA_ETAT) d'un texte par son numéro, d'un article dans un texte spécifique, ou d'un terme de recherche dans les champs d'un texte.
 Cette fonction ne récupère que les textes en vigueur à la date actuelle. 
