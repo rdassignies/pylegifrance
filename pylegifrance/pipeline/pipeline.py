@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Script qui gère les pipelines permettant d'extraire les informations retournées par 
-l'API Legifrance
+Classe permettant de gérer un pipeline générique de traitement des résultats
+renvoyés par l'API Legifrance. 
 
 @author: Raphael d'Assignies'
 """
@@ -18,8 +18,10 @@ from process.processors import (search_response_DTO,
 
 from process.formatters import formate_text_response, formate_article_response
 
-loglevel = os.getenv("LOG_LEVEL")
-logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+# Charger le niveau de logging à partir des variables d'environnement
+logging_level = os.getenv('LOG_LEVEL', 'INFO').upper()
+
+logging.basicConfig(level=logging_level, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
 

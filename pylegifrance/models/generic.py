@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 Created on Thu Nov 16 10:07:49 2023
-Generic Models for legifrance API
+Modèles génériques de l'API legifrance
 
 @author: raphael
 """

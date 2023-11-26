@@ -7,17 +7,6 @@ import time
 import os
 
 from requests_oauthlib import OAuth2Session
-from dotenv import load_dotenv
-
-
-
-# TODO: ajouterload env pour les var d'environnements
-
-load_dotenv()
-# client_id = os.getenv("LEGIFRANCE_CLIENT_ID")
-# client_secret = os.getenv("LEGIFRANCE_CLIENT_SECRET")
-_API_HOST = ''
-_TOKEN_URL = 'https://oauth.piste.gouv.fr/api/oauth/token'
 
 
 class LegiHandler:
@@ -31,16 +20,19 @@ class LegiHandler:
 
         Parameters
         ----------
-        legifrance_api_key : TYPE, optional
-            DESCRIPTION. The default is os.getenv("LEGIFRANCE_CLIENT_ID").
-        legifrance_api_secret : TYPE, optional
-            DESCRIPTION. The default is os.getenv("LEGIFRANCE_CLIENT_SECRET").
-
+        legifrance_api_key : str, optional
+            Clé API Legifrance. Par défaut, os.getenv("LEGIFRANCE_CLIENT_ID").
+        legifrance_api_secret : str, optional
+            Secret API Legifrance. Par défaut, os.getenv("LEGIFRANCE_CLIENT_SECRET").
         Returns
         -------
         None.
 
         """
+        # Vérifie si les variables d'environnement sont chargées
+        if not legifrance_api_key or not legifrance_api_secret:
+            raise ValueError("Les clés d'API Legifrance ne sont "
+                             "pas définies dans les variables d'environnement.")
 
         self.token = ''
         self.client_id = legifrance_api_key

@@ -2,11 +2,13 @@
 # -*- coding: utf-8 -*-
 """
 Created on Sun Nov 12 19:17:02 2023
-Ce script créé les pipelines associés aux recherches
+Atelier de création des fonctions de recherche dans les différents fonds
+legifrance et autres. 
 @author: Raphaël d'Assignies
 """
 from typing import Union, List
 import logging
+import os
 
 from .pipeline import (
     Pipeline, CallApiStep, ExtractSearchResult,
@@ -20,7 +22,10 @@ from models.search import (
     Operateur, ChampsCODE, FacettesCODE, FacettesLODA
     )
 
-logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+# Charger le niveau de logging à partir des variables d'environnement
+logging_level = os.getenv('LOG_LEVEL', 'INFO').upper()
+
+logging.basicConfig(level=logging_level, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
 
@@ -100,6 +105,9 @@ def recherche_CODE(client:LegiHandler,
                           )
 
     # Construction de la requête finale (payload)
+    
+    # Astuce qui permet de valider le fond recherché 
+    fond_cible=Fond(fond=fond)
     initial_data = RechercheFinal(recherche=recherche, fond=fond)
 
     logger.debug("---------- Payload -------------")
@@ -112,18 +120,18 @@ def recherche_CODE(client:LegiHandler,
         GetArticleId(),
         CallApiStep(client),
     ]
-    # If search=='' get textid instead
+    # Sisearch=='' récupérer le textid à la place
     if not search:
         pipeline_steps[2] = GetTextId()
 
-    # Add a formatter if True
+    # Ajoute un formatter si demandé
     if formatter:
         pipeline_steps.append(Formatters())
 
     # Instanciation de Pipeline
     pl = Pipeline(pipeline_steps)
 
-    # exécution du pipeline
+    # Exécution du pipeline
     result = pl.execute(data=initial_data)
 
     return result
