@@ -29,7 +29,7 @@ logging.basicConfig(level=logging_level, format='%(asctime)s - %(name)s - %(leve
 logger = logging.getLogger(__name__)
 
 
-def recherche_CODE(client:LegiHandler,
+def recherche_CODE(
                    code_name: str,
                    search: str = '',
                    champ: str = 'NUM_ARTICLE',
@@ -79,6 +79,9 @@ def recherche_CODE(client:LegiHandler,
     """
     logger.debug(f"SEARCH : {search} - {type(search)}")
 
+    # Initialisation du client (singleton)
+    client=LegiHandler()
+    
     # TODO: ajouter la possibilité de rapatrier un code dans son intégralité si search=None
     # Création des critères de recherche
     
@@ -137,7 +140,7 @@ def recherche_CODE(client:LegiHandler,
     return result
 
 
-def recherche_LODA(client: LegiHandler,
+def recherche_LODA(
                    text: str,
                    search: str = None,
                    champ: str = 'NUM_ARTICLE',
@@ -188,7 +191,9 @@ def recherche_LODA(client: LegiHandler,
     Returns:
         Dict: Soit un texte intégral soit un ou plusieurs articles correspondant à la recherche.
     """
-
+    # Initialisation du client (singleton)
+    client=LegiHandler()
+    
     # Création des critères de recherche
     critere_text = [Critere(valeur=text,
                             typeRecherche="EXACTE",

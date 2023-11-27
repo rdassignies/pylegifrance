@@ -12,7 +12,6 @@
 [![Issues][issues-shield]][issues-url]
 [![MIT License][license-shield]][license-url]
 [![LinkedIn][linkedin-shield]][linkedin-url]
-
 -->
 
 <br />
@@ -74,7 +73,7 @@
 
 https://www.legalgpt.eu
 
-Librairie python qui simplifie l'interrogation des contenus de legifrance en créant des fonctions pythons prêtes à l'emploi pour faciliter la recherche ou la consultation de textes légaux et réglementaires.  
+Librairie python qui simplifie l'interrogation des contenus de legifrance en créant des fonctions pythons prêtes à l'emploi pour la recherche ou la consultation de textes légaux et réglementaires.  
 Elle repose sur l'utilisation de pydantic pour gérer les structures de données d'interrogation et de réponse de l'API legifrance. 
 
 
@@ -90,21 +89,18 @@ Pour obtenir votre accès à l'API legifrance (clé API et secret), vous devez v
 
 ### Installation
 
-Vous pouvez stocker les clés dans des variables d'environnement: 
+Vous devez stocker les clés dans des variables d'environnement manuellement ou en utilisant python-dotenv (par exemple): 
 : 
   ```py
   export LEGIFRANCE_CLIENT_ID="..."
   export LEGIFRANCE_CLIENT_SECRET="..."
   ```
-
-ou les passer directement au client: 
-
+ou
 ```py
-from pylegifrance import LegiHandler
-
-client = LegiHandler(legifrance_api_key="...",
-                     legifrance_api_secret="...")
+from dotenv import load_dotenv
+load_dotenv()
 ```
+
 <!-- USAGE EXAMPLES -->
 ## Usage
 
@@ -112,22 +108,20 @@ client = LegiHandler(legifrance_api_key="...",
 Pour la liste des codes disponibles : https://www.legifrance.gouv.fr/liste/code?etatTexte=VIGUEUR
 
 ```py
-from pylegifrance import LegiHandler, recherche_CODE
-
-client = LegiHandler(legifrance_api_key=os.getenv("LEGIFRANCE_CLIENT_ID"), legifrance_api_secret=os.getenv("LEGIFRANCE_CLIENT_SECRET"))
+from pylegifrance import recherche_CODE
 
 # Obtenir l'article 7 du Code civil
-art_7_cciv = recherche_CODE(client=client, code_name="Code civil", search="7")
+art_7_cciv = recherche_CODE(code_name="Code civil", search="7")
 
 # Obtenir l'article 7 du Code civil en ne sélectionnant que certains champs spécifiques
-art_7_cciv_abstract = recherche_CODE(client=client, code_name="Code civil", search="7", formatter=True)
+art_7_cciv_abstract = recherche_CODE(code_name="Code civil", search="7", formatter=True)
 
 
 # Obtenir l'intégralité du Code civil
-code_civil = recherche_CODE(client=client, code_name="Code civil")
+code_civil = recherche_CODE(code_name="Code civil")
 
 # Rechercher le mot "sûreté" dans les articles du Code civil
-art_surete = recherche_CODE(client=client, code_name="Code civil", search="sûreté", champ="ARTICLE")
+art_surete = recherche_CODE(code_name="Code civil", search="sûreté", champ="ARTICLE")
 
 ```
 
@@ -147,28 +141,27 @@ Pour plus de détails, se référer à la documentation de la fonction.
 
 ### Recherche dans le fond LODA
 ```py
-from pylegifrance import LegiHandler, recherche_LODA
+from pylegifrance import recherche_LODA
 
-client = LegiHandler(legifrance_api_key=os.getenv("LEGIFRANCE_CLIENT_ID"), legifrance_api_secret=os.getenv("LEGIFRANCE_CLIENT_SECRET"))
 
 # Obtenir l'article 9 de la loi informatique et libertés
-art_9_7817 = recherche_LODA(client=client, text="78-17", search="9")
+art_9_7817 = recherche_LODA(text="78-17", search="9")
 
 # Obtenir l'intégralité de la loi informatique et libertés
-loi_7817 = recherche_LODA(client=client, text="78-17")
+loi_7817 = recherche_LODA(text="78-17")
 
 # Rechercher le mot "autorité" dans tous les contenus de la loi informatique et libertés
-art_surete = recherche_LODA(client=client,  text="78-17", search="autorité", champ="ALL")
+art_surete = recherche_LODA(text="78-17", search="autorité", champ="ALL")
 
 # Rechercher le mot "autorité" dans tous les contenus de la loi informatique et libertés en ne sélectionnant que certains champs spécifiques (formatter=True)
-art_surete_abstract = recherche_LODA(client=client,  text="78-17", search="autorité", champ="ALL", formatter=True)
+art_surete_abstract = recherche_LODA(text="78-17", search="autorité", champ="ALL", formatter=True)
 ```
-La fonction recherche LODA permt la recherche dans le fond LODA (LODA_DATE, LODA_ETAT) d'un texte par son numéro, d'un article dans un texte spécifique, ou d'un terme de recherche dans les champs d'un texte.
+La fonction recherche LODA permet la recherche dans le fond LODA (LODA_DATE, LODA_ETAT) d'un texte par son numéro, d'un article dans un texte spécifique, ou d'un terme de recherche dans les champs d'un texte.
 Cette fonction ne récupère que les textes en vigueur à la date actuelle. 
 Par défaut, la facette "DATE_VERSION" est définie sur la date du jour, et les facettes "TEXT_LEGAL_STATUS" et "ARTICLE_LEGAL_STATUTS" sont définies sur "VIGEUR", quel que soit le fond cible (LODA_DATE ou LODA_ETAT).
 
 Attention : Il est de la responsabilité exclusive de l'utilisateur de vérifier que les informations renvoyées par l'API sont pertinentes et à jour.
-Certains paramètres comme "sort" ou "typepagination" ne sont pas encore accessibles (voir models.search pour plus de détails et roadmap *infra*).
+Certains paramètres comme "sort" ou "typepagination" ne sont pas encore accessibles (roadmap *infra*).
 
 Pour plus de détails, se référer à la documentation de la fonction. 
 <!-- ROADMAP -->
@@ -176,6 +169,7 @@ Pour plus de détails, se référer à la documentation de la fonction.
 
 - [ ] Ajout des fonctions recherche_JURI, rechercher_CETAT, KALI,...
 - [ ] Ajout de l'intégralité des paramètres dans les recherches
+- [ ] Ajout d'un fichier de configuration permettant de paramètrer le formatter
 - [ ] Implémentation des fonctions suggest, consult et list
 
 See the [open issues](https://github.com/rdassignies/pylegifrance/issues) for a full list of proposed features (and known issues).

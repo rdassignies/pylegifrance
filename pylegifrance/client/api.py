@@ -11,12 +11,19 @@ from requests_oauthlib import OAuth2Session
 
 class LegiHandler:
 
-    def __init__(
-                 self,
-                 legifrance_api_key=os.getenv("LEGIFRANCE_CLIENT_ID"),
-                 legifrance_api_secret=os.getenv("LEGIFRANCE_CLIENT_SECRET")
-                 ):
+    _instance = None
+
+    def __new__(cls, *args, **kwargs):
+        if cls._instance is None:
+            cls._instance = super(LegiHandler, cls).__new__(cls)
+            # Initialisation de l'instance unique
+            cls._instance._initialize(*args, **kwargs)
+        return cls._instance
+
+    def _initialize(self, legifrance_api_key=os.getenv("LEGIFRANCE_CLIENT_ID"),
+                    legifrance_api_secret=os.getenv("LEGIFRANCE_CLIENT_SECRET")):
         """
+        Initialisation interne de l'instance unique.
 
         Parameters
         ----------
@@ -31,7 +38,7 @@ class LegiHandler:
         """
         # Vérifie si les variables d'environnement sont chargées
         if not legifrance_api_key or not legifrance_api_secret:
-            raise ValueError("Les clés d'API Legifrance ne sont "
+            raise ValueError("Les clés de l'API Legifrance ne sont "
                              "pas définies dans les variables d'environnement.")
 
         self.token = ''
