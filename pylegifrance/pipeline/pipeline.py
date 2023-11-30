@@ -12,11 +12,10 @@ import logging
 import json
 import os
 
-from models.consult import GetArticle, LegiPart
-from process.processors import (search_response_DTO,
+from pylegifrance.models.consult import GetArticle, LegiPart
+from pylegifrance.process.processors import (search_response_DTO,
                                 get_article_id, get_text_id)
-
-from process.formatters import formate_text_response, formate_article_response
+from pylegifrance.process.formatters import formate_text_response, formate_article_response
 
 # Charger le niveau de logging à partir des variables d'environnement
 logging_level = os.getenv('LOG_LEVEL', 'INFO').upper()

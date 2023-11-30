@@ -13,7 +13,7 @@ from datetime import datetime
 
 
 from pydantic import BaseModel, Field, field_validator
-from models.generic import (Operateur, TypeChamp,
+from pylegifrance.models.generic import (Operateur, TypeChamp,
                             Fonds,  TypeFacettes, TypeRecherche,
                             CodeNom
                             )
@@ -42,6 +42,14 @@ class ChampsLODA(Enum):
     TRAVAUX_PREP = "TRAVAUX_PREP"
     SIGNATURE = "SIGNATURE"
     NOTA = "NOTA"
+
+class ChampsJURI(Enum): 
+    ALL = "ALL"
+    TITLE = "TITLE"
+    ABSTRAT = "ABSTRAT"
+    TEXTE = "TEXTE"
+    RESUMES = "RESUMES"
+    NUM_AFFAIRE = "NUM_AFFAIRE"
 
 # Facettes autorisées pour CODE, LODA ... 
 class FacettesCODE(Enum):
@@ -103,6 +111,7 @@ class EtatTextFiltre(BaseModel):
 class EtatArticleFiltre(BaseModel):
     facette: TypeFacettes = TypeFacettes.ARTICLE_LEGAL_STATUS
     valeur: str = "VIGUEUR"
+
 
 
 class Recherche(BaseModel):
@@ -175,6 +184,10 @@ class RechercheFinal(BaseModel):
                if champ.typeChamp.value not in ChampsLODA.__members__:
                    raise ValueError(f"TypeChamp {champ.typeChamp} "
                                     "is not valide for le fond {fond}")
+            if fond in ['JURI']:
+                if champ.typeChamp.value not in ChampsJURI.__members__:
+                    raise ValueError(f"TypeChamp {champ.typeChamp} "
+                                     "is not valide for le fond {fond}")
         return v
 
     @field_validator('recherche')

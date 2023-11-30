@@ -8,8 +8,9 @@ Fonctions qui traite les résultats renvoyés par l'API legifrance
 
 from typing import Union
 import json
-from models.consult import GetArticle, LegiPart
 import logging
+
+from pylegifrance.models.consult import GetArticle, LegiPart
 
 
 logging.basicConfig(level=logging.DEBUG, format="%(asctime)s - %(name)s -"

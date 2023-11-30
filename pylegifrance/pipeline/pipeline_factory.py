@@ -8,14 +8,15 @@ legifrance et autres.
 """
 from typing import Union, List
 import logging
-import os
-
-from .pipeline import (
+import os, inspect
+# from dotenv import load_dotenv
+# load_dotenv()
+from pylegifrance.pipeline.pipeline import (
     Pipeline, CallApiStep, ExtractSearchResult,
     GetArticleId, GetTextId, Formatters
     )
-from client.api import LegiHandler
-from models.search import (
+from pylegifrance.client.api import LegiHandler
+from pylegifrance.models.search import (
     Critere, Champ, NomCodeFiltre, NatureFiltre, DateVersionFiltre,
     EtatTextFiltre, EtatArticleFiltre, Fond, 
     Recherche, RechercheFinal, TypeRecherche,
@@ -60,7 +61,6 @@ def recherche_CODE(
       code_name="Code civil", champ="ARTICLE"
 
     Args:
-        client (LegiHandler): Client pour se connecter à l'API Legifrance.
         code_name (str): Nom du Code (ex. "Code civil").
         search (str, optional): Terme recherché dans un champ spécifique du code.
         champ (str, optional): Type de champ de recherche, par défaut 'NUM_ARTICLE'. 
@@ -80,8 +80,10 @@ def recherche_CODE(
     logger.debug(f"SEARCH : {search} - {type(search)}")
 
     # Initialisation du client (singleton)
-    client=LegiHandler()
-    
+    client = LegiHandler()
+    logger.info(f"INFO CLIENT :  {type(client)}, {dir(client)}")
+    client.set_api_keys()
+        
     # TODO: ajouter la possibilité de rapatrier un code dans son intégralité si search=None
     # Création des critères de recherche
     
@@ -172,7 +174,6 @@ def recherche_LODA(
       text="78-17", search="autorité", champ="ALL"
 
     Args:
-        client (LegiHandler): Client pour se connecter à l'API Legifrance.
         text (str): Numéro de texte (ex. "78-17").
         search (str, optional): Terme(s) de recherche. Par défaut est None.
         champ (str, optional): Type de champ de recherche, par défaut 'NUM_ARTICLE'. 
@@ -193,6 +194,8 @@ def recherche_LODA(
     """
     # Initialisation du client (singleton)
     client=LegiHandler()
+    client.set_api_keys()
+    print("ADRESSE DU CLIENT DS RECHERCHE LODA: ", id(client))
     
     # Création des critères de recherche
     critere_text = [Critere(valeur=text,
@@ -264,10 +267,62 @@ def recherche_LODA(
     return result
 
 
-def recherche_JURI():
+def recherche_JURI(
+                    search: str = None,
+                    champ: str = 'ALL',
+                    type_recherche: str = "EXACTE",
+                    fond: str = "JURI",
+                    formatter: bool = False,
+                    page_number: int = 1,
+                    page_size: int = 10,
+                    *args):
     # TODO: à implémenter
-    pass
+   
+    # Initialisation du client (singleton)
+    client=LegiHandler()
+    client.set_api_keys()
+    
+    # Création des critères de recherche
+    critere = [Critere(valeur=search,
+                       typeRecherche="EXACTE",
+                       operateur="ET")]
+    
+    fields = [Champ(typeChamp=champ,
+                    criteres=critere,
+                    operateur="ET")]
+    
+    # Construction des paramètres de la recherche
+    recherche = Recherche(champs=fields,
+                          filtres=[],
+                          pageNumber=page_number,
+                          pageSize=page_size
+                         )
+    
+    # Astuce qui permet de valider le fond recherché 
+    fond_cible=Fond(fond=fond)
 
+    initial_data = RechercheFinal(recherche=recherche, fond=fond)
+
+    logger.debug("---------- Payload -------------")
+    logger.debug(initial_data.model_dump(mode='json'))
+
+    # Initialisation des étapes du pipeline
+    pipeline_steps = [
+        CallApiStep(client)
+    ]
+
+    # Ajoute un formatter si True
+    if formatter:
+        pipeline_steps.append(Formatters())
+
+    # Instanciation de Pipeline
+    pl = Pipeline(pipeline_steps)
+
+    # Exécution du pipeline
+    result = pl.execute(data=initial_data, data_type='')
+
+    return result
+    
 
 def recherche_CETAT():
     # TODO: à implémenter

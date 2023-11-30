@@ -20,34 +20,58 @@ class LegiHandler:
             cls._instance._initialize(*args, **kwargs)
         return cls._instance
 
-    def _initialize(self, legifrance_api_key=os.getenv("LEGIFRANCE_CLIENT_ID"),
-                    legifrance_api_secret=os.getenv("LEGIFRANCE_CLIENT_SECRET")):
+    def _initialize(self):
         """
         Initialisation interne de l'instance unique.
+
+        Returns
+        -------
+        LegiHandler.
+
+        """
+        self.client_id = None
+        self.client_secret = None
+        self.token = ''
+        self.token_url= 'https://oauth.piste.gouv.fr/api/oauth/token'
+        self.api_url = 'https://api.piste.gouv.fr/dila/legifrance/lf-engine-app/'
+
+    def set_api_keys(self, legifrance_api_key=None, legifrance_api_secret=None):
+       """
+        Définit ou met à jour les clés API pour l'instance.
+
+        Si les clés ne sont pas fournies, la méthode utilise les valeurs 
+        actuelles, si elles existent.
+        Si les valeurs actuelles n'existent pas, elle tente de les 
+        récupérer à partir des variables d'environnement.
 
         Parameters
         ----------
         legifrance_api_key : str, optional
-            Clé API Legifrance. Par défaut, os.getenv("LEGIFRANCE_CLIENT_ID").
+            Clé API Legifrance. Si None, conserve la valeur actuelle 
+            ou tente de la récupérer depuis la variable d'environnement.
         legifrance_api_secret : str, optional
-            Secret API Legifrance. Par défaut, os.getenv("LEGIFRANCE_CLIENT_SECRET").
-        Returns
-        -------
-        None.
-
+            Secret API Legifrance. Si None, conserve la valeur actuelle 
+            ou tente de le récupérer depuis la variable d'environnement.
         """
-        # Vérifie si les variables d'environnement sont chargées
-        if not legifrance_api_key or not legifrance_api_secret:
-            raise ValueError("Les clés de l'API Legifrance ne sont "
-                             "pas définies dans les variables d'environnement.")
+        
+      # Utiliser les clés existantes si de nouvelles clés ne sont pas fournies
+       if legifrance_api_key is None:
+            legifrance_api_key = self.client_id if self.client_id else os.getenv("LEGIFRANCE_CLIENT_ID")
+       if legifrance_api_secret is None:
+            legifrance_api_secret = self.client_secret if self.client_secret else os.getenv("LEGIFRANCE_CLIENT_SECRET")
 
-        self.token = ''
-        self.client_id = legifrance_api_key
-        self.client_secret = legifrance_api_secret
-        self.token_url= 'https://oauth.piste.gouv.fr/api/oauth/token'
-        self.api_url = 'https://api.piste.gouv.fr/dila/legifrance/lf-engine-app/'
-        self.time_token = time.time()
-        self._get_access()
+       if not legifrance_api_key or not legifrance_api_secret:
+           print("client_id dans les paramètrse et le test: ",legifrance_api_key )
+
+           raise ValueError("Les clés de l'API Legifrance ne sont pas présentes")
+           
+       # Vérifie si les nouvelles clés sont différentes des clés existantes
+       if (self.client_id != legifrance_api_key or
+            self.client_secret != legifrance_api_secret):
+            self.client_id = legifrance_api_key
+            self.client_secret = legifrance_api_secret
+            self._get_access()  # Renouveler le token uniquement si les clés ont changé
+
 
     def _get_access(self, attempts=3, delay=5):
 
@@ -62,6 +86,7 @@ class LegiHandler:
             response = requests.post(self.token_url, data=data)
             if 200 <= response.status_code < 300:
                 token = response.json().get('access_token')
+                self.time_token = time.time()
                 self.token = token
                 self.expires_in = response.json().get('expires_in')
                 self.client = OAuth2Session(self.client_id, token=token)

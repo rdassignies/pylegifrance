@@ -6,45 +6,44 @@ Fonctions de test pour la recherche
 @author: raphael
 """
 import os
-from pipeline.pipeline import (
+
+from pylegifrance.pipeline.pipeline import (
     Pipeline, CallApiStep, ExtractSearchResult, 
     GetArticleId, GetTextId, Formatters
     )
-from client import api
-from pipeline.pipeline_factory import recherche_CODE, recherche_LODA
-from process.formatters import formate_article_response, formate_text_response
+from pylegifrance.pipeline.pipeline_factory import recherche_CODE, recherche_LODA
+from pylegifrance.process.formatters import formate_article_response, formate_text_response
 
-client = api.LegiHandler(legifrance_api_key=os.getenv("LEGIFRANCE_CLIENT_ID"),
- legifrance_api_secret=os.getenv("LEGIFRANCE_CLIENT_SECRET"))
+
 
 def test_recherche_CODE_valide(client): 
     
-    recherche_CODE(client, nom_code="Code civil", search="7")
+    recherche_CODE(code_name="Code civil", search="7")
     
    
 
 def test_recherche_LODA_1article(client): 
 
-    loda_search_article = recherche_LODA(client=client, text='78-17', search='7')
+    loda_search_article = recherche_LODA(text='78-17', search='7')
     print(formate_article_response(loda_search_article))
 
 def test_recherche_LODA_1text(client): 
 
-    loda_search_text = recherche_LODA(client=client, text='78-17')
+    loda_search_text = recherche_LODA(text='78-17')
     print(formate_text_response(loda_search_text))
 
 def test_recherche_LODA_term(client): 
-    loda_search_empty_num_article = recherche_LODA(client=client,
+    loda_search_empty_num_article = recherche_LODA(
                                                    text='78-17',
                                                    search='poursuite',
                                                    champ='ALL')
 
 def test_recherche_LODA_empty_text(client): 
-    loda_search_empty_text = recherche_LODA(client=client, search='autorité')
+    loda_search_empty_text = recherche_LODA(search='autorité')
     
     
 def test_recherche_LODA_wrong_field(client): 
-    loda_search_empty_num_article = recherche_LODA(client=client,
+    loda_search_empty_num_article = recherche_LODA(
                                                    text='78-17',
                                                    search='poursuite',
                                                    champ='RAISON SOCIALE')
@@ -59,15 +58,13 @@ def test_recherche_LODA_wrong_fond(client):
 
 def test_recherche_CODE_1article(client): 
 
-    code_search_article = recherche_CODE(client=client,
-                                         code_name="Code civil",
+    code_search_article = recherche_CODE(code_name="Code civil",
                                          search='1200',
                                          formatter=True)   
 
 def test_recherche_CODE_all(client): 
 
-    code_all = recherche_CODE(client=client,
-                              code_name="Code civil",
+    code_all = recherche_CODE(code_name="Code civil",
                               formatter=True)
 
 def test_recherche_CODE_term(client): 
