@@ -95,11 +95,13 @@ Vous devez stocker les clés dans des variables d'environnement manuellement ou 
   export LEGIFRANCE_CLIENT_ID="..."
   export LEGIFRANCE_CLIENT_SECRET="..."
   ```
-ou
+sinon vous pouvez initialiser le client manuellement
 ```py
-from dotenv import load_dotenv
-load_dotenv()
+  from pylegifrance import LegiHandler
+  client = LegiHandler()
+  client.set_api_keys(legifrance_api_key=<votre clé>, legifrance_api_secret=<votre secret>)
 ```
+
 
 <!-- USAGE EXAMPLES -->
 ## Usage
