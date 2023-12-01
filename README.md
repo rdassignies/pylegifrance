@@ -114,16 +114,16 @@ Pour la liste des codes disponibles : https://www.legifrance.gouv.fr/liste/code?
 from pylegifrance import recherche_CODE
 
 # Obtenir l'article 7 du Code civil
-art_7_cciv = recherche_CODE(code_name="Code civil", search="7")
+recherche_CODE(code_name="Code civil", search="7")
 
 # Obtenir l'article 7 du Code civil en ne sélectionnant que certains champs spécifiques
-art_7_cciv_abstract = recherche_CODE(code_name="Code civil", search="7", formatter=True)
+recherche_CODE(code_name="Code civil", search="7", formatter=True)
 
 # Obtenir l'intégralité du Code civil
-code_civil = recherche_CODE(code_name="Code civil")
+recherche_CODE(code_name="Code civil")
 
 # Rechercher le mot "sûreté" dans les articles du Code civil
-art_surete = recherche_CODE(code_name="Code civil", search="sûreté", champ="ARTICLE")
+recherche_CODE(code_name="Code civil", search="sûreté", champ="ARTICLE")
 
 ```
 La fonction recherche_CODE permet la recherche dans le fond CODE (CODE_DATE, CODE_ETAT) d'un article par son numéro, d'un terme de recherche ou d'un code dans son intégralité.
