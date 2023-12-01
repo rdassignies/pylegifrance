@@ -30,11 +30,7 @@ logging_level = config['logging']['level']
 logging.basicConfig(level=logging_level, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-# A supprimer en production
 
-print("Configuration du logging level dans pipeline:", logging_level)
-root_logger = logging.getLogger()
-print("Root logger dans pipeline: ", root_logger.getEffectiveLevel())
 
 
 class Pipeline:
