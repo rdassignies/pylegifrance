@@ -8,12 +8,15 @@ Fonctions qui traite les résultats renvoyés par l'API legifrance
 
 from typing import Union
 import json
+import os
 import logging
 
 from pylegifrance.models.consult import GetArticle, LegiPart
 import yaml
 
-with open('../config.yaml', 'r') as file:
+from importlib import resources
+
+with resources.open_text('pylegifrance', 'config.yaml') as file:
     config = yaml.safe_load(file)
 
 logging_level = config['logging']['level']

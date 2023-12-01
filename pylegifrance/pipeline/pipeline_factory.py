@@ -9,6 +9,7 @@ legifrance et autres.
 import logging
 import os
 from typing import List
+from importlib import resources
 
 from pylegifrance.pipeline.pipeline import (
     Pipeline, CallApiStep, ExtractSearchResult,
@@ -23,7 +24,9 @@ from pylegifrance.models.search import (
     )
 import yaml
 
-with open('../config.yaml', 'r') as file:
+from importlib import resources
+
+with resources.open_text('pylegifrance', 'config.yaml') as file:
     config = yaml.safe_load(file)
 
 logging_level = config['logging']['level']

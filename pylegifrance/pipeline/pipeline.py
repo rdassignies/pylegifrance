@@ -19,8 +19,11 @@ from pylegifrance.process.formatters import formate_text_response, formate_artic
 
 import yaml
 
-with open('../config.yaml', 'r') as file:
+from importlib import resources
+
+with resources.open_text('pylegifrance', 'config.yaml') as file:
     config = yaml.safe_load(file)
+
 
 
 logging_level = config['logging']['level']

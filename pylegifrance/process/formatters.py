@@ -11,9 +11,11 @@ from typing import List, Union, Dict
 
 import yaml
 
-with open('../config.yaml', 'r') as file:
-    config = yaml.safe_load(file)
+from importlib import resources
 
+with resources.open_text('pylegifrance', 'config.yaml') as file:
+    config = yaml.safe_load(file)
+    
 ARTICLE_KEYS = config['article_keys']
 ROOT_KEYS = config['root_keys']
 SECTION_KEYS = config['section_keys']
