@@ -7,6 +7,17 @@ import time
 import os
 import logging
 
+import yaml
+
+from importlib import resources
+
+with resources.open_text('pylegifrance', 'config.yaml') as file:
+    config = yaml.safe_load(file)
+
+logging_level = config['logging']['level']
+logging.basicConfig(level=logging_level, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
+
 
 class LegiHandler:
 
@@ -87,6 +98,8 @@ class LegiHandler:
                 self.time_token = time.time()
                 self.token = token
                 self.expires_in = response.json().get('expires_in')
+                logging.info(f"Connexion à l'api legifrance réussie.")
+                break 
             else:
                 if i < attempts - 1:  # Si ce n'est pas la dernière tentative
                     time.sleep(delay)  # Attendre avant la prochaine tentative
