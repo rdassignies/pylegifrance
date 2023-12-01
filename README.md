@@ -74,7 +74,7 @@
 https://www.legalgpt.eu
 
 Librairie python qui simplifie l'interrogation des contenus de legifrance en créant des fonctions pythons prêtes à l'emploi pour la recherche ou la consultation de textes légaux et réglementaires.  
-Elle repose sur l'utilisation de pydantic pour gérer les structures de données d'interrogation et de réponse de l'API legifrance. 
+Elle repose sur l'utilisation de pydantic pour gérer les structures de données d'interrogation et de réponse de l'API legifrance. A terme l'intégralité des fonctions de l'API legifrance seront disponibles sous forme de fonctions python. 
 
 
 <!-- GETTING STARTED -->
