@@ -26,3 +26,7 @@ Homepage = "https://github.com/rdassignies/pylegifrance"
 
 [project.optional-dependencies]
 dev = ["pytest>=7.0", "twine>=4.0.2"]
+
+[tool.setuptools]
+package-data = {"config" = ["pylegifrance/pylegifrance/config.yaml"]}
+
