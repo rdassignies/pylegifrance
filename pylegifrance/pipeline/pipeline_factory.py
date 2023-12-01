@@ -87,8 +87,6 @@ def recherche_CODE(
     # Initialisation du client (singleton)
     client = LegiHandler()
     client.set_api_keys()
-    root_logger = logging.getLogger()
-    print("Niveau de logging actuel du root logger dans recherche code:", root_logger.getEffectiveLevel())
         
     # TODO: ajouter la possibilité de rapatrier un code dans son intégralité si search=None
     # Création des critères de recherche
@@ -203,9 +201,7 @@ def recherche_LODA(
     # Initialisation du client (singleton)
     client=LegiHandler()
     client.set_api_keys()
-    root_logger = logging.getLogger()
-    print("Niveau de logging actuel du root logger dans recherche LODA:", root_logger.getEffectiveLevel())
-       
+   
     # Création des critères de recherche
     critere_text = [Critere(valeur=text,
                             typeRecherche="EXACTE",
