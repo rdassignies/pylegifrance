@@ -10,7 +10,7 @@ setup(
     install_requires=[
         "pydantic>=2",
         "requests",
-        "requests-oauthlib"
+        "PyYAML"
     ],
     description="Librairie qui fournit des fonctions simples pour rechercher dans legifrance",
     long_description=long_description,
