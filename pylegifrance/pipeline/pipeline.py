@@ -17,11 +17,21 @@ from pylegifrance.process.processors import (search_response_DTO,
                                 get_article_id, get_text_id)
 from pylegifrance.process.formatters import formate_text_response, formate_article_response
 
-# Charger le niveau de logging à partir des variables d'environnement
-logging_level = os.getenv('LOG_LEVEL', 'INFO').upper()
+import yaml
 
+with open('../config.yaml', 'r') as file:
+    config = yaml.safe_load(file)
+
+
+logging_level = config['logging']['level']
 logging.basicConfig(level=logging_level, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
+
+# A supprimer en production
+
+print("Configuration du logging level dans pipeline:", logging_level)
+root_logger = logging.getLogger()
+print("Root logger dans pipeline: ", root_logger.getEffectiveLevel())
 
 
 class Pipeline:

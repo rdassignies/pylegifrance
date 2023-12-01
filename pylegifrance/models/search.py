@@ -14,12 +14,10 @@ from datetime import datetime
 
 from pydantic import BaseModel, Field, field_validator
 from pylegifrance.models.generic import (Operateur, TypeChamp,
-                            Fonds,  TypeFacettes, TypeRecherche,
-                            CodeNom
-                            )
+                                         Fonds,  TypeFacettes, TypeRecherche,
+                                         CodeNom, Nature)
 
-# Champs autorisés pour CODE, LODA, ... 
-# TODO: sortir ces infos pour les mettre dans un fichier spécifique
+# Champs autorisés pour CODE, LODA, JURI,... 
 
 class ChampsCODE(Enum):
     ALL = "ALL"
@@ -64,6 +62,7 @@ class FacettesLODA(Enum) :
     TEXT_LEGAL_STATUS = "TEXT_LEGAL_STATUS"
     ARTICLE_LEGAL_STATUS = "ARTICLE_LEGAL_STATUS"
 
+# Criteres et champ génériques
 
 class Critere(BaseModel):
     """
@@ -83,7 +82,7 @@ class Champ(BaseModel):
     """
     typeChamp: TypeChamp
     criteres: List[Critere]
-    operateur: Operateur = Operateur.ET
+    operateur: Operateur = "ET"
 
 
 # Modèle de filtres spécifiques
@@ -96,22 +95,21 @@ class DateVersionFiltre(BaseModel):
 class NomCodeFiltre(BaseModel):
     facette: TypeFacettes = TypeFacettes.NOM_CODE
     valeurs: List[CodeNom]
-    
+
 
 class NatureFiltre(BaseModel):
-    facette:TypeFacettes = TypeFacettes.NATURE
-    valeurs: str = None
+    facette: TypeFacettes = TypeFacettes.NATURE
+    valeurs: List[Nature] = ["LOI", "ORDONNANCE", "DECRET", "ARRETE"]
 
 
 class EtatTextFiltre(BaseModel):
     facette: TypeFacettes = TypeFacettes.TEXT_LEGAL_STATUS
     valeur: str = "VIGUEUR"
-    
+
 
 class EtatArticleFiltre(BaseModel):
     facette: TypeFacettes = TypeFacettes.ARTICLE_LEGAL_STATUS
     valeur: str = "VIGUEUR"
-
 
 
 class Recherche(BaseModel):
@@ -139,7 +137,7 @@ class Recherche(BaseModel):
                         ]]
     pageNumber: int = 1
     pageSize: int = 10
-    operateur: str = Operateur.ET
+    operateur: Operateur = Operateur.ET
     sort: str = "PERTINENCE"
     typePagination: str = "ARTICLE"
 
@@ -173,9 +171,9 @@ class RechercheFinal(BaseModel):
         Validates the compatibility between the field type and the archive fonds.
         The test relies on an ENUM list of fields authorized for each fonds.
         """
-        
+
         fond = values.data['fond']
-        for champ in v.champs :
+        for champ in v.champs:
             if fond in ['CODE_DATE', 'CODE_ETAT']:
                if champ.typeChamp.value not in ChampsCODE.__members__:
                    raise ValueError(f"TypeChamp {champ.typeChamp}"
@@ -194,7 +192,7 @@ class RechercheFinal(BaseModel):
     @classmethod
     def validate_filtres(cls, v, values):
         """
-        Validates the compatibility between the filter type (facet) 
+        Validates the compatibility between the filter type (facet)
         and the archive fonds.The test is based on an ENUM list of facet names
         authorized for each fonds.
         """

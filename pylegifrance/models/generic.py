@@ -102,6 +102,13 @@ class TypeFacettes(str, Enum):
     ARTICLE_LEGAL_STATUS = "ARTICLE_LEGAL_STATUS"
     NATURE = "NATURE"
     NOR = "NOR"
+    
+class Nature(str, Enum): 
+    LOI = "LOI"
+    ORDONNANCE = "ORDONNANCE"
+    DECRET = "DECRET"
+    ARRETE = "ARRETE"
+    
 
 
 class CodeNom(str, Enum):

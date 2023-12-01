@@ -3,14 +3,13 @@
 """
 Created on Sun Nov 12 19:17:02 2023
 Atelier de création des fonctions de recherche dans les différents fonds
-legifrance et autres. 
+legifrance et autres.
 @author: Raphaël d'Assignies
 """
-from typing import Union, List
 import logging
-import os, inspect
-# from dotenv import load_dotenv
-# load_dotenv()
+import os
+from typing import List
+
 from pylegifrance.pipeline.pipeline import (
     Pipeline, CallApiStep, ExtractSearchResult,
     GetArticleId, GetTextId, Formatters
@@ -18,17 +17,18 @@ from pylegifrance.pipeline.pipeline import (
 from pylegifrance.client.api import LegiHandler
 from pylegifrance.models.search import (
     Critere, Champ, NomCodeFiltre, NatureFiltre, DateVersionFiltre,
-    EtatTextFiltre, EtatArticleFiltre, Fond, 
+    EtatTextFiltre, EtatArticleFiltre, NatureFiltre, Fond, 
     Recherche, RechercheFinal, TypeRecherche,
     Operateur, ChampsCODE, FacettesCODE, FacettesLODA
     )
+import yaml
 
-# Charger le niveau de logging à partir des variables d'environnement
-logging_level = os.getenv('LOG_LEVEL', 'INFO').upper()
+with open('../config.yaml', 'r') as file:
+    config = yaml.safe_load(file)
 
+logging_level = config['logging']['level']
 logging.basicConfig(level=logging_level, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
-
 
 def recherche_CODE(
                    code_name: str,
@@ -69,6 +69,7 @@ def recherche_CODE(
                                valeurs possibles : UN_DES_MOTS, EXACTE, TOUS_LES_MOTS_DANS_UN_CHAMP, 
                                AUCUN_DES_MOTS, AUCUNE_CORRESPONDANCE_A_CETTE_EXPRESSION
         fond (str, optional): Type de fond parmi CODE_DATE ou CODE_ETAT. Par défaut est "CODE_DATE".
+        nature (list): sous-ens. du fond LODA (LOI, ORDONNANCE, DECRET, ARRETE). Par défaut tous les textes du fond. 
         formatter (bool, optional): Active le formatage dynamique du résultat final.
         page_number (int, optional): Numéro de la page de résultat. Par défaut à 1.
         page_size (int, optional): Nombre de résultats par page. Par défaut à 10 (max 100).
@@ -77,12 +78,14 @@ def recherche_CODE(
     Returns:
         Dict: Soit un code en intégralité soit un ou plusieurs articles correspondant à la recherche.
     """
-    logger.debug(f"SEARCH : {search} - {type(search)}")
+    # logger.debug(f"SEARCH : {search} - {type(search)}")
+    logger.info(f"Configuration du logging level dans recherche CODE: {logging_level}")
 
     # Initialisation du client (singleton)
     client = LegiHandler()
-    logger.info(f"INFO CLIENT :  {type(client)}, {dir(client)}")
     client.set_api_keys()
+    root_logger = logging.getLogger()
+    print("Niveau de logging actuel du root logger dans recherche code:", root_logger.getEffectiveLevel())
         
     # TODO: ajouter la possibilité de rapatrier un code dans son intégralité si search=None
     # Création des critères de recherche
@@ -148,6 +151,7 @@ def recherche_LODA(
                    champ: str = 'NUM_ARTICLE',
                    type_recherche: str = "EXACTE",
                    fond: str = "LODA_DATE",
+                   nature: List = ["LOI", "ORDONNANCE", "DECRET", "ARRETE"],
                    formatter: bool = False,
                    page_number: int = 1,
                    page_size: int = 10,
@@ -184,6 +188,7 @@ def recherche_LODA(
                                valeurs possibles : UN_DES_MOTS, EXACTE, TOUS_LES_MOTS_DANS_UN_CHAMP, 
                                AUCUN_DES_MOTS, AUCUNE_CORRESPONDANCE_A_CETTE_EXPRESSION
         fond (str, optional): Type de fond parmi LODA_DATE ou LODA_ETAT. Par défaut est "LODA_DATE".
+        nature
         formatter (bool, optional): Active le formatage dynamique du résultat final.
         page_number (int, optional): Numéro de la page de résultat. Par défaut à 1.
         page_size (int, optional): Nombre de résultats par page. Par défaut à 10 (max 100).
@@ -195,8 +200,9 @@ def recherche_LODA(
     # Initialisation du client (singleton)
     client=LegiHandler()
     client.set_api_keys()
-    print("ADRESSE DU CLIENT DS RECHERCHE LODA: ", id(client))
-    
+    root_logger = logging.getLogger()
+    print("Niveau de logging actuel du root logger dans recherche LODA:", root_logger.getEffectiveLevel())
+       
     # Création des critères de recherche
     critere_text = [Critere(valeur=text,
                             typeRecherche="EXACTE",
@@ -224,10 +230,13 @@ def recherche_LODA(
     filtre_date = DateVersionFiltre()
     filtre_etat_text = EtatTextFiltre()
     filtre_etat_art = EtatArticleFiltre()
-    
+    filtre_nature = NatureFiltre(valeurs=nature)
     # Construction des paramètres de la recherche
     recherche = Recherche(champs=fields,
-                          filtres=[filtre_etat_text,filtre_etat_art, filtre_date],
+                          filtres=[filtre_etat_text,
+                                   filtre_etat_art, 
+                                   filtre_date, 
+                                   filtre_nature],
                           pageNumber=page_number,
                           pageSize=page_size
                          )

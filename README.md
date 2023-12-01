@@ -80,8 +80,9 @@ Elle repose sur l'utilisation de pydantic pour gérer les structures de données
 <!-- GETTING STARTED -->
 ## Démarrage
 
-Pour installer la librairie : `pip install pylegifrance`
+Pour installer la librairie : `pip install git+https://github.com/rdassignies/pylegifrance `
 
+Un package depuis PyPi sera accessible ultérieurement. 
 
 ### Pré requis
 
@@ -118,7 +119,6 @@ art_7_cciv = recherche_CODE(code_name="Code civil", search="7")
 # Obtenir l'article 7 du Code civil en ne sélectionnant que certains champs spécifiques
 art_7_cciv_abstract = recherche_CODE(code_name="Code civil", search="7", formatter=True)
 
-
 # Obtenir l'intégralité du Code civil
 code_civil = recherche_CODE(code_name="Code civil")
 
@@ -126,52 +126,58 @@ code_civil = recherche_CODE(code_name="Code civil")
 art_surete = recherche_CODE(code_name="Code civil", search="sûreté", champ="ARTICLE")
 
 ```
-
 La fonction recherche_CODE permet la recherche dans le fond CODE (CODE_DATE, CODE_ETAT) d'un article par son numéro, d'un terme de recherche ou d'un code dans son intégralité.
 
 Cette fonction ne récupère que les codes en vigueur à la date actuelle. 
 Par défaut, la facette "DATE_VERSION" est définie sur la date du jour, quel que soit le fond cible (CODE_DATE ou CODE_ETAT).
 
-! Attention : Il est de la responsabilité exclusive de l'utilisateur de vérifier que les informations renvoyées par l'API sont pertinentes et à jour.
+**! Attention** : Il est de la responsabilité exclusive de l'utilisateur de vérifier que les informations renvoyées par l'API sont pertinentes et à jour.
 
-Certains paramètres comme "sort" ou "typepagination" ne sont pas encore accessibles (voir roadmap *infra*).
+Certains paramètres comme "sort" ou "typepagination" ou le type de de recherche ne sont pas encore accessibles (roadmap *infra*).
 
 Pour plus de détails, se référer à la documentation de la fonction. 
 
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-### Recherche dans le fond LODA
+### Recherche dans le fond LODA (LOI, ORDONNANCE, DECRET, ARRETE)
 ```py
 from pylegifrance import recherche_LODA
 
-
 # Obtenir l'article 9 de la loi informatique et libertés
-art_9_7817 = recherche_LODA(text="78-17", search="9")
+recherche_LODA(text="78-17", search="9")
+
+# Obtenir l'article 2 de l'ordonnance 58-1100 
+recherche_LODA(text='58-1100', search="2", nature=["ORDONNANCE"])
 
 # Obtenir l'intégralité de la loi informatique et libertés
-loi_7817 = recherche_LODA(text="78-17")
+recherche_LODA(text="78-17")
 
 # Rechercher le mot "autorité" dans tous les contenus de la loi informatique et libertés
-art_surete = recherche_LODA(text="78-17", search="autorité", champ="ALL")
+recherche_LODA(text="78-17", search="autorité", champ="ALL")
+
+# Rechercher le mot "publique" dans le champ "article" du décret n°2023-823
+recherche_LODA(text='2023-823', search="publique", nature=["DECRET"], champ="ARTICLE")
 
 # Rechercher le mot "autorité" dans tous les contenus de la loi informatique et libertés en ne sélectionnant que certains champs spécifiques (formatter=True)
-art_surete_abstract = recherche_LODA(text="78-17", search="autorité", champ="ALL", formatter=True)
+recherche_LODA(text="78-17", search="autorité", champ="ALL", formatter=True)
 ```
 La fonction recherche LODA permet la recherche dans le fond LODA (LODA_DATE, LODA_ETAT) d'un texte par son numéro, d'un article dans un texte spécifique, ou d'un terme de recherche dans les champs d'un texte.
-Cette fonction ne récupère que les textes en vigueur à la date actuelle. 
-Par défaut, la facette "DATE_VERSION" est définie sur la date du jour, et les facettes "TEXT_LEGAL_STATUS" et "ARTICLE_LEGAL_STATUTS" sont définies sur "VIGEUR", quel que soit le fond cible (LODA_DATE ou LODA_ETAT).
+Il est possible de sélectionner le type de textes en modifiant la liste "nature" qui est par défaut ["lOI", "ORDONNANCE", "DECRET", "ARRETE"]. 
 
-Attention : Il est de la responsabilité exclusive de l'utilisateur de vérifier que les informations renvoyées par l'API sont pertinentes et à jour.
-Certains paramètres comme "sort" ou "typepagination" ne sont pas encore accessibles (roadmap *infra*).
+Cette fonction ne récupère que les textes en vigueur à la date actuelle. Par défaut, la facette "DATE_VERSION" est définie sur la date du jour, et les facettes "TEXT_LEGAL_STATUS" et "ARTICLE_LEGAL_STATUTS" sont définies sur "VIGEUR", quel que soit le fond cible (LODA_DATE ou LODA_ETAT).
+
+**! Attention** : Il est de la responsabilité exclusive de l'utilisateur de vérifier que les informations renvoyées par l'API sont pertinentes et à jour.
+
+Certains paramètres comme "sort" ou "typepagination" ou le type de de recherche ne sont pas encore accessibles (roadmap *infra*).
 
 Pour plus de détails, se référer à la documentation de la fonction. 
 <!-- ROADMAP -->
 ## Roadmap
 
 - [ ] Ajout des fonctions recherche_JURI, rechercher_CETAT, KALI,...
-- [ ] Ajout de l'intégralité des paramètres dans les recherches
-- [ ] Ajout d'un fichier de configuration permettant de paramètrer le formatter
+- [ ] Ajout de l'intégralité des paramètres dans les recherches ("EXACTE", "UN_DES_MOTS",etc)
+- [ ] Ajout du paramètre date de signature dans la recherche
 - [ ] Implémentation des fonctions suggest, consult et list
 
 See the [open issues](https://github.com/rdassignies/pylegifrance/issues) for a full list of proposed features (and known issues).

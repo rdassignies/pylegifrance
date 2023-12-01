@@ -55,7 +55,7 @@ class GetSectionByCid(BaseModel):
         """
         Route de la recherche et type de modèle renvoyé
         """
-        route = "/consult/getSectionByCid"
+        route = "consult/getSectionByCid"
 
 
 class GetArticle(BaseModel):
@@ -70,5 +70,5 @@ class GetArticle(BaseModel):
         Route de la recherche et type de modèle renvoyé
         """
 
-        route = "/consult/getArticle"
+        route = "consult/getArticle"
         model_reponse = 'GetArticleResponse'

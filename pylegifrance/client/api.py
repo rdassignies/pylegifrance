@@ -5,8 +5,7 @@
 import requests
 import time
 import os
-
-from requests_oauthlib import OAuth2Session
+import logging
 
 
 class LegiHandler:
@@ -15,7 +14,8 @@ class LegiHandler:
 
     def __new__(cls, *args, **kwargs):
         if cls._instance is None:
-            cls._instance = super(LegiHandler, cls).__new__(cls)
+            # cls._instance = super(LegiHandler, cls).__new__(cls)
+            cls._instance = super().__new__(cls)
             # Initialisation de l'instance unique
             cls._instance._initialize(*args, **kwargs)
         return cls._instance
@@ -32,7 +32,7 @@ class LegiHandler:
         self.client_id = None
         self.client_secret = None
         self.token = ''
-        self.token_url= 'https://oauth.piste.gouv.fr/api/oauth/token'
+        self.token_url = 'https://oauth.piste.gouv.fr/api/oauth/token'
         self.api_url = 'https://api.piste.gouv.fr/dila/legifrance/lf-engine-app/'
 
     def set_api_keys(self, legifrance_api_key=None, legifrance_api_secret=None):
@@ -53,7 +53,7 @@ class LegiHandler:
             Secret API Legifrance. Si None, conserve la valeur actuelle 
             ou tente de le récupérer depuis la variable d'environnement.
         """
-        
+ 
       # Utiliser les clés existantes si de nouvelles clés ne sont pas fournies
        if legifrance_api_key is None:
             legifrance_api_key = self.client_id if self.client_id else os.getenv("LEGIFRANCE_CLIENT_ID")
@@ -61,16 +61,14 @@ class LegiHandler:
             legifrance_api_secret = self.client_secret if self.client_secret else os.getenv("LEGIFRANCE_CLIENT_SECRET")
 
        if not legifrance_api_key or not legifrance_api_secret:
-           print("client_id dans les paramètrse et le test: ",legifrance_api_key )
-
            raise ValueError("Les clés de l'API Legifrance ne sont pas présentes")
            
        # Vérifie si les nouvelles clés sont différentes des clés existantes
        if (self.client_id != legifrance_api_key or
-            self.client_secret != legifrance_api_secret):
-            self.client_id = legifrance_api_key
-            self.client_secret = legifrance_api_secret
-            self._get_access()  # Renouveler le token uniquement si les clés ont changé
+           self.client_secret != legifrance_api_secret):
+           self.client_id = legifrance_api_key
+           self.client_secret = legifrance_api_secret
+           self._get_access()  # Renouveler le token uniquement si les clés ont changé
 
 
     def _get_access(self, attempts=3, delay=5):
@@ -89,13 +87,13 @@ class LegiHandler:
                 self.time_token = time.time()
                 self.token = token
                 self.expires_in = response.json().get('expires_in')
-                self.client = OAuth2Session(self.client_id, token=token)
             else:
                 if i < attempts - 1:  # Si ce n'est pas la dernière tentative
                     time.sleep(delay)  # Attendre avant la prochaine tentative
                 else:
                     raise Exception(f"Erreur lors de l'obtention du token après {attempts} tentatives."
                                     "Dernière erreur : {response.status_code} - {response.text}")
+
 
     def _update_client(self):
         """

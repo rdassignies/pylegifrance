@@ -11,10 +11,13 @@ import json
 import logging
 
 from pylegifrance.models.consult import GetArticle, LegiPart
+import yaml
 
+with open('../config.yaml', 'r') as file:
+    config = yaml.safe_load(file)
 
-logging.basicConfig(level=logging.DEBUG, format="%(asctime)s - %(name)s -"
-                                                " %(levelname)s - %(message)s")
+logging_level = config['logging']['level']
+logging.basicConfig(level=logging_level, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
 

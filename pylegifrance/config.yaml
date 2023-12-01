@@ -1,0 +1,25 @@
+logging:
+  level: WARNING
+
+api:
+  key: your_api_key
+  secret: your_api_secret
+
+article_keys:
+  - pathTitle
+  - content
+  - num
+  - fullSectionsTitre
+  - texte
+  - etat
+  - VersionArticle
+
+root_keys:
+  - cid
+  - title
+
+section_keys:
+  - title
+  - cid
+
+# Ajoutez ici d'autres configurations au besoin

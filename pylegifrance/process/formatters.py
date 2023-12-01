@@ -9,11 +9,16 @@ que les clés choisie. Le paramètre de recherche doit être à formatter='True'
 """
 from typing import List, Union, Dict
 
-# TODO : à mettre dans une fichier de configuration (YAML)
-ARTICLE_KEYS = ('pathTitle', 'content', 'num', 'fullSectionsTitre',
-                'texte', 'etat', 'VersionArticle')
-ROOT_KEYS = ('cid', 'title')
-SECTION_KEYS = ('title', 'cid')
+import yaml
+
+with open('../config.yaml', 'r') as file:
+    config = yaml.safe_load(file)
+
+ARTICLE_KEYS = config['article_keys']
+ROOT_KEYS = config['root_keys']
+SECTION_KEYS = config['section_keys']
+
+
 
 
 def formate_text_response(data,
