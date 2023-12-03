@@ -145,22 +145,23 @@ Pour plus de détails, se référer à la documentation de la fonction.
 from pylegifrance import recherche_LODA
 
 # Obtenir l'article 9 de la loi informatique et libertés
-recherche_LODA(text="78-17", search="9")
+recherche_LODA(text_id="78-17", search="9")
 
 # Obtenir l'article 2 de l'ordonnance 58-1100 
-recherche_LODA(text='58-1100', search="2", nature=["ORDONNANCE"])
+recherche_LODA(text_id='58-1100', search="2", nature=["ORDONNANCE"])
 
 # Obtenir l'intégralité de la loi informatique et libertés
-recherche_LODA(text="78-17")
+recherche_LODA(text_id="78-17")
 
 # Rechercher le mot "autorité" dans tous les contenus de la loi informatique et libertés
-recherche_LODA(text="78-17", search="autorité", champ="ALL")
+recherche_LODA(text_id="78-17", search="autorité", champ="ALL")
 
 # Rechercher le mot "publique" dans le champ "article" du décret n°2023-823
-recherche_LODA(text='2023-823', search="publique", nature=["DECRET"], champ="ARTICLE")
+recherche_LODA(text_id='2023-823', search="publique", nature=["DECRET"], champ="ARTICLE")
 
 # Rechercher le mot "autorité" dans tous les contenus de la loi informatique et libertés en ne sélectionnant que certains champs spécifiques (formatter=True)
-recherche_LODA(text="78-17", search="autorité", champ="ALL", formatter=True)
+recherche_LODA(text_id="78-17", search="autorité", champ="ALL", formatter=True)
+
 ```
 La fonction recherche LODA permet la recherche dans le fond LODA (LODA_DATE, LODA_ETAT) d'un texte par son numéro, d'un article dans un texte spécifique, ou d'un terme de recherche dans les champs d'un texte.
 Il est possible de sélectionner le type de textes en modifiant la liste "nature" qui est par défaut ["lOI", "ORDONNANCE", "DECRET", "ARRETE"]. 
