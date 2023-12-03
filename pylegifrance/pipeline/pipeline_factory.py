@@ -257,8 +257,8 @@ def recherche_LODA(
 
     initial_data = RechercheFinal(recherche=recherche, fond=fond)
 
-    logger.info("---------- Payload -------------")
-    logger.info(initial_data.model_dump(mode='json'))
+    logger.debug("---------- Payload -------------")
+    logger.debug(initial_data.model_dump(mode='json'))
 
     # Initialisation des étapes du pipeline
     pipeline_steps = [
