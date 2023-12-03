@@ -1,5 +1,5 @@
 logging:
-  level: WARNING
+  level: INFO
 
 api:
   key: your_api_key
