@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-
 import requests
 import time
 import os
@@ -74,14 +73,13 @@ class LegiHandler:
 
        if not legifrance_api_key or not legifrance_api_secret:
            raise ValueError("Les clés de l'API Legifrance ne sont pas présentes")
-           
+
        # Vérifie si les nouvelles clés sont différentes des clés existantes
        if (self.client_id != legifrance_api_key or
            self.client_secret != legifrance_api_secret):
            self.client_id = legifrance_api_key
            self.client_secret = legifrance_api_secret
            self._get_access()  # Renouveler le token uniquement si les clés ont changé
-
 
     def _get_access(self, attempts=3, delay=5):
 
@@ -117,12 +115,10 @@ class LegiHandler:
 
         elapsed_time = time.time() - self.time_token
         if elapsed_time >= self.expires_in:
-            print("renouvellement du token")
             self.time_token = time.time()
             self._get_access()
 
-
-    def call_api(self, route:str, data:str):
+    def call_api(self, route: str, data: str):
 
         self._update_client()
         headers = {
@@ -140,11 +136,11 @@ class LegiHandler:
 
         return response
 
-    def ping(self, route:str = "list/ping"):
+    def ping(self, route: str = "list/ping"):
         # TODO: implémenter les pings selon documentation legifrance
         pass
 
-    def get(self, route:str):
+    def get(self, route: str):
         headers = {
             'Authorization': f'Bearer {self.token}'
         }
@@ -152,5 +148,5 @@ class LegiHandler:
         response = requests.get(f"{self.api_url}{route}", headers=headers)
         response.raise_for_status()
         self.data = response.json()
-        
+
         return response
