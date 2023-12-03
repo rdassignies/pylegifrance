@@ -18,8 +18,8 @@ from pylegifrance.pipeline.pipeline import (
 from pylegifrance.client.api import LegiHandler
 from pylegifrance.models.search import (
     Critere, Champ, NomCodeFiltre, NatureFiltre, DateVersionFiltre,
-    EtatTextFiltre, EtatArticleFiltre, NatureFiltre, Fond, 
-    Recherche, RechercheFinal, TypeRecherche,
+    EtatTextFiltre, EtatArticleFiltre, NatureFiltre, DatesPeriod, 
+    DateSignatureFiltre, Fond, Recherche, RechercheFinal, TypeRecherche,
     Operateur, ChampsCODE, FacettesCODE, FacettesLODA
     )
 import yaml
@@ -32,6 +32,7 @@ with resources.open_text('pylegifrance', 'config.yaml') as file:
 logging_level = config['logging']['level']
 logging.basicConfig(level=logging_level, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
+logger.setLevel(logging_level)
 
 def recherche_CODE(
                    code_name: str,
@@ -81,8 +82,6 @@ def recherche_CODE(
     Returns:
         Dict: Soit un code en intégralité soit un ou plusieurs articles correspondant à la recherche.
     """
-    # logger.debug(f"SEARCH : {search} - {type(search)}")
-    logger.info(f"Configuration du logging level dans recherche CODE: {logging_level}")
 
     # Initialisation du client (singleton)
     client = LegiHandler()
@@ -147,12 +146,13 @@ def recherche_CODE(
 
 
 def recherche_LODA(
-                   text: str,
+                   text_id: str = '',
                    search: str = None,
                    champ: str = 'NUM_ARTICLE',
                    type_recherche: str = "EXACTE",
                    fond: str = "LODA_DATE",
                    nature: List = ["LOI", "ORDONNANCE", "DECRET", "ARRETE"],
+                   date_signature: List = None,
                    formatter: bool = False,
                    page_number: int = 1,
                    page_size: int = 10,
@@ -189,7 +189,8 @@ def recherche_LODA(
                                valeurs possibles : UN_DES_MOTS, EXACTE, TOUS_LES_MOTS_DANS_UN_CHAMP, 
                                AUCUN_DES_MOTS, AUCUNE_CORRESPONDANCE_A_CETTE_EXPRESSION
         fond (str, optional): Type de fond parmi LODA_DATE ou LODA_ETAT. Par défaut est "LODA_DATE".
-        nature
+        nature (list) : Type de texte recherché parmi LOI, ORD., DECRET, ARRETE
+        date_signature(list) : date (start et end) de signature au format "YYYY-MM-DD"
         formatter (bool, optional): Active le formatage dynamique du résultat final.
         page_number (int, optional): Numéro de la page de résultat. Par défaut à 1.
         page_size (int, optional): Nombre de résultats par page. Par défaut à 10 (max 100).
@@ -198,12 +199,13 @@ def recherche_LODA(
     Returns:
         Dict: Soit un texte intégral soit un ou plusieurs articles correspondant à la recherche.
     """
+
     # Initialisation du client (singleton)
-    client=LegiHandler()
+    client = LegiHandler()
     client.set_api_keys()
-   
+
     # Création des critères de recherche
-    critere_text = [Critere(valeur=text,
+    critere_text = [Critere(valeur=text_id,
                             typeRecherche="EXACTE",
                             operateur="ET")]
     # Création des champs de recherche
@@ -230,25 +232,33 @@ def recherche_LODA(
     filtre_etat_text = EtatTextFiltre()
     filtre_etat_art = EtatArticleFiltre()
     filtre_nature = NatureFiltre(valeurs=nature)
+    filtres = [filtre_etat_text,
+               filtre_etat_art,
+               filtre_date,
+               filtre_nature]
+
+    if date_signature:
+        filtre_date_sig = DateSignatureFiltre(
+            dates=DatesPeriod(start=date_signature[0], end=date_signature[1])
+            )
+        filtres.append(filtre_date_sig)
+
     # Construction des paramètres de la recherche
     recherche = Recherche(champs=fields,
-                          filtres=[filtre_etat_text,
-                                   filtre_etat_art, 
-                                   filtre_date, 
-                                   filtre_nature],
+                          filtres=filtres,
                           pageNumber=page_number,
                           pageSize=page_size
                          )
 
     # Construction de la requête finale (payload)
 
-    # Astuce qui permet de valider le fond recherché 
-    fond_cible=Fond(fond=fond)
+    # Astuce qui permet de valider le fond recherché = lève erreur si pas valide
+    fond_cible = Fond(fond=fond)
 
     initial_data = RechercheFinal(recherche=recherche, fond=fond)
 
-    logger.debug("---------- Payload -------------")
-    logger.debug(initial_data.model_dump(mode='json'))
+    logger.info("---------- Payload -------------")
+    logger.info(initial_data.model_dump(mode='json'))
 
     # Initialisation des étapes du pipeline
     pipeline_steps = [
@@ -285,11 +295,11 @@ def recherche_JURI(
                     page_size: int = 10,
                     *args):
     # TODO: à implémenter
-   
+
     # Initialisation du client (singleton)
-    client=LegiHandler()
+    client = LegiHandler()
     client.set_api_keys()
-    
+
     # Création des critères de recherche
     critere = [Critere(valeur=search,
                        typeRecherche="EXACTE",
@@ -298,16 +308,16 @@ def recherche_JURI(
     fields = [Champ(typeChamp=champ,
                     criteres=critere,
                     operateur="ET")]
-    
+
     # Construction des paramètres de la recherche
     recherche = Recherche(champs=fields,
                           filtres=[],
                           pageNumber=page_number,
                           pageSize=page_size
                          )
-    
+
     # Astuce qui permet de valider le fond recherché 
-    fond_cible=Fond(fond=fond)
+    fond_cible = Fond(fond=fond)
 
     initial_data = RechercheFinal(recherche=recherche, fond=fond)
 

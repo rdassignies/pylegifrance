@@ -159,7 +159,7 @@ class GetTextId(PipelineStep):
 
         if data_type == "ExtractSearchResult":
             text_id = get_text_id(data)
-        else: 
+        else:
              raise TypeError("Les données pour extraire les identifiants de textes ne sont "
                              "pas dans le format correct")
 
