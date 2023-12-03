@@ -22,6 +22,7 @@ with resources.open_text('pylegifrance', 'config.yaml') as file:
 logging_level = config['logging']['level']
 logging.basicConfig(level=logging_level, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
+logger.setLevel(logging_level)
 
 
 def search_response_DTO(results: Union[dict, str]):
@@ -46,7 +47,10 @@ def search_response_DTO(results: Union[dict, str]):
 
     elif not isinstance(results, dict):
         raise TypeError("results must be a valid dict")
-    
+
+    logger.info(f"Nombre de résultats trouvés: {results['totalResultNumber']}")
+    logger.debug(f"Facets : {results['facets']}")
+
     def get_with_default(dictionary, key, default=''):
         value = dictionary.get(key)
         return value if value is not None else default
@@ -87,6 +91,7 @@ def search_response_DTO(results: Union[dict, str]):
     for result in results['results']:
         extract_recursive(result)
 
+    
     return extracted_data
 
 
@@ -116,9 +121,9 @@ def get_text_id(data):
     logger.debug(f"Size of data containing LEGITEXT: {len(text_ids)}")
 
     if not text_ids:
-        raise GetTextIdError("The GetText list is empty"
-                             "- No LEGITEXT found in the data."
-                             "Check search criteria.")
+        raise GetTextIdError("La liste GetText est vide !"
+                             "- Pas d'identifiant LEGITEXT trouvé."
+                             "Vérifier vos critères de recherche.")
     return text_ids
 
 
@@ -150,9 +155,9 @@ def get_article_id(data):
                  f"LEGIARTI: {len(article_ids)}")
 
     if not article_ids:
-        raise GetArticleIdError("The GetArticle list is empty"
-                                "- No LEGIARTI found in the data."
-                                "Check search criteria.")
+        raise GetArticleIdError("La liste GetArticle est vide !"
+                                "- Pas d'identifiant LEGIARTI trouvé."
+                                "Vérifier vos critères de recherche.")
 
     return article_ids
 
