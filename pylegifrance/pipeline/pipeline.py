@@ -29,6 +29,7 @@ with resources.open_text('pylegifrance', 'config.yaml') as file:
 logging_level = config['logging']['level']
 logging.basicConfig(level=logging_level, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
+logger.setLevel(logging_level)
 
 
 
