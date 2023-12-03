@@ -165,7 +165,7 @@ recherche_LODA(text_id="78-17", search="autorité", champ="ALL", formatter=True)
 # Rechercher les arrêtés et les décrets dont la date de signature est entre le 09 août et le 12 août 2023 (format YYYY-MM-DD)
 recherche_LODA(date_signature=["2023-08-09", "2023-08-12"], nature=["DECRET", "ARRETE"])
 
-# Recherche l'expression complète "signature électronique" dans tout le fond LODA dans le champ ARTICLE des décrets signés entre le 09 août 2017 et le 12 août 2018 
+# Recherche l'expression complète "signature électronique" dans le champ ARTICLE des décrets signés entre le 09 août 2017 et le 12 août 2018 
 
 recherche_LODA(search="signature électronique", champ='ARTICLE', type_recherche="TOUS_LES_MOTS_DANS_UN_CHAMP", nature=['DECRET'], date_signature=["2017-08-09", "2018-08-12"])
 
