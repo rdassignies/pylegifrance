@@ -162,9 +162,16 @@ recherche_LODA(text_id='2023-823', search="publique", nature=["DECRET"], champ="
 # Rechercher le mot "autorité" dans tous les contenus de la loi informatique et libertés en ne sélectionnant que certains champs spécifiques (formatter=True)
 recherche_LODA(text_id="78-17", search="autorité", champ="ALL", formatter=True)
 
+# Rechercher les arrêtés et les décrets dont la date de signature est entre le 09 août et le 12 août 2023 (format YYYY-MM-DD)
+recherche_LODA(date_signature=["2023-08-09", "2023-08-12"], nature=["DECRET", "ARRETE"])
+
+# Recherche l'expression complète "signature électronique" dans tout le fond LODA dans le champ ARTICLE des décrets signés entre le 09 août 2017 et le 12 août 2018 
+
+recherche_LODA(search="signature électronique", champ='ARTICLE', type_recherche="TOUS_LES_MOTS_DANS_UN_CHAMP", nature=['DECRET'], date_signature=["2017-08-09", "2018-08-12"])
+
 ```
 La fonction recherche LODA permet la recherche dans le fond LODA (LODA_DATE, LODA_ETAT) d'un texte par son numéro, d'un article dans un texte spécifique, ou d'un terme de recherche dans les champs d'un texte.
-Il est possible de sélectionner le type de textes en modifiant la liste "nature" qui est par défaut ["lOI", "ORDONNANCE", "DECRET", "ARRETE"]. 
+Il est possible de sélectionner le type de textes en modifiant la liste "nature" qui est par défaut ["LOI", "ORDONNANCE", "DECRET", "ARRETE"]. 
 
 Cette fonction ne récupère que les textes en vigueur à la date actuelle. Par défaut, la facette "DATE_VERSION" est définie sur la date du jour, et les facettes "TEXT_LEGAL_STATUS" et "ARTICLE_LEGAL_STATUTS" sont définies sur "VIGEUR", quel que soit le fond cible (LODA_DATE ou LODA_ETAT).
 
@@ -177,9 +184,9 @@ Pour plus de détails, se référer à la documentation de la fonction.
 ## Roadmap
 
 - [ ] Ajout des fonctions recherche_JURI, rechercher_CETAT, KALI,...
-- [ ] Ajout de l'intégralité des paramètres dans les recherches ("EXACTE", "UN_DES_MOTS",etc)
-- [ ] Ajout du paramètre date de signature dans la recherche
 - [ ] Implémentation des fonctions suggest, consult et list
+- [ ] Ajout de fonctions de formattage avancé en sortie
+- [ ] Ajout des paramètres de tri des résultats 
 
 See the [open issues](https://github.com/rdassignies/pylegifrance/issues) for a full list of proposed features (and known issues).
 
