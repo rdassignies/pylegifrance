@@ -3,13 +3,12 @@
 """
 Created on Mon Nov 13 19:16:30 2023
 Modèles pydantic pour la recherche (route: "search") de l'API Legifrance
-
 @author: Raphaël d'Assignies'
 """
 
-from typing import List, Union
+from typing import List, Union, Optional
 from enum import Enum
-from datetime import datetime
+from datetime import date, datetime
 
 
 from pydantic import BaseModel, Field, field_validator
@@ -17,7 +16,8 @@ from pylegifrance.models.generic import (Operateur, TypeChamp,
                                          Fonds,  TypeFacettes, TypeRecherche,
                                          CodeNom, Nature)
 
-# Champs autorisés pour CODE, LODA, JURI,... 
+# Champs autorisés pour CODE, LODA, JURI,...
+
 
 class ChampsCODE(Enum):
     ALL = "ALL"
@@ -25,6 +25,7 @@ class ChampsCODE(Enum):
     TABLE = "TABLE"
     NUM_ARTICLE = "NUM_ARTICLE"
     ARTICLE = "ARTICLE"
+
 
 class ChampsLODA(Enum):
     ALL = "ALL"
@@ -41,6 +42,7 @@ class ChampsLODA(Enum):
     SIGNATURE = "SIGNATURE"
     NOTA = "NOTA"
 
+
 class ChampsJURI(Enum): 
     ALL = "ALL"
     TITLE = "TITLE"
@@ -49,29 +51,34 @@ class ChampsJURI(Enum):
     RESUMES = "RESUMES"
     NUM_AFFAIRE = "NUM_AFFAIRE"
 
-# Facettes autorisées pour CODE, LODA ... 
+# Facettes autorisées pour CODE, LODA ...
+
+
 class FacettesCODE(Enum):
     NOM_CODE = "NOM_CODE"
     DATE_SIGNATURE = "DATE_SIGNATURE"
     DATE_VERSION = "DATE_VERSION"
 
-class FacettesLODA(Enum) : 
+
+class FacettesLODA(Enum):
     NATURE = "NATURE"
     NOR = "NOR"
     DATE_VERSION = "DATE_VERSION"
+    DATE_SIGNATURE = "DATE_SIGNATURE"
     TEXT_LEGAL_STATUS = "TEXT_LEGAL_STATUS"
     ARTICLE_LEGAL_STATUS = "ARTICLE_LEGAL_STATUS"
 
 # Criteres et champ génériques
 
+
 class Critere(BaseModel):
     """
     Liste des critères/groupes de critères de recherche pour ce champ
     """
-    
+
     #criteres: Optional[List["Critere"]] = [] #Sous-critère/Sous-groupe de critères
     typeRecherche: TypeRecherche = "EXACTE"
-    valeur: str # "Mot(s)/expression recherchés")
+    valeur: str # " Mot(s)/expression recherchés"
     operateur: Operateur = "ET"
 
 
@@ -91,6 +98,26 @@ class DateVersionFiltre(BaseModel):
     facette: TypeFacettes = TypeFacettes.DATE_VERSION
     singleDate: str = datetime.now().strftime("%Y-%m-%d")
 
+class DatesPeriod(BaseModel):
+    start: Optional[str]
+    end: Optional[str] = None
+    
+    @field_validator('start', 'end')
+    @classmethod
+    def valider_format_date(cls, v):
+        if v is None:
+            return v
+        try:
+            # Valider et convertir la date en utilisant le format YYYY-DD-MM
+            return datetime.strptime(v, '%Y-%m-%d').date().strftime('%Y-%m-%d')
+        except ValueError:
+            raise ValueError('Le format de la date doit être YYYY-MM-DD')
+    
+
+class DateSignatureFiltre(BaseModel):
+    facette: TypeFacettes = TypeFacettes.DATE_SIGNATURE
+    dates: DatesPeriod
+    
 
 class NomCodeFiltre(BaseModel):
     facette: TypeFacettes = TypeFacettes.NOM_CODE
@@ -134,6 +161,7 @@ class Recherche(BaseModel):
                         NatureFiltre,
                         EtatTextFiltre,
                         EtatArticleFiltre,
+                        DateSignatureFiltre
                         ]]
     pageNumber: int = 1
     pageSize: int = 10

@@ -70,6 +70,7 @@ class TypeRecherche(Enum):
     AUCUN_DES_MOTS = "AUCUN_DES_MOTS"
     AUCUNE_CORRESPONDANCE_A_CETTE_EXPRESSION = "AUCUNE_CORRESPONDANCE_A_CETTE_EXPRESSION"
 
+
 class Fonds(str, Enum):
     """ Liste des fonds disponibles pour la recherche
     Fonds sur lequel appliquer la recherche. Pour rechercher dans tous les
@@ -94,7 +95,8 @@ class Fonds(str, Enum):
     CIRC = "CIRC"
     ACCO = "ACCO"
 
-class TypeFacettes(str, Enum): 
+
+class TypeFacettes(str, Enum):
     NOM_CODE = "NOM_CODE"
     DATE_SIGNATURE = "DATE_SIGNATURE"
     DATE_VERSION = "DATE_VERSION"
@@ -102,13 +104,13 @@ class TypeFacettes(str, Enum):
     ARTICLE_LEGAL_STATUS = "ARTICLE_LEGAL_STATUS"
     NATURE = "NATURE"
     NOR = "NOR"
-    
-class Nature(str, Enum): 
+
+
+class Nature(str, Enum):
     LOI = "LOI"
     ORDONNANCE = "ORDONNANCE"
     DECRET = "DECRET"
     ARRETE = "ARRETE"
-    
 
 
 class CodeNom(str, Enum):
