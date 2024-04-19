@@ -207,7 +207,7 @@ Distributed under the MIT License. See `LICENSE.txt` for more information.
 
 Raphael d'Assignies - email: rdassignies AT protonmail.ch.com
 
-https://legalgpt.eu
+https://dassignies.law
 
 Project Link: [https://github.com/rdassignies/pylegifrance](https://github.com/rdassignies/pylegifrance)
 
