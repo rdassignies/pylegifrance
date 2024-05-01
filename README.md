@@ -205,7 +205,7 @@ Distributed under the MIT License. See `LICENSE.txt` for more information.
 <!-- CONTACT -->
 ## Contact
 
-Raphael d'Assignies - email: rdassignies AT protonmail.ch.com
+Raphael d'Assignies - email: rdassignies AT protonmail.ch
 
 https://dassignies.law
 
