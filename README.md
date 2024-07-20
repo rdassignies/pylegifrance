@@ -71,7 +71,7 @@
 
 [![Pydantic v2](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/pydantic/pydantic/main/docs/badge/v2.json)](https://pydantic.dev)
 
-https://www.legalgpt.eu
+https://dassignies.law
 
 Librairie python qui simplifie l'interrogation des contenus de legifrance en créant des fonctions pythons prêtes à l'emploi pour la recherche ou la consultation de textes légaux et réglementaires.  
 Elle repose sur l'utilisation de pydantic pour gérer les structures de données d'interrogation et de réponse de l'API legifrance. A terme l'intégralité des fonctions de l'API legifrance seront disponibles sous forme de fonctions python. 
@@ -205,9 +205,9 @@ Distributed under the MIT License. See `LICENSE.txt` for more information.
 <!-- CONTACT -->
 ## Contact
 
-Raphael d'Assignies - email: rdassignies AT protonmail.ch.com
+Raphael d'Assignies - email: rdassignies AT protonmail.ch
 
-https://legalgpt.eu
+https://dassignies.law
 
 Project Link: [https://github.com/rdassignies/pylegifrance](https://github.com/rdassignies/pylegifrance)
 
