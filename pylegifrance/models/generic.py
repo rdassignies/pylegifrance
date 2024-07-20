@@ -115,6 +115,7 @@ class Nature(str, Enum):
 
 class CodeNom(str, Enum):
     CC = "Code civil"
+    CCOM = "Code de commerce"
     CDC = "Code des communes"
     CDDDA = "Code de déontologie des architectes"
     CDJA = "Code de justice administrative"
