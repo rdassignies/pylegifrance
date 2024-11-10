@@ -67,6 +67,8 @@
 <!-- ABOUT THE PROJECT -->
 # PyLegifrance
 
+Si vous souhaitez accéder directement à une API simplifiée, c'est par ici : https://lab.dassignies.law
+
 ### Built With
 
 [![Pydantic v2](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/pydantic/pydantic/main/docs/badge/v2.json)](https://pydantic.dev)
@@ -78,6 +80,7 @@ Elle repose sur l'utilisation de pydantic pour gérer les structures de données
 
 
 <!-- GETTING STARTED -->
+
 ## Démarrage
 
 Pour installer la librairie : `pip install git+https://github.com/rdassignies/pylegifrance `
