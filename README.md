@@ -67,7 +67,7 @@
 <!-- ABOUT THE PROJECT -->
 # PyLegifrance
 
-Si vous souhaitez accéder directement à une API simplifiée, c'est par ici : https://lab.dassignies.law
+Si vous souhaitez accéder directement à une API simplifiée, c'est par ici : [https://lab.dassignies.law](https://lab.dassignies.law/api/docs) 
 
 ### Built With
 
