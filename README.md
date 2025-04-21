@@ -68,6 +68,7 @@
 # PyLegifrance
 
 Si vous souhaitez accéder directement à une API simplifiée, c'est par ici : [https://lab.dassignies.law](https://lab.dassignies.law/api/docs) 
+Pour un serveur MCP Legifrance, c'est par ici : [https://github.com/rdassignies/mcp-server-legifrance](https://github.com/rdassignies/mcp-server-legifrance)
 
 ### Built With
 
