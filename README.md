@@ -67,9 +67,7 @@
 <!-- ABOUT THE PROJECT -->
 # PyLegifrance
 
-Si vous souhaitez accéder directement à une API simplifiée, c'est par ici : [https://lab.dassignies.law](https://lab.dassignies.law/api/docs) 
 
-Pour un serveur MCP Legifrance, c'est par ici : [https://github.com/rdassignies/mcp-server-legifrance](https://github.com/rdassignies/mcp-server-legifrance)
 
 ### Built With
 
@@ -79,6 +77,10 @@ https://dassignies.law
 
 Librairie python qui simplifie l'interrogation des contenus de legifrance en créant des fonctions pythons prêtes à l'emploi pour la recherche ou la consultation de textes légaux et réglementaires.  
 Elle repose sur l'utilisation de pydantic pour gérer les structures de données d'interrogation et de réponse de l'API legifrance. A terme l'intégralité des fonctions de l'API legifrance seront disponibles sous forme de fonctions python. 
+
+Si vous souhaitez accéder directement à une API simplifiée, c'est par ici : [https://lab.dassignies.law](https://lab.dassignies.law/api/docs) 
+
+Pour un serveur MCP Legifrance, c'est par ici : [https://github.com/rdassignies/mcp-server-legifrance](https://github.com/rdassignies/mcp-server-legifrance)
 
 
 <!-- GETTING STARTED -->
