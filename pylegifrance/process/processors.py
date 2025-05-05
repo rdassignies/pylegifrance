@@ -8,7 +8,6 @@ Fonctions qui traite les résultats renvoyés par l'API legifrance
 
 from typing import Union
 import json
-import os
 import logging
 
 from pylegifrance.models.consult import GetArticle, LegiPart
@@ -16,11 +15,13 @@ import yaml
 
 from importlib import resources
 
-with resources.open_text('pylegifrance', 'config.yaml') as file:
+with resources.files("pylegifrance").joinpath("config.yaml").open("r") as file:
     config = yaml.safe_load(file)
 
-logging_level = config['logging']['level']
-logging.basicConfig(level=logging_level, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logging_level = config["logging"]["level"]
+logging.basicConfig(
+    level=logging_level, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
 logger = logging.getLogger(__name__)
 logger.setLevel(logging_level)
 
@@ -31,7 +32,7 @@ def search_response_DTO(results: Union[dict, str]):
     (RechercheFinal).
 
     Args:
-        results (Dict): Dict de résultats (clé 'results') renvoyé 
+        results (Dict): Dict de résultats (clé 'results') renvoyé
         par l'API Legifrance
 
     Returns:
@@ -51,7 +52,7 @@ def search_response_DTO(results: Union[dict, str]):
     logger.info(f"Nombre de résultats trouvés: {results['totalResultNumber']}")
     logger.debug(f"Facets : {results['facets']}")
 
-    def get_with_default(dictionary, key, default=''):
+    def get_with_default(dictionary, key, default=""):
         value = dictionary.get(key)
         return value if value is not None else default
 
@@ -60,38 +61,47 @@ def search_response_DTO(results: Union[dict, str]):
     # Fonction récursive pour parcourir les éléments
     def extract_recursive(element):
         # Extraire les données de 'titles' si elles existent
-        if 'titles' in element:
-            for title in element['titles']:
-                extracted_data.append({
-                    'title_id': get_with_default(title, 'id'),
-                    'title_cid': get_with_default(title, 'cid'),
-                    'title': get_with_default(title, 'title')
-                })
+        if "titles" in element:
+            for title in element["titles"]:
+                extracted_data.append(
+                    {
+                        "title_id": get_with_default(title, "id"),
+                        "title_cid": get_with_default(title, "cid"),
+                        "title": get_with_default(title, "title"),
+                    }
+                )
 
         # Extraire les données de 'sections' si elles existent
-        if 'sections' in element:
-            for section in element['sections']:
-                extracted_data.append({
-                    'section_id': get_with_default(section, 'id'),
-                    'title': (section, 'title'),
-                })
+        if "sections" in element:
+            for section in element["sections"]:
+                extracted_data.append(
+                    {
+                        "section_id": get_with_default(section, "id"),
+                        "title": (section, "title"),
+                    }
+                )
                 # Appel récursif pour les extracts dans les sections
-                if 'extracts' in section:
-                    for extract in section['extracts']:
-                        extracted_data.append({
-                            'extract_id': get_with_default(extract, 'id'),
-                            'num': get_with_default(extract, 'num'),
-                            'legal_status': get_with_default(extract, 'legalStatus'),
-                            'date_version': get_with_default(extract, 'dateVersion'),
-                            'title': get_with_default(extract, 'title'),
-                            'values': get_with_default(extract, 'values')
-                        })
+                if "extracts" in section:
+                    for extract in section["extracts"]:
+                        extracted_data.append(
+                            {
+                                "extract_id": get_with_default(extract, "id"),
+                                "num": get_with_default(extract, "num"),
+                                "legal_status": get_with_default(
+                                    extract, "legalStatus"
+                                ),
+                                "date_version": get_with_default(
+                                    extract, "dateVersion"
+                                ),
+                                "title": get_with_default(extract, "title"),
+                                "values": get_with_default(extract, "values"),
+                            }
+                        )
 
     # Appel initial sur les résultats
-    for result in results['results']:
+    for result in results["results"]:
         extract_recursive(result)
 
-    
     return extracted_data
 
 
@@ -114,16 +124,17 @@ def get_text_id(data):
     logger.debug("get_text_id: RETRIEVING LEGITEXT --------")
     text_ids = []
     for item in data:
-
-        if 'title_id' in item and item['title_id'].startswith('LEGITEXT'):
-            text_ids.append(LegiPart(textId=item['title_id']))
+        if "title_id" in item and item["title_id"].startswith("LEGITEXT"):
+            text_ids.append(LegiPart(textId=item["title_id"]))
 
     logger.debug(f"Size of data containing LEGITEXT: {len(text_ids)}")
 
     if not text_ids:
-        raise GetTextIdError("La liste GetText est vide !"
-                             "- Pas d'identifiant LEGITEXT trouvé."
-                             "Vérifier vos critères de recherche.")
+        raise GetTextIdError(
+            "La liste GetText est vide !"
+            "- Pas d'identifiant LEGITEXT trouvé."
+            "Vérifier vos critères de recherche."
+        )
     return text_ids
 
 
@@ -148,25 +159,28 @@ def get_article_id(data):
 
     article_ids = []
     for item in data:
-        if 'extract_id' in item and item['extract_id'].startswith('LEGIARTI'):
-            article_ids.append(GetArticle(id=item['extract_id']))
+        if "extract_id" in item and item["extract_id"].startswith("LEGIARTI"):
+            article_ids.append(GetArticle(id=item["extract_id"]))
 
-    logger.debug("Size of data containing "
-                 f"LEGIARTI: {len(article_ids)}")
+    logger.debug(f"Size of data containing LEGIARTI: {len(article_ids)}")
 
     if not article_ids:
-        raise GetArticleIdError("La liste GetArticle est vide !"
-                                "- Pas d'identifiant LEGIARTI trouvé."
-                                "Vérifier vos critères de recherche.")
+        raise GetArticleIdError(
+            "La liste GetArticle est vide !"
+            "- Pas d'identifiant LEGIARTI trouvé."
+            "Vérifier vos critères de recherche."
+        )
 
     return article_ids
 
 
 class GetArticleIdError(Exception):
     """Lève une exception si LEGIARTI list est vide."""
+
     pass
 
 
 class GetTextIdError(Exception):
     """Lève une exception si LEGITEXT list est vide."""
+
     pass
