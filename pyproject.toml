@@ -7,10 +7,11 @@ name = "pylegifrance"
 version = "0.0.3a1"
 description = "Librairie qui fournit des fonctions simples pour rechercher dans legifrance"
 dependencies = [
-    "pydantic>=2",
     "requests",
     "PyYAML",
     "dotenv>=0.9.9",
+    "tenacity>=9.0.0",
+    "pydantic>=2.10.6",
 ]
 requires-python = ">=3.8"
 readme = "readme.md"
@@ -25,6 +26,9 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 
+[tool.pytest.ini_options]
+pythonpath = "."
+
 [project.urls]
 Homepage = "https://github.com/rdassignies/pylegifrance"
 
@@ -37,5 +41,5 @@ package-data = {"pylegifrance" = ["pylegifrance/config.yaml"]}
 [dependency-groups]
 dev = [
     "pytest>=8.3.5",
+    "pre-commit>=3.4.0",
 ]
-
