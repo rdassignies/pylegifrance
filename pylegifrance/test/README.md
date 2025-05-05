@@ -1,0 +1,40 @@
+# Exécution des Tests pour PyLegifrance
+
+Ce document explique comment exécuter les tests pour le paquet PyLegifrance.
+
+## Prérequis
+
+Avant d’exécuter les tests, assurez-vous d’avoir :
+
+1. Installé le paquet et ses dépendances :
+
+```bash
+  uv sync
+```
+
+2. Configuré les variables d’environnement pour l’API Legifrance (pour les tests API).
+
+### Variables d’Environnement
+
+Copiez le fichier `.env.example` situé à la racine du projet vers un nouveau fichier nommé `.env`, puis saisissez vos identifiants API Legifrance :
+
+```
+# Legifrance API configuration
+LEGIFRANCE_CLIENT_ID=your_client_id
+LEGIFRANCE_CLIENT_SECRET=your_client_secret
+```
+
+Ces identifiants sont nécessaires pour que les tests API fonctionnent correctement.
+
+## Exécution des Tests
+
+Pour exécuter tous les tests :
+
+```bash
+  uv run pytest pylegifrance/test
+```
+
+## Documentation Officielle Pytest
+
+Pour plus d’informations sur l’utilisation de pytest, consultez la documentation officielle :  
+👉 [pytest Documentation](https://docs.pytest.org/)
