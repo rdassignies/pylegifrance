@@ -1,16 +1,14 @@
-from typing import Optional, List, Dict, Any
-import re
+from typing import List
 from enum import Enum
-from datetime import datetime
 
 
-from pydantic import BaseModel, Field, validator
-from inspect import Signature, Parameter
+from pydantic import BaseModel, Field, ConfigDict
 
 
-#SUGGEST CONTROLLER 
+# SUGGEST CONTROLLER
 
-#Liste des fonds dans lesquels exécuter la recherche pour la suggestion
+
+# Liste des fonds dans lesquels exécuter la recherche pour la suggestion
 class SupplyEnum(str, Enum):
     ALL = "ALL"
     ALL_SUGGEST = "ALL_SUGGEST"
@@ -36,18 +34,23 @@ class SupplyEnum(str, Enum):
     ACCO = "ACCO"
     PDF = "PDF"
 
-class SuggestSupplyRequest(BaseModel) : 
 
-    """ Requête de suggestion d'une recherche textuelle dans un ou
+class SuggestSupplyRequest(BaseModel):
+    """Requête de suggestion d'une recherche textuelle dans un ou
     plusieurs fonds
     """
+
     searchText: str = Field(..., example="mariage", description="Texte à rechercher")
-    supplies: List[SupplyEnum] = Field(..., example=["JORF", "JURI"], description="Liste des fonds dans lesquels exécuter la recherche pour la suggestion")
-    documentsDits: bool = Field(True, description="Indicateur de la présence de documents dits")
+    supplies: List[SupplyEnum] = Field(
+        ...,
+        example=["JORF", "JURI"],
+        description="Liste des fonds dans lesquels exécuter la recherche pour la suggestion",
+    )
+    documentsDits: bool = Field(
+        True, description="Indicateur de la présence de documents dits"
+    )
 
-    class Config:
-           route = "suggest"
-
+    model_config = ConfigDict(route="suggest")
 
 
 CODE_LIST = {
