@@ -54,7 +54,7 @@ logger.setLevel(logging_level)
 
 def recherche_CODE(
     code_name: str,
-    search: str = "",
+    search: str = None,
     champ: str = "NUM_ARTICLE",
     type_recherche: str = "EXACTE",
     fond: str = "CODE_DATE",
@@ -85,6 +85,7 @@ def recherche_CODE(
     Args:
         code_name (str): Nom du Code (ex. "Code civil").
         search (str, optional): Terme recherché dans un champ spécifique du code.
+                               Si None, récupère le code dans son intégralité.
         champ (str, optional): Type de champ de recherche, par défaut 'NUM_ARTICLE'.
                                valeurs possibles : 'ALL', 'NUM_ARTICLE', 'TITLE', 'TABLE'.
         type_recherche (str, optional): Type de recherche. Par défaut est "EXACTE".
@@ -105,13 +106,19 @@ def recherche_CODE(
     client = LegiHandler()
     client.set_api_keys()
 
-    # TODO: ajouter la possibilité de rapatrier un code dans son intégralité si search=None
-    # Création des critères de recherche
+    # Création des critères de recherche et des champs de recherche
+    if search:
+        criteres = [
+            Critere(valeur=search, typeRecherche=type_recherche, operateur="ET")
+        ]
+        field = Champ(typeChamp=champ, criteres=criteres, operateur="ET")
+    else:
+        # When search is None, use a search criterion that will match all articles
+        # Using a space with the TITLE field and EXACTE type to retrieve the entire code
+        criteres = [Critere(valeur=" ", typeRecherche="EXACTE", operateur="ET")]
+        field = Champ(typeChamp="TITLE", criteres=criteres, operateur="ET")
 
-    criteres = [Critere(valeur=search, typeRecherche=type_recherche, operateur="ET")]
-
-    # Création des champs de recherche
-    field = Champ(typeChamp=champ, criteres=criteres, operateur="ET")
+    champs = [field]
 
     if args:
         print("ATTENTION : Traitement de *args pas encore implémenté.")
@@ -123,7 +130,7 @@ def recherche_CODE(
 
     # Construction des paramètres de la recherche
     recherche = Recherche(
-        champs=[field],
+        champs=champs,
         filtres=[filtre_code, filtre_date],
         pageNumber=page_number,
         pageSize=page_size,
