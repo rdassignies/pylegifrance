@@ -6,12 +6,12 @@ Modèles pydantic pour la recherche (route: "search") de l'API Legifrance
 @author: Raphaël d'Assignies'
 """
 
-from typing import List, Union, Optional
+from typing import List, Union, Optional, ClassVar
 from enum import Enum
 from datetime import datetime
 
 
-from pydantic import BaseModel, field_validator, ConfigDict
+from pydantic import BaseModel, field_validator
 from pylegifrance.models.constants import (
     Fonds,
     TypeFacettes,
@@ -231,7 +231,8 @@ class RechercheFinal(BaseModel):
     fond: Fonds
     recherche: Recherche  # Défini ailleurs
 
-    model_config = ConfigDict(route="search", model_reponse="SearchResponseDTO")
+    route: ClassVar[str] = "search"
+    model_reponse: ClassVar[str] = "SearchResponseDTO"
 
     @field_validator("recherche")
     @classmethod

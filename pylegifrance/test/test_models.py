@@ -159,9 +159,9 @@ def test_deprecated_route_warning():
 
     # Verify the model is still usable despite the warning
     assert code_table.textId == "LEGITEXT000006070721"
-    assert code_table.model_config["route"] == "consult/code/tableMatieres"
+    assert code_table.route == "consult/code/tableMatieres"
 
     # Test that the recommended replacement works
     legi_sommaire = LegiSommaireConsult(textId="LEGITEXT000006070721")
     assert legi_sommaire.textId == "LEGITEXT000006070721"
-    assert legi_sommaire.model_config["route"] == "consult/legi/tableMatieres"
+    assert legi_sommaire.route == "consult/legi/tableMatieres"

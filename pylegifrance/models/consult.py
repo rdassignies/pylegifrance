@@ -1,383 +1,269 @@
-from typing import Optional
+from typing import Optional, ClassVar
 from datetime import datetime
+from pydantic import BaseModel, Field
 import warnings
 
 
-from pydantic import BaseModel, Field, ConfigDict
+class BaseConsultModel(BaseModel):
+    route: ClassVar[Optional[str]] = None
+    model_reponse: ClassVar[Optional[str]] = None
 
-# Consult Controler
-# Models for the /consult endpoints
 
-
-class Jorf(BaseModel):
-    """
-    Récupère le contenu d'un texte du fonds JORF à partir de son identifiant
-
-    """
+class Jorf(BaseConsultModel):
+    """Récupère le contenu d'un texte du fonds JORF à partir de son identifiant"""
 
     textCid: str
     searchedString: Optional[str] = None
+    route = "consult/jorf"
+    model_reponse = "ConsultTextResponse"
 
-    model_config = ConfigDict(route="consult/jorf", model_reponse="ConsultTextResponse")
 
-
-class LegiPart(BaseModel):
-    """
-    Récupère le contenu d'un texte du fonds LEGI
-    à partir de son identifiant et de sa date de vigueur
-
-    """
+class LegiPart(BaseConsultModel):
+    """Récupère le contenu d'un texte du fonds LEGI à partir de son identifiant et de sa date de vigueur"""
 
     date: str = datetime.now().strftime("%Y-%m-%d")
     textId: str
     searchedString: Optional[str] = None
-
-    model_config = ConfigDict(
-        route="consult/legiPart", model_reponse="ConsultTextResponse"
-    )
+    route = "consult/legiPart"
+    model_reponse = "ConsultTextResponse"
 
 
-class GetSectionByCid(BaseModel):
-    """
-    Récupère la liste des section par leur identifiant commun
-
-    """
+class GetSectionByCid(BaseConsultModel):
+    """Récupère la liste des section par leur identifiant commun"""
 
     cid: str
+    route = "consult/getSectionByCid"
 
-    model_config = ConfigDict(route="consult/getSectionByCid")
 
-
-class GetArticle(BaseModel):
-    """
-    Récupère un article par son identifiant
-
-    """
+class GetArticle(BaseConsultModel):
+    """Récupère un article par son identifiant"""
 
     id: str
-
-    model_config = ConfigDict(
-        route="consult/getArticle", model_reponse="GetArticleResponse"
-    )
+    route = "consult/getArticle"
+    model_reponse = "GetArticleResponse"
 
 
-class GetArticleWithIdEliOrAlias(BaseModel):
-    """
-    Récupère un article par son identifiant ELI ou son alias
-    """
+class GetArticleWithIdEliOrAlias(BaseConsultModel):
+    """Récupère un article par son identifiant ELI ou son alias"""
 
     id: str
-
-    model_config = ConfigDict(
-        route="consult/getArticleWithIdEliOrAlias", model_reponse="GetArticleResponse"
-    )
+    route = "consult/getArticleWithIdEliOrAlias"
+    model_reponse = "GetArticleResponse"
 
 
-class GetArticleByCid(BaseModel):
-    """
-    Récupère un article par son identifiant CID
-    """
+class GetArticleByCid(BaseConsultModel):
+    """Récupère un article par son identifiant CID"""
 
     cid: str
-
-    model_config = ConfigDict(
-        route="consult/getArticleByCid", model_reponse="GetListArticleResponse"
-    )
+    route = "consult/getArticleByCid"
+    model_reponse = "GetListArticleResponse"
 
 
-class CodeConsult(BaseModel):
-    """
-    Récupère le contenu d'un code à partir de son identifiant et de sa date de vigueur
-    """
+class CodeConsult(BaseConsultModel):
+    """Récupère le contenu d'un code à partir de son identifiant et de sa date de vigueur"""
 
     date: str = datetime.now().strftime("%Y-%m-%d")
     textId: str
     searchedString: Optional[str] = None
+    route = "consult/code"
+    model_reponse = "ConsultTextResponse"
 
-    model_config = ConfigDict(route="consult/code", model_reponse="ConsultTextResponse")
 
-
-class CodeConsultWithAncienId(BaseModel):
-    """
-    Récupère le contenu d'un code à partir de son ancien identifiant
-    """
+class CodeConsultWithAncienId(BaseConsultModel):
+    """Récupère le contenu d'un code à partir de son ancien identifiant"""
 
     ancienId: str
     date: str = datetime.now().strftime("%Y-%m-%d")
     searchedString: Optional[str] = None
-
-    model_config = ConfigDict(
-        route="consult/getCodeWithAncienId", model_reponse="ConsultTextResponse"
-    )
+    route = "consult/getCodeWithAncienId"
+    model_reponse = "ConsultTextResponse"
 
 
-class CnilConsult(BaseModel):
-    """
-    Récupère le contenu d'un texte CNIL à partir de son identifiant
-    """
+class CnilConsult(BaseConsultModel):
+    """Récupère le contenu d'un texte CNIL à partir de son identifiant"""
 
     textCid: str
     searchedString: Optional[str] = None
-
-    model_config = ConfigDict(
-        route="consult/cnil", model_reponse="ConsultCnilTextResponse"
-    )
+    route = "consult/cnil"
+    model_reponse = "ConsultCnilTextResponse"
 
 
-class CnilConsultWithAncienId(BaseModel):
-    """
-    Récupère le contenu d'un texte CNIL à partir de son ancien identifiant
-    """
+class CnilConsultWithAncienId(BaseConsultModel):
+    """Récupère le contenu d'un texte CNIL à partir de son ancien identifiant"""
 
     ancienId: str
     searchedString: Optional[str] = None
-
-    model_config = ConfigDict(
-        route="consult/getCnilWithAncienId", model_reponse="ConsultCnilTextResponse"
-    )
+    route = "consult/getCnilWithAncienId"
+    model_reponse = "ConsultCnilTextResponse"
 
 
-class JuriConsult(BaseModel):
-    """
-    Récupère le contenu d'un texte jurisprudentiel à partir de son identifiant
-    """
+class JuriConsult(BaseConsultModel):
+    """Récupère le contenu d'un texte jurisprudentiel à partir de son identifiant"""
 
     textId: str
     searchedString: Optional[str] = None
-
-    model_config = ConfigDict(
-        route="consult/juri", model_reponse="ConsultJuriTextResponse"
-    )
+    route = "consult/juri"
+    model_reponse = "ConsultJuriTextResponse"
 
 
-class JuriConsultWithAncienId(BaseModel):
-    """
-    Récupère le contenu d'un texte jurisprudentiel à partir de son ancien identifiant
-    """
+class JuriConsultWithAncienId(BaseConsultModel):
+    """Récupère le contenu d'un texte jurisprudentiel à partir de son ancien identifiant"""
 
     ancienId: str
     searchedString: Optional[str] = None
-
-    model_config = ConfigDict(
-        route="consult/getJuriWithAncienId", model_reponse="ConsultJuriTextResponse"
-    )
+    route = "consult/getJuriWithAncienId"
+    model_reponse = "ConsultJuriTextResponse"
 
 
-class JorfConsult(BaseModel):
-    """
-    Récupère le contenu d'un texte du fonds JORF à partir de son identifiant
-    """
+class JorfConsult(BaseConsultModel):
+    """Récupère le contenu d'un texte du fonds JORF à partir de son identifiant"""
 
     textCid: str
     searchedString: Optional[str] = None
+    route = "consult/jorf"
+    model_reponse = "ConsultJorfResponse"
 
-    model_config = ConfigDict(route="consult/jorf", model_reponse="ConsultJorfResponse")
 
-
-class JorfConsultWithNor(BaseModel):
-    """
-    Récupère le contenu d'un texte du fonds JORF à partir de son numéro NOR
-    """
+class JorfConsultWithNor(BaseConsultModel):
+    """Récupère le contenu d'un texte du fonds JORF à partir de son numéro NOR"""
 
     nor: str
     searchedString: Optional[str] = None
-
-    model_config = ConfigDict(
-        route="consult/getJoWithNor", model_reponse="ConsultJorfResponse"
-    )
+    route = "consult/getJoWithNor"
+    model_reponse = "ConsultJorfResponse"
 
 
-class JorfContConsult(BaseModel):
-    """
-    Récupère le contenu d'un JO à partir de son identifiant
-    """
+class JorfContConsult(BaseConsultModel):
+    """Récupère le contenu d'un JO à partir de son identifiant"""
 
     contId: str
     searchedString: Optional[str] = None
+    route = "consult/jorfCont"
+    model_reponse = "GetJosResponse"
 
-    model_config = ConfigDict(route="consult/jorfCont", model_reponse="GetJosResponse")
 
-
-class LastNJo(BaseModel):
-    """
-    Récupère les N derniers JO
-    """
+class LastNJo(BaseConsultModel):
+    """Récupère les N derniers JO"""
 
     n: int = Field(..., description="Nombre de JO à récupérer")
-
-    model_config = ConfigDict(
-        route="consult/lastNJo", model_reponse="GetJorfContResponse"
-    )
+    route = "consult/lastNJo"
+    model_reponse = "GetJorfContResponse"
 
 
-class KaliTextConsult(BaseModel):
-    """
-    Récupère le contenu d'un texte KALI à partir de son identifiant
-    """
+class KaliTextConsult(BaseConsultModel):
+    """Récupère le contenu d'un texte KALI à partir de son identifiant"""
 
     textId: str
     searchedString: Optional[str] = None
-
-    model_config = ConfigDict(
-        route="consult/kaliText", model_reponse="ConsultKaliTextResponse"
-    )
+    route = "consult/kaliText"
+    model_reponse = "ConsultKaliTextResponse"
 
 
-class KaliTextConsultArticle(BaseModel):
-    """
-    Récupère un article d'un texte KALI à partir de son identifiant
-    """
+class KaliTextConsultArticle(BaseConsultModel):
+    """Récupère un article d'un texte KALI à partir de son identifiant"""
 
     textId: str
     articleId: str
     searchedString: Optional[str] = None
-
-    model_config = ConfigDict(
-        route="consult/kaliArticle", model_reponse="ConsultKaliTextResponse"
-    )
+    route = "consult/kaliArticle"
+    model_reponse = "ConsultKaliTextResponse"
 
 
-class KaliTextConsultSection(BaseModel):
-    """
-    Récupère une section d'un texte KALI à partir de son identifiant
-    """
+class KaliTextConsultSection(BaseConsultModel):
+    """Récupère une section d'un texte KALI à partir de son identifiant"""
 
     textId: str
     sectionId: str
     searchedString: Optional[str] = None
-
-    model_config = ConfigDict(
-        route="consult/kaliSection", model_reponse="ConsultKaliTextResponse"
-    )
+    route = "consult/kaliSection"
+    model_reponse = "ConsultKaliTextResponse"
 
 
-class KaliContConsult(BaseModel):
-    """
-    Récupère le contenu d'un conteneur KALI à partir de son identifiant
-    """
+class KaliContConsult(BaseConsultModel):
+    """Récupère le contenu d'un conteneur KALI à partir de son identifiant"""
 
     contId: str
     searchedString: Optional[str] = None
-
-    model_config = ConfigDict(
-        route="consult/kaliCont", model_reponse="ConsultKaliContResponse"
-    )
+    route = "consult/kaliCont"
+    model_reponse = "ConsultKaliContResponse"
 
 
-class KaliContConsultIdcc(BaseModel):
-    """
-    Récupère le contenu d'un conteneur KALI à partir de son IDCC
-    """
+class KaliContConsultIdcc(BaseConsultModel):
+    """Récupère le contenu d'un conteneur KALI à partir de son IDCC"""
 
     idcc: str
     searchedString: Optional[str] = None
-
-    model_config = ConfigDict(
-        route="consult/kaliContIdcc", model_reponse="ConsultKaliContResponse"
-    )
+    route = "consult/kaliContIdcc"
+    model_reponse = "ConsultKaliContResponse"
 
 
-class LegiSommaireConsult(BaseModel):
-    """
-    Récupère la table des matières d'un texte LEGI à partir de son identifiant
-    """
+class LegiSommaireConsult(BaseConsultModel):
+    """Récupère la table des matières d'un texte LEGI à partir de son identifiant"""
 
     textId: str
     date: str = datetime.now().strftime("%Y-%m-%d")
-
-    model_config = ConfigDict(
-        route="consult/legi/tableMatieres", model_reponse="ConsultTextResponse"
-    )
+    route = "consult/legi/tableMatieres"
+    model_reponse = "ConsultTextResponse"
 
 
-class DossierLegislatifConsult(BaseModel):
-    """
-    Récupère le contenu d'un dossier législatif à partir de son identifiant
-    """
+class DossierLegislatifConsult(BaseConsultModel):
+    """Récupère le contenu d'un dossier législatif à partir de son identifiant"""
 
     cid: str
     searchedString: Optional[str] = None
-
-    model_config = ConfigDict(
-        route="consult/dossierLegislatif",
-        model_reponse="ConsultDossierLegislatifResponse",
-    )
+    route = "consult/dossierLegislatif"
+    model_reponse = "ConsultDossierLegislatifResponse"
 
 
-class SameNumArticle(BaseModel):
-    """
-    Récupère les articles ayant le même numéro
-    """
+class SameNumArticle(BaseConsultModel):
+    """Récupère les articles ayant le même numéro"""
 
     textId: str
     articleId: str
     date: str = datetime.now().strftime("%Y-%m-%d")
-
-    model_config = ConfigDict(
-        route="consult/sameNumArticle", model_reponse="SectionsRevisionArticleResponse"
-    )
+    route = "consult/sameNumArticle"
+    model_reponse = "SectionsRevisionArticleResponse"
 
 
-class ConcordanceLinksArticle(BaseModel):
-    """
-    Récupère les liens de concordance d'un article
-    """
+class ConcordanceLinksArticle(BaseConsultModel):
+    """Récupère les liens de concordance d'un article"""
 
     textId: str
     articleId: str
     date: str = datetime.now().strftime("%Y-%m-%d")
-
-    model_config = ConfigDict(
-        route="consult/concordanceLinksArticle",
-        model_reponse="SectionsRevisionArticleResponse",
-    )
+    route = "consult/concordanceLinksArticle"
+    model_reponse = "SectionsRevisionArticleResponse"
 
 
-class ServicePublicLinksArticle(BaseModel):
-    """
-    Récupère les liens Service-Public.fr d'un article
-    """
+class ServicePublicLinksArticle(BaseConsultModel):
+    """Récupère les liens Service-Public.fr d'un article"""
 
     textId: str
     articleId: str
     date: str = datetime.now().strftime("%Y-%m-%d")
-
-    model_config = ConfigDict(
-        route="consult/servicePublicLinksArticle",
-        model_reponse="ServicePublicLinksArticleResponse",
-    )
+    route = "consult/servicePublicLinksArticle"
+    model_reponse = "ServicePublicLinksArticleResponse"
 
 
-class JuriPlanClassement(BaseModel):
-    """
-    Récupère le plan de classement des jurisprudences
-    """
+class JuriPlanClassement(BaseConsultModel):
+    """Récupère le plan de classement des jurisprudences"""
 
-    pass
-
-    model_config = ConfigDict(
-        route="consult/getJuriPlanClassement",
-        model_reponse="GetListPlanClassementJuriResponse",
-    )
+    route = "consult/getJuriPlanClassement"
+    model_reponse = "GetListPlanClassementJuriResponse"
 
 
-class GetTables(BaseModel):
-    """
-    Récupère les tables
-    """
+class GetTables(BaseConsultModel):
+    """Récupère les tables"""
 
     textId: str
     date: str = datetime.now().strftime("%Y-%m-%d")
-
-    model_config = ConfigDict(
-        route="consult/getTables", model_reponse="GetTableResponse"
-    )
+    route = "consult/getTables"
+    model_reponse = "GetTableResponse"
 
 
-class CodeTableMatieres(BaseModel):
+class CodeTableMatieres(BaseConsultModel):
     """
     Récupère la table des matières d'un texte de type CODE à partir de son identifiant et de sa date de vigueur
-
     DEPRECATED: Cette route est dépréciée. Utilisez LegiSommaireConsult avec le paramètre nature='CODE' à la place.
     """
 
@@ -393,6 +279,5 @@ class CodeTableMatieres(BaseModel):
             stacklevel=2,
         )
 
-    model_config = ConfigDict(
-        route="consult/code/tableMatieres", model_reponse="ConsultTextResponse"
-    )
+    route = "consult/code/tableMatieres"
+    model_reponse = "ConsultTextResponse"

@@ -57,9 +57,7 @@ def test_requete_simple():
         client = LegiHandler()
         client.set_api_keys()
         art = GetArticle(id="LEGIARTI000047362226")
-        client.call_api(
-            route=art.model_config["route"], data=art.model_dump(mode="json")
-        )
+        client.call_api(route=art.route, data=art.model_dump(mode="json"))
 
 
 def test_request_decompose():
@@ -90,7 +88,7 @@ def test_request_decompose():
         print(
             "Root logger level before requests call: ", root_logger.getEffectiveLevel()
         )
-        url = client.api_url + art.model_config["route"]
+        url = client.api_url + art.route
         requests.post(url, headers=headers, json=art.model_dump(mode="json"))
 
 

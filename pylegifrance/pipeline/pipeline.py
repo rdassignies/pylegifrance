@@ -245,22 +245,21 @@ class CallApiStep(PipelineStep):
             response.content jsonifié du module requests.
         """
         # Logique pour appeler l'API avec un seul modèle
-        response = self.client.call_api(
-            route=model.model_config["route"], data=model.model_dump(mode="json")
-        )
+        route = getattr(model, "route", None)
+
+        response = self.client.call_api(route=route, data=model.model_dump(mode="json"))
 
         # Log des informations de la réponse
         logger.debug("---------- call_api_SINGLE -------------")
         logger.debug(
-            f"Appel API vers {model.model_config['route']} retourné "
-            "code de statut {response.status_code}"
+            f"Appel API vers {route} retourné code de statut {{response.status_code}}"
         )
         # logger.debug(f"En-têtes de réponse: {response.headers}")
         logger.debug(f"Corps de réponse: {response.text}")
 
-        return json.loads(response.content.decode("utf-8")), model.model_config[
-            "model_reponse"
-        ]
+        model_reponse = getattr(model, "model_reponse", None)
+
+        return json.loads(response.content.decode("utf-8")), model_reponse
 
     def _call_api_multiple(self, models: List[BaseModel]) -> List:
         """
@@ -278,21 +277,26 @@ class CallApiStep(PipelineStep):
         # Logique pour appeler l'API avec plusieurs modèles
         responses = []
         for model in models:
+            route = getattr(model, "route", None)
+
             response = self.client.call_api(
-                route=model.model_config["route"], data=model.model_dump(mode="json")
+                route=route, data=model.model_dump(mode="json")
             )
             responses.append(json.loads(response.content.decode("utf-8")))
 
             # Log des informations de la réponse
             logger.debug("---------- call_api_MULTIPLE -------------")
             logger.debug(
-                f"Appel API vers {model.model_config['route']} retourné "
+                f"Appel API vers {route} retourné "
                 "code de statut {response.status_code}"
             )
             # logger.debug(f"En-têtes de réponse: {response.headers}")
             # logger.debug(f"Corps de réponse: {response.text}")
 
-        return responses, models[0].model_config["model_reponse"]
+        # Get model_reponse from the first model
+        model_reponse = getattr(models[0], "model_reponse", None)
+
+        return responses, model_reponse
 
 
 class Formatters(PipelineStep):

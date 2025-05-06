@@ -1,8 +1,8 @@
-from typing import List
+from typing import List, ClassVar
 from pylegifrance.models.constants import SupplyEnum
 
 
-from pydantic import BaseModel, Field, ConfigDict
+from pydantic import BaseModel, Field
 
 
 # SUGGEST CONTROLLER
@@ -23,4 +23,4 @@ class SuggestSupplyRequest(BaseModel):
         True, description="Indicateur de la présence de documents dits"
     )
 
-    model_config = ConfigDict(route="suggest")
+    route: ClassVar[str] = "suggest"
