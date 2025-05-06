@@ -21,6 +21,11 @@ from pylegifrance.models.search import (
     Operateur,
 )
 
+from pylegifrance.models.consult import (
+    CodeTableMatieres,
+    LegiSommaireConsult,
+)
+
 
 def test_champ_valide():
     """
@@ -140,3 +145,23 @@ def test_RechercheFinal_invalid_facet_type(facet_type, fond, expected_error):
     # Validation should fail with the expected error message
     with pytest.raises(ValidationError, match=expected_error):
         RechercheFinal(recherche=search, fond=fond)
+
+
+def test_deprecated_route_warning():
+    """
+    Tests that a deprecation warning is raised when using a deprecated route.
+    """
+    # Test that CodeTableMatieres raises a deprecation warning
+    with pytest.warns(
+        DeprecationWarning, match="La route 'consult/code/tableMatieres' est dépréciée"
+    ):
+        code_table = CodeTableMatieres(textId="LEGITEXT000006070721")
+
+    # Verify the model is still usable despite the warning
+    assert code_table.textId == "LEGITEXT000006070721"
+    assert code_table.model_config["route"] == "consult/code/tableMatieres"
+
+    # Test that the recommended replacement works
+    legi_sommaire = LegiSommaireConsult(textId="LEGITEXT000006070721")
+    assert legi_sommaire.textId == "LEGITEXT000006070721"
+    assert legi_sommaire.model_config["route"] == "consult/legi/tableMatieres"

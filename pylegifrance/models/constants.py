@@ -6,7 +6,7 @@ and ensure consistency across the codebase.
 """
 
 from enum import Enum
-from typing import Dict
+from typing import Dict, List, Tuple
 
 
 class CodeNom(str, Enum):
@@ -218,3 +218,11 @@ class TypeRecherche(Enum):
     AUCUN_MOT = "AUCUN_MOT"
     EXPRESSION = "EXPRESSION"
     CHAMP_VIDE = "CHAMP_VIDE"
+
+
+# List of deprecated routes and their replacements
+# Format: (deprecated_route, replacement_route, replacement_params)
+# If there are no special parameters needed for the replacement, use None
+DEPRECATED_ROUTES: List[Tuple[str, str, Dict[str, str]]] = [
+    ("consult/code/tableMatieres", "consult/legi/tableMatieres", {"nature": "CODE"}),
+]

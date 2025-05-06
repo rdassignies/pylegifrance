@@ -1,5 +1,6 @@
 from typing import Optional
 from datetime import datetime
+import warnings
 
 
 from pydantic import BaseModel, Field, ConfigDict
@@ -370,4 +371,28 @@ class GetTables(BaseModel):
 
     model_config = ConfigDict(
         route="consult/getTables", model_reponse="GetTableResponse"
+    )
+
+
+class CodeTableMatieres(BaseModel):
+    """
+    Récupère la table des matières d'un texte de type CODE à partir de son identifiant et de sa date de vigueur
+
+    DEPRECATED: Cette route est dépréciée. Utilisez LegiSommaireConsult avec le paramètre nature='CODE' à la place.
+    """
+
+    textId: str
+    date: str = datetime.now().strftime("%Y-%m-%d")
+
+    def __init__(self, **data):
+        super().__init__(**data)
+        warnings.warn(
+            "La route 'consult/code/tableMatieres' est dépréciée. "
+            "Utilisez LegiSommaireConsult avec le paramètre nature='CODE' à la place.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+
+    model_config = ConfigDict(
+        route="consult/code/tableMatieres", model_reponse="ConsultTextResponse"
     )
