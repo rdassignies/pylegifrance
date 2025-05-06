@@ -12,14 +12,16 @@ from datetime import datetime
 
 
 from pydantic import BaseModel, field_validator, ConfigDict
-from pylegifrance.models.generic import (
-    Operateur,
-    TypeChamp,
+from pylegifrance.models.constants import (
     Fonds,
     TypeFacettes,
     TypeRecherche,
     CodeNom,
     Nature,
+)
+from pylegifrance.models.generic import (
+    Operateur,
+    TypeChamp,
 )
 
 # Champs autorisés pour CODE, LODA, JURI,...
@@ -132,7 +134,36 @@ class DateSignatureFiltre(BaseModel):
 
 class NomCodeFiltre(BaseModel):
     facette: TypeFacettes = TypeFacettes.NOM_CODE
-    valeurs: List[CodeNom]
+    valeurs: List[Union[CodeNom, str]]
+
+    @field_validator("valeurs")
+    @classmethod
+    def validate_code_names(cls, v):
+        """
+        Validates and converts string code names to CodeNom enum values if needed.
+        This maintains backward compatibility with code that passes strings.
+        Raises ValidationError if a string is not a valid code name.
+        """
+        result = []
+        for code in v:
+            if isinstance(code, str):
+                # Check if the string is a direct enum value (e.g., "CCIV")
+                if code in CodeNom.__members__:
+                    result.append(CodeNom[code])
+                else:
+                    # Check if the string is a value of an enum (e.g., "Code civil")
+                    found = False
+                    for enum_val in CodeNom:
+                        if enum_val.value == code:
+                            result.append(enum_val)
+                            found = True
+                            break
+                    if not found:
+                        # If not found, raise a ValidationError
+                        raise ValueError(f"Invalid code name: {code}")
+            else:
+                result.append(code)
+        return result
 
 
 class NatureFiltre(BaseModel):
