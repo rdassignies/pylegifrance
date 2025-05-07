@@ -1,0 +1,116 @@
+name: Story
+description: Créez une nouvelle User Story.
+title: "[]"
+labels: ["story"]
+assignees: []
+
+body:
+  - type: markdown
+    id: problem_description
+    attributes:
+      value: |
+        ## 📝 Problématique à Adresser
+        Veuillez décrire la problématique en utilisant l'un des formats suivants:
+
+        - **Récit Utilisateur**: En tant que `type d'utilisateur`, je souhaite `un objectif/une fonctionnalité` afin de `une raison/un cas d'utilisation`.
+        - **Récit de Situation**: Lorsque `situation`, je souhaite `motivation` afin que `résultat attendu`.
+        - **Récit de Problématique**: Afin de `résoudre la problématique`, nous allons `élaborer une solution`.
+        - **Récit d'Amélioration**: Nous disposons actuellement de `situation actuelle`, nous souhaitons obtenir `situation désirée`.
+
+        ---
+  - type: textarea
+    id: problem_to_solve
+    attributes:
+      label: Problématique à Adresser
+      placeholder: "Veuillez utiliser l'un des formats suivants: Récit Utilisateur, Récit de Situation, Récit de Problématique, ou Récit d'Amélioration."
+    validations:
+      required: true
+
+  - type: markdown
+    id: details_description
+    attributes:
+      value: |
+        ## 📋 Informations Complémentaires
+        Veuillez fournir toute information additionnelle, captures d'écran ou exemples pour clarifier la demande.
+
+        ---
+  - type: textarea
+    id: further_details
+    attributes:
+      label: Informations Complémentaires
+      placeholder: "Veuillez inclure des informations supplémentaires ou partager des fichiers pertinents."
+    validations:
+      required: false
+
+  - type: markdown
+    id: solution_description
+    attributes:
+      value: |
+        ## 💡 Solution Proposée
+        Veuillez décrire votre solution en détail.
+
+        ---
+  - type: textarea
+    id: proposed_solution
+    attributes:
+      label: Solution Proposée
+      placeholder: "Veuillez décrire la solution que vous proposez."
+    validations:
+      required: true
+
+  - type: markdown
+    id: test_description
+    attributes:
+      value: |
+        ## 🧪 Scénarios de Test (BDD)
+        Veuillez fournir des scénarios de test en utilisant le format Behavior-Driven Development (BDD) pour valider la fonctionnalité. Ces scénarios doivent être alignés avec les critères d'acceptation et constituer une base pour les tests automatisés.
+
+        ### Exemple:
+        ```gherkin
+        Fonctionnalité: [Nom de la Fonctionnalité]
+          En tant que [type d'utilisateur]
+          Je souhaite [objectif]
+          Afin de [bénéfice/valeur]
+
+          Scénario: [Titre du Scénario]
+            Étant donné [État initial ou préconditions]
+            Lorsque [Action effectuée par l'utilisateur]
+            Alors [Résultat attendu]
+
+          Scénario: [Titre d'un Autre Scénario]
+            Étant donné [État initial ou préconditions]
+            Lorsque [Action effectuée par l'utilisateur]
+            Alors [Résultat attendu]
+        ```
+
+        ---
+  - type: textarea
+    id: testing
+    attributes:
+      label: Scénarios de Test
+      placeholder: "Veuillez inclure des scénarios de test en utilisant la syntaxe Gherkin."
+    validations:
+      required: true
+
+  - type: markdown
+    id: criteria_description
+    attributes:
+      value: |
+        ## ✅ Critères d'Acceptation
+        Veuillez définir les exigences pour que cette fonctionnalité soit considérée comme complète du point de vue utilisateur.
+
+        - **Les détails d'implémentation ne sont pas des critères d'acceptation.** Veuillez éviter les spécificités concernant le code, les bibliothèques ou les technologies utilisées.
+        - **Concentrez-vous sur les attentes de l'utilisateur**: Veuillez décrire ce que la fonctionnalité doit accomplir pour l'utilisateur.
+        - **Alignez avec les scénarios de test**: Veuillez assurer la cohérence entre cette section et les scénarios de test.
+
+        ---
+  - type: textarea
+    id: acceptance_criteria
+    attributes:
+      label: Critères d'Acceptation
+      placeholder: |
+        - [ ] Critère 1: La fonctionnalité répond à un besoin spécifique de l'utilisateur.
+        - [ ] Critère 2: La fonctionnalité correspond aux scénarios de test décrits.
+        - [ ] Critère 3: Le retour utilisateur sur l'ergonomie et l'utilisabilité est positif.
+    validations:
+      required: true
