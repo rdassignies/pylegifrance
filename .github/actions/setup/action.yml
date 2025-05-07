@@ -1,0 +1,29 @@
+name: 'Common Setup'
+description: 'Sets up the environment with common dependencies and configurations'
+
+inputs:
+  install-all-extras:
+    description: 'Whether to install all extras with uv sync'
+    required: false
+    default: 'false'
+  env-content:
+    description: 'Content for .env file'
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Create .env file
+      shell: bash
+      run: |
+        install -m 600 /dev/null .env
+        printf "%s" "${{ inputs.env-content }}" > .env
+
+    - name: Install uv package manager
+      shell: bash
+      run: pip install uv
+
+    - name: Install dependencies with uv
+      if: inputs.install-all-extras == 'false'
+      shell: bash
+      run: uv sync --all-extras
