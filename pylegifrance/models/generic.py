@@ -18,15 +18,17 @@ class Operateur(Enum):
     """
     Opérateur entre les champs de recherche
     """
+
     ET = "ET"
     OU = "OU"
 
 
 class TypeChamp(Enum):
     """
-    Type de champ. Il est possible d'utiliser la valeur ALL pour r
-    echercher dans tous les champs.
+    Type de champ. Il est possible d'utiliser la valeur ALL pour
+    rechercher dans tous les champs.
     """
+
     ALL = "ALL"
     TITLE = "TITLE"
     TABLE = "TABLE"
@@ -62,17 +64,19 @@ class TypeChamp(Enum):
 
 
 class TypeRecherche(Enum):
-    """Type de recherche effectuée
-    """
+    """Type de recherche effectuée"""
+
     EXACTE = "EXACTE"
     UN_DES_MOTS = "UN_DES_MOTS"
     TOUS_LES_MOTS_DANS_UN_CHAMP = "TOUS_LES_MOTS_DANS_UN_CHAMP"
     AUCUN_DES_MOTS = "AUCUN_DES_MOTS"
-    AUCUNE_CORRESPONDANCE_A_CETTE_EXPRESSION = "AUCUNE_CORRESPONDANCE_A_CETTE_EXPRESSION"
+    AUCUNE_CORRESPONDANCE_A_CETTE_EXPRESSION = (
+        "AUCUNE_CORRESPONDANCE_A_CETTE_EXPRESSION"
+    )
 
 
 class Fonds(str, Enum):
-    """ Liste des fonds disponibles pour la recherche
+    """Liste des fonds disponibles pour la recherche
     Fonds sur lequel appliquer la recherche. Pour rechercher dans tous les
     fonds, il faut définir la valeur ALL.
     Pour les fonds LODA et CODE, il existe deux types de recherche :
