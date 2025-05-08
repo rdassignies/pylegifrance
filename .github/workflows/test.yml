@@ -2,16 +2,16 @@ name: Test
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
   workflow_dispatch:
 
 jobs:
   test:
     runs-on: self-hosted
     container:
-      image: python:3.11
+      image: python:3.12
 
     steps:
       - name: Checkout Code
@@ -20,7 +20,7 @@ jobs:
       - name: Setup Common Environment
         uses: ./.github/actions/setup
         with:
-          install-all-extras: 'true'
+          install-all-extras: "true"
           env-content: ${{ secrets.ENV }}
 
       - name: Run tests
