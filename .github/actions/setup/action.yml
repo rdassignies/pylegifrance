@@ -1,13 +1,13 @@
-name: 'Common Setup'
-description: 'Sets up the environment with common dependencies and configurations'
+name: "Common Setup"
+description: "Sets up the environment with common dependencies and configurations"
 
 inputs:
   install-all-extras:
-    description: 'Whether to install all extras with uv sync'
+    description: "Whether to install all extras with uv sync"
     required: false
-    default: 'false'
+    default: "false"
   env-content:
-    description: 'Content for .env file'
+    description: "Content for .env file"
     required: true
 
 runs:

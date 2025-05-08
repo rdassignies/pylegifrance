@@ -1,0 +1,79 @@
+site_name: PyLegifrance
+site_description: Librairie Python qui simplifie l'accès aux données juridiques françaises via l'API Legifrance
+site_author: PyLegifrance
+site_url: https://pylegifrance.github.io/pylegifrance/
+repo_url: https://github.com/pylegifrance/pylegifrance
+repo_name: pylegifrance/pylegifrance
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  language: fr
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.expand
+    - navigation.indexes
+    - content.code.copy
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Passer au mode sombre
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Passer au mode clair
+  icon:
+    repo: fontawesome/brands/github
+
+nav:
+  - Accueil: index.md
+  - Tutoriels:
+      - Tutoriels: tutorials/index.md
+  - Guides Pratiques:
+      - Guides: how-to/index.md
+  - Référence:
+      - Référence API: reference/index.md
+  - Explication:
+      - Concepts: explanation/index.md
+
+markdown_extensions:
+  - meta
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.tabbed:
+      alternate_style: true
+
+plugins:
+  - search:
+      lang: fr
+  - tags:
+  - minify:
+      minify_html: true
+      minify_js: true
+      minify_css: true
+      htmlmin_opts:
+        remove_comments: true
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/pylegifrance/pylegifrance
+      name: PyLegifrance sur GitHub
+  open_graph:
+    site_name: PyLegifrance
+    title: PyLegifrance - Librairie Python pour l'API Legifrance
+    description: Librairie Python qui simplifie l'accès aux données juridiques françaises via l'API Legifrance
+    image: assets/images/social-card.png
+    url: https://pylegifrance.github.io/pylegifrance/
+    type: website

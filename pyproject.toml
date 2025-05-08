@@ -6,40 +6,51 @@ build-backend = "setuptools.build_meta"
 name = "pylegifrance"
 version = "0.0.3a1"
 description = "Librairie qui fournit des fonctions simples pour rechercher dans legifrance"
+requires-python = ">=3.12"
+readme = "README.md"
+license = { file = "LICENSE" }
+
+authors = [
+    { name = "Raphaël d'Assignies", email = "rdassignies@protonmail.ch" },
+    { name = "Frederic F.", email = "17061560+freddo1503@users.noreply.github.com" }
+]
+
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.12",
+    "Operating System :: OS Independent"
+]
+
 dependencies = [
     "requests",
     "PyYAML",
     "dotenv>=0.9.9",
     "tenacity>=9.0.0",
-    "pydantic>=2.10.6",
+    "pydantic>=2.10.6"
 ]
-requires-python = ">=3.8"
-readme = "readme.md"
-authors = [
-    {name = "Raphaël d'Assignies", email = "rdassignies@protonmail.ch"},
-    {name = "Frederic F.", email = "17061560+freddo1503@users.noreply.github.com"}
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.3.5",
+    "pre-commit>=3.4.0",
+    "twine>=4.0.2"
 ]
-license = {file = "LICENSE"}
-classifiers = [
-    "License :: OSI Approved :: MIT License",
-    "Programming Language :: Python :: 3.10",
-    "Operating System :: OS Independent",
+docs = [
+    "mkdocs>=1.6.1",
+    "mkdocs-material>=9.6.12",
+    "mkdocs-minify-plugin>=0.7.1",
+    "pymdown-extensions"
 ]
+
+[project.urls]
+Homepage = "https://github.com/pylegifrance/pylegifrance"
 
 [tool.pytest.ini_options]
 pythonpath = "."
 
-[project.urls]
-Homepage = "https://github.com/rdassignies/pylegifrance"
-
-[project.optional-dependencies]
-dev = ["pytest>=7.0", "twine>=4.0.2"]
-
 [tool.setuptools]
-package-data = {"pylegifrance" = ["pylegifrance/config.yaml"]}
+package-data = { "pylegifrance" = ["pylegifrance/config.yaml"] }
 
-[dependency-groups]
-dev = [
-    "pytest>=8.3.5",
-    "pre-commit>=3.4.0",
-]
+[tool.setuptools.packages.find]
+include = ["pylegifrance", "pylegifrance.*"]
+exclude = ["site", "site.*"]
