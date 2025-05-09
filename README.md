@@ -16,7 +16,7 @@
 
 <br />
   <!--<div align="center">
- <a href="https://github.com/rdassignies/pylegifrance">
+ <a href="https://github.com/pylegifrance/pylegifrance">
     <img src="images/logo.png" alt="Logo" width="80" height="80">
   </a> -->
 
@@ -25,14 +25,14 @@
   <p align="center">
     project_description
     <br />
-    <a href="https://github.com/rdassignies/pylegifrance/docs"><strong>Documentation  »</strong></a>
+    <a href="https://github.com/pylegifrance/pylegifrance/docs"><strong>Documentation  »</strong></a>
     <br />
     <br />
-    <a href="https://github.com/rdassignies/pylegifrance">View Demo</a>
+    <a href="https://github.com/pylegifrance/pylegifrance">View Demo</a>
     ·
-    <a href="https://github.com/rdassignies/pylegifrance/issues">Report Bug</a>
+    <a href="https://github.com/pylegifrance/pylegifrance/issues">Report Bug</a>
     ·
-    <a href="https://github.com/rdassignies/pylegifrance/issues">Request Feature</a>
+    <a href="https://github.com/pylegifrance/pylegifrance/issues">Request Feature</a>
   </p>
 </div> -->
 <!-- TABLE OF CONTENTS 
@@ -87,13 +87,15 @@ Pour un serveur MCP Legifrance, c'est par ici : [https://github.com/rdassignies/
 
 ## Démarrage
 
-Pour installer la librairie : `pip install git+https://github.com/rdassignies/pylegifrance `
+Pour installer la librairie : `uv pip install git+https://github.com/pylegifrance/pylegifrance `
 
 Un package depuis PyPi sera accessible ultérieurement. 
 
 ### Pré requis
 
-Pour obtenir votre accès à l'API legifrance (clé API et secret), vous devez vous connecter sur le portail PISTE : https://developer.aife.economie.gouv.fr/ 
+Pour obtenir votre accès à l'API legifrance (clé API et secret), vous devez créer un compte sur le portail PISTE : https://piste.gouv.fr
+
+Pour des instructions détaillées sur la création d'un compte et l'obtention des clés API, consultez le [guide officiel du portail PISTE](https://piste.gouv.fr/en/help-center/guide) ou la [documentation complète](https://pylegifrance.github.io/pylegifrance/how-to/#comment-obtenir-un-compte-sur-le-portail-piste).
 
 ### Installation
 
@@ -195,7 +197,7 @@ Pour plus de détails, se référer à la documentation de la fonction.
 - [ ] Ajout de fonctions de formattage avancé en sortie
 - [ ] Ajout des paramètres de tri des résultats 
 
-See the [open issues](https://github.com/rdassignies/pylegifrance/issues) for a full list of proposed features (and known issues).
+See the [open issues](https://github.com/pylegifrance/pylegifrance/issues) for a full list of proposed features (and known issues).
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -216,7 +218,7 @@ Raphael d'Assignies - email: rdassignies AT protonmail.ch
 
 https://dassignies.law
 
-Project Link: [https://github.com/rdassignies/pylegifrance](https://github.com/rdassignies/pylegifrance)
+Project Link: [https://github.com/pylegifrance/pylegifrance](https://github.com/pylegifrance/pylegifrance)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -225,13 +227,12 @@ Project Link: [https://github.com/rdassignies/pylegifrance](https://github.com/r
 [contributors-shield]: https://img.shields.io/github/contributors/rdassignies/pylegifrance.svg?style=for-the-badge
 [contributors-url]: github.com/rdassignies/pylegifrance/graphs/contributors
 [forks-shield]: https://img.shields.io/github/forks/rdassignies/pylegifrance.svg?style=for-the-badge
-[forks-url]: https://github.com/rdassignies/pylegifrance/network/members
+[forks-url]: https://github.com/pylegifrance/pylegifrance/network/members
 [stars-shield]: https://img.shields.io/github/stars/rdassignies/pylegifrance.svg?style=for-the-badge
-[stars-url]: https://github.com/rdassignies/pylegifrance/stargazers
+[stars-url]: https://github.com/pylegifrance/pylegifrance/stargazers
 [issues-shield]: https://img.shields.io/github/issues/rdassignies/pylegifrance.svg?style=for-the-badge
-[issues-url]: https://github.com/rdassignies/pylegifrance/issues
+[issues-url]: https://github.com/pylegifrance/pylegifrance/issues
 [license-shield]: https://img.shields.io/github/license/rdassignies/pylegifrance.svg?style=for-the-badge
-[license-url]: https://github.com/rdassignies/pylegifrance/blob/master/LICENSE.txt
+[license-url]: https://github.com/pylegifrance/pylegifrance/blob/master/LICENSE.txt
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [linkedin-url]: https://fr.linkedin.com/in/dassignies
-
