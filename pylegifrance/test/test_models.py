@@ -18,6 +18,8 @@ from pylegifrance.models.consult import (
     LegiSommaireConsult,
 )
 
+from pylegifrance.models.constants import CodeNom
+
 
 @pytest.fixture
 def basic_criteria():
@@ -172,3 +174,113 @@ def test_deprecated_route_warning():
     # Then it should have the correct properties
     assert legi_sommaire.textId == text_id
     assert legi_sommaire.route == "consult/legi/tableMatieres"
+
+
+def test_nom_code_filtre_with_valid_code_names():
+    """
+    Test that NomCodeFiltre accepts valid code names.
+    """
+    # Given valid code names from the CodeNom enum
+    valid_code_names = [
+        "Code civil",  # String value
+        CodeNom.CCIV,  # Enum value
+        "CCIV",  # Enum member name
+    ]
+
+    # When creating a NomCodeFiltre with these values
+    filtre = NomCodeFiltre(valeurs=valid_code_names)
+
+    # Then the filter should have the correct values
+    assert len(filtre.valeurs) == 3
+    assert all(isinstance(code, CodeNom) for code in filtre.valeurs)
+    assert CodeNom.CCIV in filtre.valeurs
+
+
+def test_nom_code_filtre_with_code_de_commerce():
+    """
+    Test that NomCodeFiltre accepts 'Code de commerce' as a valid code name.
+    """
+    # Given 'Code de commerce' as a code name
+    code_name = "Code de commerce"
+
+    # When creating a NomCodeFiltre with this value
+    # Then it should not raise a validation error
+    try:
+        filtre = NomCodeFiltre(valeurs=[code_name])
+        assert len(filtre.valeurs) == 1
+        assert filtre.valeurs[0] == CodeNom.CCOM
+    except ValidationError as e:
+        pytest.fail(f"NomCodeFiltre validation failed for 'Code de commerce': {e}")
+
+
+def test_nom_code_filtre_with_code_de_commerce_in_recherche():
+    """
+    Test that 'Code de commerce' is accepted in a complete Recherche model.
+    """
+    # Given a basic search criteria
+    critere = Critere(
+        valeur="7", typeRecherche=TypeRecherche.EXACTE, operateur=Operateur.ET
+    )
+    field = Champ(typeChamp="NUM_ARTICLE", criteres=[critere], operateur=Operateur.ET)
+
+    # And 'Code de commerce' as a code name
+    code_name = "Code de commerce"
+    filtre_code = NomCodeFiltre(valeurs=[code_name])
+    filtre_date = DateVersionFiltre()
+
+    # When creating a Recherche with these values
+    # Then it should not raise a validation error
+    try:
+        recherche = Recherche(
+            champs=[field],
+            filtres=[filtre_code, filtre_date],
+            pageNumber=1,
+            pageSize=10,
+        )
+        assert len(recherche.filtres) == 2
+        assert recherche.filtres[0].valeurs[0] == CodeNom.CCOM
+    except ValidationError as e:
+        pytest.fail(f"Recherche validation failed for 'Code de commerce': {e}")
+
+
+def test_nom_code_filtre_with_code_de_commerce_in_recherche_final():
+    """
+    Test that 'Code de commerce' is accepted in a complete RechercheFinal model.
+    """
+    # Given a basic search criteria
+    critere = Critere(
+        valeur="7", typeRecherche=TypeRecherche.EXACTE, operateur=Operateur.ET
+    )
+    field = Champ(typeChamp="NUM_ARTICLE", criteres=[critere], operateur=Operateur.ET)
+
+    # And 'Code de commerce' as a code name
+    code_name = "Code de commerce"
+    filtre_code = NomCodeFiltre(valeurs=[code_name])
+    filtre_date = DateVersionFiltre()
+
+    # When creating a Recherche and RechercheFinal with these values
+    # Then it should not raise a validation error
+    try:
+        recherche = Recherche(
+            champs=[field],
+            filtres=[filtre_code, filtre_date],
+            pageNumber=1,
+            pageSize=10,
+        )
+        recherche_final = RechercheFinal(recherche=recherche, fond="CODE_DATE")
+        assert recherche_final.recherche.filtres[0].valeurs[0] == CodeNom.CCOM
+    except ValidationError as e:
+        pytest.fail(f"RechercheFinal validation failed for 'Code de commerce': {e}")
+
+
+def test_nom_code_filtre_with_invalid_code_name():
+    """
+    Test that NomCodeFiltre rejects invalid code names.
+    """
+    # Given an invalid code name
+    invalid_code_name = "Code inexistant"
+
+    # When attempting to create a NomCodeFiltre with this value
+    # Then a validation error should be raised
+    with pytest.raises(ValidationError, match="Invalid code name"):
+        NomCodeFiltre(valeurs=[invalid_code_name])
