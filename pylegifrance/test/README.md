@@ -34,6 +34,10 @@ Pour exécuter tous les tests :
   uv run pytest pylegifrance/test
 ```
 
+## Approche de Test
+
+Ce projet suit l'approche de [Behaviour-Driven Development (BDD)](https://behave.readthedocs.io/en/latest/) en utilisant le framework [Cucumber](https://cucumber.io/).
+
 ## Documentation Officielle Pytest
 
 Pour plus d’informations sur l’utilisation de pytest, consultez la documentation officielle :  
