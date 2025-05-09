@@ -1,11 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Tue Nov 14 12:12:19 2023
-
-@author: raphael
-"""
-
 import pytest
 from pydantic import ValidationError
 
@@ -27,37 +19,45 @@ from pylegifrance.models.consult import (
 )
 
 
-def test_champ_valide():
-    """
-    Teste si un champ est valide avec des critères corrects.
-    """
-    criteria = Critere(
+@pytest.fixture
+def basic_criteria():
+    """Fixture to provide a basic search criteria."""
+    # Given a basic search value and parameters
+    return Critere(
         valeur="7", typeRecherche=TypeRecherche.EXACTE, operateur=Operateur.ET
     )
+
+
+def test_field_with_valid_criteria(basic_criteria):
+    """
+    Test that a field with valid criteria is correctly constructed.
+    """
+    # Given a valid criteria
+    criteria = basic_criteria
+
+    # When a field is created with the criteria
     field = Champ(typeChamp="VISA", criteres=[criteria], operateur=Operateur.ET)
 
-    # Vérification du type du champ et des critères
+    # Then the field should have the correct properties
     assert field.typeChamp.value == "VISA"
     assert len(field.criteres) == 1
     assert field.criteres[0].valeur == "7"
     assert field.operateur == Operateur.ET
 
 
-def test_RechercheFinal_fond_type_champs_valide():
+def test_recherche_final_with_valid_field_and_fond(basic_criteria):
     """
-    Teste si une recherche finale est valide avec un fond correct
-    et un champ autorisé.
+    Test that a RechercheFinal with valid field and fond is correctly constructed.
     """
-    criteria = Critere(valeur="7", typeRecherche="EXACTE", operateur="ET")
-    field = Champ(typeChamp="VISA", criteres=[criteria], operateur=Operateur.ET)
-
-    # Création des filtres et recherche finale
-    # Use a valid filter for LODA_DATE (NatureFiltre instead of NomCodeFiltre)
+    # Given a valid field and filter
+    field = Champ(typeChamp="VISA", criteres=[basic_criteria], operateur=Operateur.ET)
     filtre = NatureFiltre(valeurs=["LOI", "DECRET"])
+
+    # When a search and final search are created
     search = Recherche(champs=[field], filtres=[filtre])
     final = RechercheFinal(recherche=search, fond="LODA_DATE")
 
-    # Assertions pour vérifier la validité du modèle
+    # Then the final search should have the correct properties
     assert final.fond == "LODA_DATE"
     assert len(final.recherche.champs) == 1
     assert final.recherche.champs[0].typeChamp.value == "VISA"
@@ -76,36 +76,39 @@ def test_RechercheFinal_fond_type_champs_valide():
         # Add more invalid combinations as needed
     ],
 )
-def test_RechercheFinal_invalid_field_type(field_type, fond, expected_error):
+def test_recherche_final_with_invalid_field_type(
+    field_type, fond, expected_error, basic_criteria
+):
     """
-    Tests that validation correctly rejects invalid field types for specific fonds.
+    Test that validation correctly rejects invalid field types for specific fonds.
     """
-    criteria = Critere(valeur="7", typeRecherche="EXACTE", operateur="ET")
-    field = Champ(typeChamp=field_type, criteres=[criteria], operateur=Operateur.ET)
-
+    # Given a field with an invalid type for the specified fond
+    field = Champ(
+        typeChamp=field_type, criteres=[basic_criteria], operateur=Operateur.ET
+    )
     filtre = NomCodeFiltre(valeurs=["Code civil"])
     search = Recherche(champs=[field], filtres=[filtre])
 
-    # Validation should fail with the expected error message
+    # When attempting to create a RechercheFinal with the invalid combination
+    # Then validation should fail with the expected error message
     with pytest.raises(ValidationError, match=expected_error):
         RechercheFinal(recherche=search, fond=fond)
 
 
-def test_RechercheFinal_fond_type_filtres_valide():
+def test_recherche_final_with_valid_filters(basic_criteria):
     """
-    Teste si une recherche finale avec des filtres valides
-    est correctement construite.
+    Test that a RechercheFinal with valid filters is correctly constructed.
     """
-    criteria = Critere(valeur="7", typeRecherche="EXACTE", operateur="ET")
-    field = Champ(typeChamp="NUM_ARTICLE", criteres=[criteria], operateur="ET")
-
-    filtre = NomCodeFiltre(valeurs=["Code civil"])
+    # Given valid field and filters
+    field = Champ(typeChamp="NUM_ARTICLE", criteres=[basic_criteria], operateur="ET")
+    filtre1 = NomCodeFiltre(valeurs=["Code civil"])
     filtre2 = DateVersionFiltre()
 
-    search = Recherche(champs=[field], filtres=[filtre, filtre2])
+    # When a search and final search are created with the filters
+    search = Recherche(champs=[field], filtres=[filtre1, filtre2])
     final = RechercheFinal(recherche=search, fond="CODE_DATE")
 
-    # Assertions sur le contenu des filtres et la recherche
+    # Then the final search should have the correct filter properties
     assert final.fond == "CODE_DATE"
     assert len(final.recherche.filtres) == 2
     assert isinstance(final.recherche.filtres[0], NomCodeFiltre)
@@ -124,44 +127,48 @@ def test_RechercheFinal_fond_type_filtres_valide():
         # Add more invalid combinations as needed
     ],
 )
-def test_RechercheFinal_invalid_facet_type(facet_type, fond, expected_error):
+def test_recherche_final_with_invalid_facet_type(
+    facet_type, fond, expected_error, basic_criteria
+):
     """
-    Tests that validation correctly rejects invalid facet types for specific fonds.
+    Test that validation correctly rejects invalid facet types for specific fonds.
     """
-    criteria = Critere(valeur="7", typeRecherche="EXACTE", operateur="ET")
-    field = Champ(typeChamp="NUM_ARTICLE", criteres=[criteria], operateur=Operateur.ET)
-
-    # Create a filter with the specified facet type
-    if facet_type == "NOM_CODE":
-        filtre = NomCodeFiltre(valeurs=["Code civil"])
-    else:
-        # Add handling for other facet types if needed
-        filtre = NomCodeFiltre(valeurs=["Code civil"])
-
+    # Given a field and a filter with an invalid facet type for the specified fond
+    field = Champ(
+        typeChamp="NUM_ARTICLE", criteres=[basic_criteria], operateur=Operateur.ET
+    )
+    filtre1 = NomCodeFiltre(valeurs=["Code civil"])
     filtre2 = DateVersionFiltre()
 
-    search = Recherche(champs=[field], filtres=[filtre, filtre2])
+    # When a search is created with the invalid filter
+    search = Recherche(champs=[field], filtres=[filtre1, filtre2])
 
-    # Validation should fail with the expected error message
+    # Then validation should fail with the expected error message when creating the final search
     with pytest.raises(ValidationError, match=expected_error):
         RechercheFinal(recherche=search, fond=fond)
 
 
 def test_deprecated_route_warning():
     """
-    Tests that a deprecation warning is raised when using a deprecated route.
+    Test that a deprecation warning is raised when using a deprecated route.
     """
-    # Test that CodeTableMatieres raises a deprecation warning
+    # Given a text ID for a code
+    text_id = "LEGITEXT000006070721"
+
+    # When creating a CodeTableMatieres instance
+    # Then a deprecation warning should be raised
     with pytest.warns(
         DeprecationWarning, match="La route 'consult/code/tableMatieres' est dépréciée"
     ):
-        code_table = CodeTableMatieres(textId="LEGITEXT000006070721")
+        code_table = CodeTableMatieres(textId=text_id)
 
-    # Verify the model is still usable despite the warning
-    assert code_table.textId == "LEGITEXT000006070721"
+    # And the model should still be usable despite the warning
+    assert code_table.textId == text_id
     assert code_table.route == "consult/code/tableMatieres"
 
-    # Test that the recommended replacement works
-    legi_sommaire = LegiSommaireConsult(textId="LEGITEXT000006070721")
-    assert legi_sommaire.textId == "LEGITEXT000006070721"
+    # When creating the recommended replacement
+    legi_sommaire = LegiSommaireConsult(textId=text_id)
+
+    # Then it should have the correct properties
+    assert legi_sommaire.textId == text_id
     assert legi_sommaire.route == "consult/legi/tableMatieres"
