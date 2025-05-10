@@ -1,6 +1,6 @@
 import pytest
 from pydantic import ValidationError
-from pylegifrance.pipeline.pipeline_factory import recherche_CODE, recherche_LODA
+from pylegifrance.pipeline.pipeline_factory import recherche_code, recherche_LODA
 from pylegifrance.process.processors import GetArticleIdError
 
 
@@ -25,7 +25,7 @@ def test_search_code_with_article_number(civil_code):
     article_number = "7"
 
     # When searching for the article
-    result = recherche_CODE(code_name=code_name, search=article_number)
+    result = recherche_code(code_name=code_name, search=article_number)
 
     # Then the search should complete without errors
     assert result is not None
@@ -145,7 +145,7 @@ def test_search_code_for_specific_article(civil_code):
     article_number = "1200"
 
     # When searching for the specific article with formatting
-    result = recherche_CODE(code_name=code_name, search=article_number, formatter=True)
+    result = recherche_code(code_name=code_name, search=article_number, formatter=True)
 
     # Then the search should complete without errors
     assert result is not None
@@ -159,7 +159,7 @@ def test_search_entire_code(civil_code):
     code_name = civil_code
 
     # When searching for the entire code with formatting
-    result = recherche_CODE(code_name=code_name, formatter=True)
+    result = recherche_code(code_name=code_name, formatter=True)
 
     # Then the search should complete without errors
     assert result is not None
@@ -175,7 +175,7 @@ def test_search_code_with_term_in_article_field(civil_code):
     field = "ARTICLE"
 
     # When searching for the term in the article field with formatting
-    result = recherche_CODE(
+    result = recherche_code(
         code_name=code_name,
         search=search_term,
         champ=field,
@@ -197,7 +197,7 @@ def test_search_code_with_pagination(civil_code):
     page_number = 2
 
     # When searching with pagination
-    result = recherche_CODE(
+    result = recherche_code(
         code_name=code_name,
         search=search_term,
         champ=field,
@@ -221,7 +221,7 @@ def test_search_code_with_invalid_code_raises_error():
     # When searching with an invalid code name
     # Then a validation error should be raised
     with pytest.raises(ValidationError):
-        recherche_CODE(
+        recherche_code(
             code_name=invalid_code,
             search=search_term,
             champ=field,
@@ -239,7 +239,7 @@ def test_search_code_with_abbreviated_field(civil_code):
     abbreviated_field = "NUM"  # Abbreviated form of NUM_ARTICLE
 
     # When searching with the abbreviated field
-    result = recherche_CODE(
+    result = recherche_code(
         code_name=code_name, search=search_term, champ=abbreviated_field, formatter=True
     )
 
@@ -258,7 +258,7 @@ def test_search_code_with_custom_fond(civil_code):
     fond = "LODA_DATE"
 
     # When searching with a custom fond
-    result = recherche_CODE(
+    result = recherche_code(
         code_name=code_name,
         search=search_term,
         champ=field,
@@ -268,3 +268,33 @@ def test_search_code_with_custom_fond(civil_code):
 
     # Then the search should complete without errors
     assert result is not None
+
+
+def test_article_url_generation(civil_code):
+    """
+    Test that the URL is correctly generated for articles with a cid.
+    """
+    # Given a valid code name and article number with formatting enabled
+    code_name = civil_code
+    article_number = "7"
+
+    # When searching for the article with formatting
+    result = recherche_code(
+        code_name=code_name,
+        search=article_number,
+        formatter=True,
+    )
+
+    # Then the result should contain a URL field with the correct format
+    assert result is not None
+
+    # Check if the result is a list or a single item
+    if isinstance(result, list):
+        for article in result:
+            if article.get("cid"):
+                assert "url" in article
+                assert article["url"] == f"https://www.legifrance.gouv.fr/codes/article_lc/{article['cid']}"
+    else:
+        if result.get("cid"):
+            assert "url" in result
+            assert result["url"] == f"https://www.legifrance.gouv.fr/codes/article_lc/{result['cid']}"

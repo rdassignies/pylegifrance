@@ -32,17 +32,18 @@ client.set_api_keys(legifrance_api_key="votre_client_id", legifrance_api_secret=
 ## Exemples d'utilisation
 
 ### Recherche dans les codes
+
 ```python
-from pylegifrance import recherche_CODE
+from pylegifrance import recherche_code
 
 # Article spécifique
-recherche_CODE(code_name="Code civil", search="7")
+recherche_code(code_name="Code civil", search="7")
 
 # Recherche par terme
-recherche_CODE(code_name="Code civil", search="sûreté", champ="ARTICLE")
+recherche_code(code_name="Code civil", search="sûreté", champ="ARTICLE")
 
 # Code entier
-recherche_CODE(code_name="Code civil")
+recherche_code(code_name="Code civil")
 ```
 
 ### Recherche dans les textes législatifs

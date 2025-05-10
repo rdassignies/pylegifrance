@@ -1,6 +1,6 @@
 import pytest
 from pydantic import ValidationError
-from pylegifrance.pipeline.pipeline_factory import recherche_CODE
+from pylegifrance.pipeline.pipeline_factory import recherche_code
 from pylegifrance.models.constants import CodeNom
 from pylegifrance.models.search import (
     NomCodeFiltre,
@@ -10,6 +10,7 @@ from pylegifrance.models.search import (
     Recherche,
     RechercheFinal,
 )
+
 
 def test_nom_code_filtre_direct_validation():
     """
@@ -26,12 +27,16 @@ def test_nom_code_filtre_direct_validation():
         assert filtre.valeurs[0] == CodeNom.CCOM
     except ValidationError as e:
         error_msg = str(e)
-        if "Input should be one of: 'Code civil', 'Code des communes'" in error_msg and \
-           "[type=enum, input_value='Code de commerce', input_type=str]" in error_msg:
+        if (
+            "Input should be one of: 'Code civil', 'Code des communes'" in error_msg
+            and "[type=enum, input_value='Code de commerce', input_type=str]"
+            in error_msg
+        ):
             # This is the expected error from the issue description
             pass
         else:
             pytest.fail(f"Unexpected validation error: {e}")
+
 
 def test_recherche_final_direct_validation():
     """
@@ -58,12 +63,16 @@ def test_recherche_final_direct_validation():
         assert recherche_final.recherche.filtres[0].valeurs[0] == CodeNom.CCOM
     except ValidationError as e:
         error_msg = str(e)
-        if "Input should be one of: 'Code civil', 'Code des communes'" in error_msg and \
-           "[type=enum, input_value='Code de commerce', input_type=str]" in error_msg:
+        if (
+            "Input should be one of: 'Code civil', 'Code des communes'" in error_msg
+            and "[type=enum, input_value='Code de commerce', input_type=str]"
+            in error_msg
+        ):
             # This is the expected error from the issue description
             pass
         else:
             pytest.fail(f"Unexpected validation error: {e}")
+
 
 def test_recherche_code_with_invalid_code_name():
     """
@@ -75,4 +84,4 @@ def test_recherche_code_with_invalid_code_name():
     # When calling recherche_CODE with this code name
     # Then a validation error should be raised
     with pytest.raises(ValidationError, match="Invalid code name"):
-        recherche_CODE(code_name=invalid_code_name, search="1", page_size=1)
+        recherche_code(code_name=invalid_code_name, search="1", page_size=1)

@@ -23,20 +23,8 @@ from pylegifrance.process.formatters import (
     formate_article_response,
 )
 
-import yaml
 
-from importlib import resources
-
-with resources.files("pylegifrance").joinpath("config.yaml").open("r") as file:
-    config = yaml.safe_load(file)
-
-
-logging_level = config["logging"]["level"]
-logging.basicConfig(
-    level=logging_level, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-)
 logger = logging.getLogger(__name__)
-logger.setLevel(logging_level)
 
 
 class Pipeline:
@@ -328,3 +316,4 @@ class Formatters(PipelineStep):
                 data,
             )
             return text, str(type(text))
+        return None

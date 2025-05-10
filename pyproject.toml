@@ -22,11 +22,10 @@ classifiers = [
 ]
 
 dependencies = [
-    "requests",
-    "PyYAML",
     "dotenv>=0.9.9",
     "tenacity>=9.0.0",
-    "pydantic>=2.10.6"
+    "pydantic>=2.10.6",
+    "requests>=2.32.3",
 ]
 
 [project.optional-dependencies]
@@ -43,8 +42,7 @@ Homepage = "https://github.com/pylegifrance/pylegifrance"
 [tool.pytest.ini_options]
 pythonpath = "."
 
-[tool.setuptools]
-package-data = { "pylegifrance" = ["pylegifrance/config.yaml"] }
+
 
 [tool.setuptools.packages.find]
 include = ["pylegifrance", "pylegifrance.*"]

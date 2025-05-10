@@ -120,19 +120,19 @@ sinon vous pouvez initialiser le client manuellement
 Pour la liste des codes disponibles : https://www.legifrance.gouv.fr/liste/code?etatTexte=VIGUEUR
 
 ```py
-from pylegifrance import recherche_CODE
+from pylegifrance import recherche_code
 
 # Obtenir l'article 7 du Code civil
-recherche_CODE(code_name="Code civil", search="7")
+recherche_code(code_name="Code civil", search="7")
 
 # Obtenir l'article 7 du Code civil en ne sélectionnant que certains champs spécifiques
-recherche_CODE(code_name="Code civil", search="7", formatter=True)
+recherche_code(code_name="Code civil", search="7", formatter=True)
 
 # Obtenir l'intégralité du Code civil
-recherche_CODE(code_name="Code civil")
+recherche_code(code_name="Code civil")
 
 # Rechercher le mot "sûreté" dans les articles du Code civil
-recherche_CODE(code_name="Code civil", search="sûreté", champ="ARTICLE")
+recherche_code(code_name="Code civil", search="sûreté", champ="ARTICLE")
 
 ```
 La fonction recherche_CODE permet la recherche dans le fond CODE (CODE_DATE, CODE_ETAT) d'un article par son numéro, d'un terme de recherche ou d'un code dans son intégralité.
