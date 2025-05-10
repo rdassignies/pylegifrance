@@ -11,6 +11,7 @@ from pylegifrance.models.search import (
     RechercheFinal,
 )
 
+
 def test_nom_code_filtre_direct_validation():
     """
     Test that directly validates 'Code de commerce' in NomCodeFiltre.
@@ -26,12 +27,16 @@ def test_nom_code_filtre_direct_validation():
         assert filtre.valeurs[0] == CodeNom.CCOM
     except ValidationError as e:
         error_msg = str(e)
-        if "Input should be one of: 'Code civil', 'Code des communes'" in error_msg and \
-           "[type=enum, input_value='Code de commerce', input_type=str]" in error_msg:
+        if (
+            "Input should be one of: 'Code civil', 'Code des communes'" in error_msg
+            and "[type=enum, input_value='Code de commerce', input_type=str]"
+            in error_msg
+        ):
             # This is the expected error from the issue description
             pass
         else:
             pytest.fail(f"Unexpected validation error: {e}")
+
 
 def test_recherche_final_direct_validation():
     """
@@ -58,12 +63,16 @@ def test_recherche_final_direct_validation():
         assert recherche_final.recherche.filtres[0].valeurs[0] == CodeNom.CCOM
     except ValidationError as e:
         error_msg = str(e)
-        if "Input should be one of: 'Code civil', 'Code des communes'" in error_msg and \
-           "[type=enum, input_value='Code de commerce', input_type=str]" in error_msg:
+        if (
+            "Input should be one of: 'Code civil', 'Code des communes'" in error_msg
+            and "[type=enum, input_value='Code de commerce', input_type=str]"
+            in error_msg
+        ):
             # This is the expected error from the issue description
             pass
         else:
             pytest.fail(f"Unexpected validation error: {e}")
+
 
 def test_recherche_code_with_invalid_code_name():
     """

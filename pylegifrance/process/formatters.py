@@ -8,18 +8,9 @@ que les clés choisie. Le paramètre de recherche doit être à formatter='True'
 
 """
 
-from typing import List, Union, Dict
+from typing import List, Union, Dict, Any
 
-import yaml
-
-from importlib import resources
-
-with resources.files("pylegifrance").joinpath("config.yaml").open("r") as file:
-    config = yaml.safe_load(file)
-
-ARTICLE_KEYS = config["article_keys"]
-ROOT_KEYS = config["root_keys"]
-SECTION_KEYS = config["section_keys"]
+from pylegifrance.config import ARTICLE_KEYS, ROOT_KEYS, SECTION_KEYS
 
 
 def formate_text_response(
@@ -83,7 +74,7 @@ def formate_text_response(
 
 def formate_article_response(
     data: Union[List, Dict], article_keys=ARTICLE_KEYS
-) -> Dict:
+) -> list[dict[Any, Any]] | dict[Any, Any]:
     """
     Extrait les données de the GetArticleResponse model (GetArticle).
 

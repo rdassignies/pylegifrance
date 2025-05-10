@@ -1,25 +1,13 @@
 import requests
 import time
-import os
 import logging
 from dotenv import load_dotenv
-
-import yaml
-from importlib import resources
 from tenacity import retry, stop_after_attempt, wait_fixed, RetryError
+from pylegifrance.config import ApiConfig
 
 load_dotenv()
 
-# Lecture de la configuration à partir du fichier config.yaml
-with resources.files("pylegifrance").joinpath("config.yaml").open("r") as file:
-    config = yaml.safe_load(file)
-
-logging_level = config["logging"]["level"]
-logging.basicConfig(
-    level=logging_level, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-)
 logger = logging.getLogger(__name__)
-logger.setLevel(logging_level)
 
 
 class LegiHandler:
@@ -31,64 +19,81 @@ class LegiHandler:
             cls._instance._initialize(*args, **kwargs)
         return cls._instance
 
-    def _initialize(self):
+    def _initialize(self, config=None):
         """
         Initialisation interne de l'instance unique.
+
+        Parameters
+        ----------
+        config : ApiConfig, optional
+            Configuration for the API client. If None, will attempt to load from environment variables.
 
         Returns
         -------
         LegiHandler.
 
+        Raises
+        ------
+        ValueError
+            If config is not provided and environment variables are not set.
         """
-        self.client_id = None
-        self.client_secret = None
+        if config is None:
+            try:
+                config = ApiConfig.from_env()
+            except ValueError as e:
+                logger.error(f"Failed to initialize API client: {e}")
+                raise
+
+        self.client_id = config.client_id
+        self.client_secret = config.client_secret
         self.token = ""
-        self.token_url = "https://oauth.piste.gouv.fr/api/oauth/token"
-        self.api_url = "https://api.piste.gouv.fr/dila/legifrance/lf-engine-app/"
+        self.token_url = config.token_url
+        self.api_url = config.api_url
         self.time_token = None
         self.expires_in = None
 
-    def set_api_keys(self, legifrance_api_key=None, legifrance_api_secret=None):
+    def set_api_keys(self, client_id=None, client_secret=None):
         """
         Définit ou met à jour les clés API pour l'instance.
 
-        Si les clés ne sont pas fournies, la méthode utilise les valeurs
-        actuelles, si elles existent.
-        Si les valeurs actuelles n'existent pas, elle tente de les
-        récupérer à partir des variables d'environnement.
+        Si les clés sont fournies, elles remplacent les valeurs actuelles.
+        Si les clés ne sont pas fournies, la méthode tente de les récupérer
+        à partir des variables d'environnement.
 
         Parameters
         ----------
-        legifrance_api_key : str, optional
-            Clé API Legifrance. Si None, conserve la valeur actuelle
-            ou tente de la récupérer depuis la variable d'environnement.
-        legifrance_api_secret : str, optional
-            Secret API Legifrance. Si None, conserve la valeur actuelle
-            ou tente de le récupérer depuis la variable d'environnement.
+        client_id : str, optional
+            Clé API Legifrance. Si None, tente de la récupérer depuis
+            la variable d'environnement.
+        client_secret : str, optional
+            Secret API Legifrance. Si None, tente de le récupérer depuis
+            la variable d'environnement.
+
+        Raises
+        ------
+        ValueError
+            Si les clés ne sont pas fournies et ne peuvent pas être récupérées
+            depuis les variables d'environnement.
         """
-        # Utiliser les clés existantes si de nouvelles clés ne sont pas fournies
-        if legifrance_api_key is None:
-            legifrance_api_key = (
-                self.client_id if self.client_id else os.getenv("LEGIFRANCE_CLIENT_ID")
-            )
-        if legifrance_api_secret is None:
-            legifrance_api_secret = (
-                self.client_secret
-                if self.client_secret
-                else os.getenv("LEGIFRANCE_CLIENT_SECRET")
-            )
+        if client_id is not None and client_secret is not None:
+            # Use provided keys
+            new_config = ApiConfig(client_id=client_id, client_secret=client_secret)
+        else:
+            # Try to load from environment
+            try:
+                new_config = ApiConfig.from_env()
+            except ValueError as e:
+                logger.error(f"Failed to set API keys: {e}")
+                raise
 
-        if not legifrance_api_key or not legifrance_api_secret:
-            raise ValueError("Les clés de l'API Legifrance ne sont pas présentes")
-
-        # Vérifie si les nouvelles clés sont différentes des clés existantes
+        # Check if keys have changed
         if (
-            self.client_id != legifrance_api_key
-            or self.client_secret != legifrance_api_secret
+            self.client_id != new_config.client_id
+            or self.client_secret != new_config.client_secret
         ):
-            self.client_id = legifrance_api_key
-            self.client_secret = legifrance_api_secret
-            self._get_access()  # Renouveler le token uniquement si les clés ont changé
+            self.client_id = new_config.client_id
+            self.client_secret = new_config.client_secret
+            self._get_access()  # Refresh token only if keys have changed
 
     @retry(stop=stop_after_attempt(3), wait=wait_fixed(5), reraise=True)
     def _get_access(self):

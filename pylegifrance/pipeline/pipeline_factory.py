@@ -7,13 +7,10 @@ legifrance et autres.
 @author: Raphaël d'Assignies
 """
 
-import yaml
 import logging
 from typing import List
-from importlib import resources
 
 from dotenv import load_dotenv
-
 
 from pylegifrance.pipeline.pipeline import (
     Pipeline,
@@ -24,6 +21,7 @@ from pylegifrance.pipeline.pipeline import (
     Formatters,
 )
 from pylegifrance.client.api import LegiHandler
+from pylegifrance.config import ApiConfig
 from pylegifrance.models.search import (
     Critere,
     Champ,
@@ -41,15 +39,7 @@ from pylegifrance.models.search import (
 
 load_dotenv()
 
-with resources.files("pylegifrance").joinpath("config.yaml").open("r") as file:
-    config = yaml.safe_load(file)
-
-logging_level = config["logging"]["level"]
-logging.basicConfig(
-    level=logging_level, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-)
 logger = logging.getLogger(__name__)
-logger.setLevel(logging_level)
 
 
 def recherche_CODE(
@@ -103,8 +93,8 @@ def recherche_CODE(
     """
 
     # Initialisation du client (singleton)
-    client = LegiHandler()
-    client.set_api_keys()
+    config = ApiConfig.from_env()
+    client = LegiHandler(config=config)
 
     # Création des critères de recherche et des champs de recherche
     if search:
@@ -229,8 +219,8 @@ def recherche_LODA(
     """
 
     # Initialisation du client (singleton)
-    client = LegiHandler()
-    client.set_api_keys()
+    config = ApiConfig.from_env()
+    client = LegiHandler(config=config)
 
     # Création des critères de recherche
     critere_text = [Critere(valeur=text_id, typeRecherche="EXACTE", operateur="ET")]
@@ -317,8 +307,8 @@ def recherche_JURI(
     # TODO: à implémenter
 
     # Initialisation du client (singleton)
-    client = LegiHandler()
-    client.set_api_keys()
+    config = ApiConfig.from_env()
+    client = LegiHandler(config=config)
 
     # Création des critères de recherche
     critere = [Critere(valeur=search, typeRecherche="EXACTE", operateur="ET")]

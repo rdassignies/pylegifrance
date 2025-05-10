@@ -694,7 +694,6 @@ source = { editable = "." }
 dependencies = [
     { name = "dotenv" },
     { name = "pydantic" },
-    { name = "pyyaml" },
     { name = "requests" },
     { name = "tenacity" },
 ]
@@ -722,8 +721,7 @@ requires-dist = [
     { name = "mkdocs-minify-plugin", marker = "extra == 'docs'", specifier = ">=0.7.1" },
     { name = "pydantic", specifier = ">=2.10.6" },
     { name = "pymdown-extensions", marker = "extra == 'docs'" },
-    { name = "pyyaml" },
-    { name = "requests" },
+    { name = "requests", specifier = ">=2.32.3" },
     { name = "tenacity", specifier = ">=9.0.0" },
 ]
 provides-extras = ["docs"]
