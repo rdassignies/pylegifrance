@@ -1,6 +1,6 @@
 import pytest
 from pydantic import ValidationError
-from pylegifrance.pipeline.pipeline_factory import recherche_CODE
+from pylegifrance.pipeline.pipeline_factory import recherche_code
 from pylegifrance.models.constants import CodeNom
 from pylegifrance.models.search import (
     NomCodeFiltre,
@@ -84,4 +84,4 @@ def test_recherche_code_with_invalid_code_name():
     # When calling recherche_CODE with this code name
     # Then a validation error should be raised
     with pytest.raises(ValidationError, match="Invalid code name"):
-        recherche_CODE(code_name=invalid_code_name, search="1", page_size=1)
+        recherche_code(code_name=invalid_code_name, search="1", page_size=1)

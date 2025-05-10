@@ -42,7 +42,7 @@ load_dotenv()
 logger = logging.getLogger(__name__)
 
 
-def recherche_CODE(
+def recherche_code(
     code_name: str,
     search: str = None,
     champ: str = "NUM_ARTICLE",

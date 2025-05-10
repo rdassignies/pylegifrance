@@ -2,10 +2,10 @@
 
 ## Fonctions principales
 
-### recherche_CODE
+### recherche_code
 
 ```python
-def recherche_CODE(
+def recherche_code(
     code_name: str,
     search: str = None,
     champ: str = "NUM_ARTICLE",

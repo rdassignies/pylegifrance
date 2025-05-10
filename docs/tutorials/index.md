@@ -5,10 +5,10 @@
 ### Exemple de base
 
 ```python
-from pylegifrance import recherche_CODE
+from pylegifrance import recherche_code
 
 # Rechercher l'article 1382 du Code civil
-resultat = recherche_CODE(code_name="Code civil", search="1382")
+resultat = recherche_code(code_name="Code civil", search="1382")
 print(resultat)
 ```
 
