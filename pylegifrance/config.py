@@ -55,6 +55,7 @@ ARTICLE_KEYS = [
     "texte",
     "etat",
     "VersionArticle",
+    "cid",
 ]
 
 ROOT_KEYS = ["cid", "title"]

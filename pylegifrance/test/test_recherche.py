@@ -268,3 +268,33 @@ def test_search_code_with_custom_fond(civil_code):
 
     # Then the search should complete without errors
     assert result is not None
+
+
+def test_article_url_generation(civil_code):
+    """
+    Test that the URL is correctly generated for articles with a cid.
+    """
+    # Given a valid code name and article number with formatting enabled
+    code_name = civil_code
+    article_number = "7"
+
+    # When searching for the article with formatting
+    result = recherche_code(
+        code_name=code_name,
+        search=article_number,
+        formatter=True,
+    )
+
+    # Then the result should contain a URL field with the correct format
+    assert result is not None
+
+    # Check if the result is a list or a single item
+    if isinstance(result, list):
+        for article in result:
+            if article.get("cid"):
+                assert "url" in article
+                assert article["url"] == f"https://www.legifrance.gouv.fr/codes/article_lc/{article['cid']}"
+    else:
+        if result.get("cid"):
+            assert "url" in result
+            assert result["url"] == f"https://www.legifrance.gouv.fr/codes/article_lc/{result['cid']}"

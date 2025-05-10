@@ -93,6 +93,10 @@ def formate_article_response(
         article = item.get("article", {})
         for key in article_keys:
             simplified_dict[key] = article.get(key)
+
+        if simplified_dict.get("cid"):
+            simplified_dict["url"] = f"https://www.legifrance.gouv.fr/codes/article_lc/{simplified_dict['cid']}"
+
         return simplified_dict
 
     # Check if data is a list and contains more than one item
