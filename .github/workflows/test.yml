@@ -20,7 +20,9 @@ jobs:
       - name: Setup Common Environment
         uses: ./.github/actions/setup
         with:
-          install-all-extras: "true"
+          install-dependencies: "true"
+          extras: "true"
+          create-env-file: "true"
           env-content: ${{ secrets.ENV }}
 
       - name: Run tests

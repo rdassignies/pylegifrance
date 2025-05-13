@@ -1,0 +1,38 @@
+name: Release to PyPI
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  release:
+    runs-on: self-hosted
+    container:
+      image: python:3.12
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Common Environment
+        uses: ./.github/actions/setup
+        with:
+          install-dependencies: "false"
+
+      - name: Build pylegifrance
+        run: uv build
+
+      - name: Check Version Consistency
+        run: |
+          TAG_VERSION=${GITHUB_REF#refs/tags/v}
+          PROJECT_VERSION=$(uv pip show your-package-name | grep ^Version | awk '{print $2}')
+          if [ "$TAG_VERSION" != "$PROJECT_VERSION" ]; then
+            echo "Tag version ($TAG_VERSION) does not match pyproject.toml version ($PROJECT_VERSION)"
+            exit 1
+          fi
+
+      - name: Publish pylegifrance to PyPI
+        env:
+          PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
+        run: uv publish --token "$PYPI_TOKEN"
