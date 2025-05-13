@@ -2,17 +2,17 @@ import os
 import pytest
 import requests
 from dotenv import load_dotenv
-from pylegifrance.client.api import LegiHandler
+from pylegifrance.client import LegifranceClient
 from pylegifrance.models.consult import GetArticle
 from pylegifrance.config import ApiConfig
 
 
 @pytest.fixture
 def api_client():
-    """Fixture to provide a configured LegiHandler client."""
+    """Fixture to provide a configured LegifranceClient client."""
     load_dotenv()
     config = ApiConfig.from_env()
-    client = LegiHandler(config=config)
+    client = LegifranceClient(config=config)
     return client
 
 
@@ -26,7 +26,7 @@ def test_client_initialization_with_env_vars(monkeypatch):
     client_secret = os.getenv("LEGIFRANCE_CLIENT_SECRET")
 
     # When a client is created using environment variables
-    client = LegiHandler()  # Should load from environment variables by default
+    client = LegifranceClient()  # Should load from environment variables by default
 
     # Then the client should have the correct API keys
     assert client.client_id == client_id
@@ -54,15 +54,15 @@ def test_client_initialization_with_explicit_config():
 
     # When a client is created with the explicit configuration
     # We need to reset the singleton for this test
-    LegiHandler._instance = None
-    client = LegiHandler(config=config)
+    LegifranceClient._instance = None
+    client = LegifranceClient(config=config)
 
     # Then the client should have the correct API keys
     assert client.client_id == test_client_id
     assert client.client_secret == test_client_secret
 
     # Reset the singleton for other tests
-    LegiHandler._instance = None
+    LegifranceClient._instance = None
 
 
 def test_client_initialization_without_env_vars(monkeypatch):
@@ -74,18 +74,18 @@ def test_client_initialization_without_env_vars(monkeypatch):
     monkeypatch.delenv("LEGIFRANCE_CLIENT_SECRET", raising=False)
 
     # Reset the singleton for this test
-    LegiHandler._instance = None
+    LegifranceClient._instance = None
 
     # When a client is created without explicit configuration
     # Then it should raise a ValueError
     with pytest.raises(ValueError) as excinfo:
-        LegiHandler()
+        LegifranceClient()
 
     # Verify the error message
     assert "Required environment variables" in str(excinfo.value)
 
     # Reset the singleton for other tests
-    LegiHandler._instance = None
+    LegifranceClient._instance = None
 
 
 def test_simple_api_request(api_client):

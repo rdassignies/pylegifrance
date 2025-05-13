@@ -1,1 +1,1 @@
-from .pipeline.pipeline_factory import recherche_LODA, recherche_code, recherche_JURIfrom .client.api import LegiHandler__all__ = ["recherche_LODA", "recherche_code", "recherche_JURI", "LegiHandler"]
+from .pipeline.pipeline_factory import recherche_LODA, recherche_code, recherche_JURIfrom .client import LegifranceClient__all__ = ["recherche_LODA", "recherche_code", "recherche_JURI", "LegifranceClient"]

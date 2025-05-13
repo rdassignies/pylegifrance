@@ -179,7 +179,7 @@ class CallApiStep(PipelineStep):
     Étape d'appel d'API dans le pipeline.
 
     Attributs:
-        client (LegiHandler): Client pour appeler l'API.
+        client (LegifranceClient): Client pour appeler l'API.
     """
 
     def __init__(self, client):

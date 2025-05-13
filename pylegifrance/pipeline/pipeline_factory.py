@@ -20,7 +20,7 @@ from pylegifrance.pipeline.pipeline import (
     GetTextId,
     Formatters,
 )
-from pylegifrance.client.api import LegiHandler
+from pylegifrance.client import LegifranceClient
 from pylegifrance.config import ApiConfig
 from pylegifrance.models.search import (
     Critere,
@@ -94,7 +94,7 @@ def recherche_code(
 
     # Initialisation du client (singleton)
     config = ApiConfig.from_env()
-    client = LegiHandler(config=config)
+    client = LegifranceClient(config=config)
 
     # Création des critères de recherche et des champs de recherche
     if search:
@@ -220,7 +220,7 @@ def recherche_LODA(
 
     # Initialisation du client (singleton)
     config = ApiConfig.from_env()
-    client = LegiHandler(config=config)
+    client = LegifranceClient(config=config)
 
     # Création des critères de recherche
     critere_text = [Critere(valeur=text_id, typeRecherche="EXACTE", operateur="ET")]
@@ -308,7 +308,7 @@ def recherche_JURI(
 
     # Initialisation du client (singleton)
     config = ApiConfig.from_env()
-    client = LegiHandler(config=config)
+    client = LegifranceClient(config=config)
 
     # Création des critères de recherche
     critere = [Critere(valeur=search, typeRecherche="EXACTE", operateur="ET")]
