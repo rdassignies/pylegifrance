@@ -2,22 +2,26 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://pylegifrance.github.io/pylegifrance/</loc>
-         <lastmod>2025-05-08</lastmod>
+         <lastmod>2025-05-13</lastmod>
+    </url>
+    <url>
+         <loc>https://pylegifrance.github.io/pylegifrance/tasks/</loc>
+         <lastmod>2025-05-13</lastmod>
     </url>
     <url>
          <loc>https://pylegifrance.github.io/pylegifrance/explanation/</loc>
-         <lastmod>2025-05-08</lastmod>
+         <lastmod>2025-05-13</lastmod>
     </url>
     <url>
          <loc>https://pylegifrance.github.io/pylegifrance/how-to/</loc>
-         <lastmod>2025-05-08</lastmod>
+         <lastmod>2025-05-13</lastmod>
     </url>
     <url>
          <loc>https://pylegifrance.github.io/pylegifrance/reference/</loc>
-         <lastmod>2025-05-08</lastmod>
+         <lastmod>2025-05-13</lastmod>
     </url>
     <url>
          <loc>https://pylegifrance.github.io/pylegifrance/tutorials/</loc>
-         <lastmod>2025-05-08</lastmod>
+         <lastmod>2025-05-13</lastmod>
     </url>
 </urlset>
