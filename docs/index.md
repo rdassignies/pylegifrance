@@ -14,7 +14,7 @@ Cette documentation suit le framework [Diátaxis](https://diataxis.fr/), qui org
 ## Installation
 
 ```bash
-  uv pip install git+https://github.com/pylegifrance/pylegifrance
+  uv add pylegifrance
 ```
 
 ## Prérequis

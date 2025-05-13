@@ -293,8 +293,14 @@ def test_article_url_generation(civil_code):
         for article in result:
             if article.get("cid"):
                 assert "url" in article
-                assert article["url"] == f"https://www.legifrance.gouv.fr/codes/article_lc/{article['cid']}"
+                assert (
+                    article["url"]
+                    == f"https://www.legifrance.gouv.fr/codes/article_lc/{article['cid']}"
+                )
     else:
         if result.get("cid"):
             assert "url" in result
-            assert result["url"] == f"https://www.legifrance.gouv.fr/codes/article_lc/{result['cid']}"
+            assert (
+                result["url"]
+                == f"https://www.legifrance.gouv.fr/codes/article_lc/{result['cid']}"
+            )
