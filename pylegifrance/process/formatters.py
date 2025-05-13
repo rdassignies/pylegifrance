@@ -95,7 +95,9 @@ def formate_article_response(
             simplified_dict[key] = article.get(key)
 
         if simplified_dict.get("cid"):
-            simplified_dict["url"] = f"https://www.legifrance.gouv.fr/codes/article_lc/{simplified_dict['cid']}"
+            simplified_dict["url"] = (
+                f"https://www.legifrance.gouv.fr/codes/article_lc/{simplified_dict['cid']}"
+            )
 
         return simplified_dict
 

@@ -59,10 +59,10 @@ Recherche dans la jurisprudence (en développement).
 
 ## Classes principales
 
-### LegiHandler
+### LegifranceClient
 
 ```python
-class LegiHandler:
+class LegifranceClient:
     def set_api_keys(self, legifrance_api_key=None, legifrance_api_secret=None)
     def call_api(self, route: str, data: str)
     def ping(self, route: str = "consult/ping")

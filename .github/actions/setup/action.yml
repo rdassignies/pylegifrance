@@ -2,18 +2,28 @@ name: "Common Setup"
 description: "Sets up the environment with common dependencies and configurations"
 
 inputs:
-  install-all-extras:
-    description: "Whether to install all extras with uv sync"
+  install-dependencies:
+    description: "Whether to install project dependencies"
+    required: false
+    default: "true"
+  extras:
+    description: "Whether to install with all extras (--all-extras flag)"
     required: false
     default: "false"
+  create-env-file:
+    description: "Whether to create .env file"
+    required: false
+    default: "true"
   env-content:
     description: "Content for .env file"
-    required: true
+    required: false
+    default: ""
 
 runs:
   using: "composite"
   steps:
     - name: Create .env file
+      if: inputs.create-env-file == 'true'
       shell: bash
       run: |
         install -m 600 /dev/null .env
@@ -23,7 +33,7 @@ runs:
       shell: bash
       run: pip install uv
 
-    - name: Install dependencies with uv
-      if: inputs.install-all-extras == 'false'
+    - name: Install project dependencies
+      if: inputs.install-dependencies == 'true'
       shell: bash
-      run: uv sync --all-extras
+      run: uv sync ${{ inputs.extras == 'true' && '--all-extras' || '' }}
