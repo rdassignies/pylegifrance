@@ -1,6 +1,5 @@
 import os
 import pytest
-import requests
 from dotenv import load_dotenv
 from pylegifrance.client import LegifranceClient
 from pylegifrance.models.consult import GetArticle
@@ -13,56 +12,45 @@ def api_client():
     load_dotenv()
     config = ApiConfig.from_env()
     client = LegifranceClient(config=config)
-    return client
+    yield client
+    client.close()
 
 
-def test_client_initialization_with_env_vars(monkeypatch):
+@pytest.mark.parametrize(
+    "config_type,description",
+    [
+        ("env_vars", "client initialization with environment variables"),
+        ("explicit", "client initialization with explicit configuration"),
+    ],
+)
+def test_client_initialization(config_type, description):
     """
-    Test that the client correctly initializes with environment variables.
+    Test client initialization with different configuration methods.
+
+    Parameters
+    ----------
+    config_type : str
+        Type of configuration to test ('env_vars' or 'explicit')
+    description : str
+        Description of the test case
     """
-    # Given environment variables are set
+    # Given API credentials
     load_dotenv()
     client_id = os.getenv("LEGIFRANCE_CLIENT_ID")
     client_secret = os.getenv("LEGIFRANCE_CLIENT_SECRET")
 
-    # When a client is created using environment variables
-    client = LegifranceClient()  # Should load from environment variables by default
+    # When a client is created with the specified configuration
+    if config_type == "env_vars":
+        client = LegifranceClient()  # Should load from environment variables by default
+    else:  # explicit config
+        config = ApiConfig(client_id=client_id, client_secret=client_secret)
+        client = LegifranceClient(config=config)
 
-    # Then the client should have the correct API keys
-    assert client.client_id == client_id
-    assert client.client_secret == client_secret
-
-    # When environment variables are removed
-    monkeypatch.delenv("LEGIFRANCE_CLIENT_ID", raising=False)
-    monkeypatch.delenv("LEGIFRANCE_CLIENT_SECRET", raising=False)
-
-    # Then the client should still retain its keys (singleton pattern)
-    assert client.client_id == client_id
-    assert client.client_secret == client_secret
-
-
-def test_client_initialization_with_explicit_config():
-    """
-    Test that the client correctly initializes with an explicit configuration.
-    """
-    # Given explicit API credentials
-    test_client_id = "test_client_id"
-    test_client_secret = "test_client_secret"
-
-    # Create a configuration with explicit values
-    config = ApiConfig(client_id=test_client_id, client_secret=test_client_secret)
-
-    # When a client is created with the explicit configuration
-    # We need to reset the singleton for this test
-    LegifranceClient._instance = None
-    client = LegifranceClient(config=config)
-
-    # Then the client should have the correct API keys
-    assert client.client_id == test_client_id
-    assert client.client_secret == test_client_secret
-
-    # Reset the singleton for other tests
-    LegifranceClient._instance = None
+    # Then the client should be able to make API calls
+    try:
+        assert client.ping(), f"Ping failed for {description}"
+    finally:
+        client.close()
 
 
 def test_client_initialization_without_env_vars(monkeypatch):
@@ -73,9 +61,6 @@ def test_client_initialization_without_env_vars(monkeypatch):
     monkeypatch.delenv("LEGIFRANCE_CLIENT_ID", raising=False)
     monkeypatch.delenv("LEGIFRANCE_CLIENT_SECRET", raising=False)
 
-    # Reset the singleton for this test
-    LegifranceClient._instance = None
-
     # When a client is created without explicit configuration
     # Then it should raise a ValueError
     with pytest.raises(ValueError) as excinfo:
@@ -84,13 +69,10 @@ def test_client_initialization_without_env_vars(monkeypatch):
     # Verify the error message
     assert "Required environment variables" in str(excinfo.value)
 
-    # Reset the singleton for other tests
-    LegifranceClient._instance = None
 
-
-def test_simple_api_request(api_client):
+def test_api_request(api_client):
     """
-    Test that a simple API request works correctly.
+    Test that an API request works correctly.
     """
     # Given a valid article ID
     article_id = "LEGIARTI000047362226"
@@ -103,39 +85,6 @@ def test_simple_api_request(api_client):
 
     # Then the response should be successful
     assert response is not None
-
-
-def test_api_request_with_manual_token(api_client):
-    """
-    Test that an API request with a manually obtained token works correctly.
-    """
-    # Given a client with API keys
-    client = api_client
-
-    # When a token is manually obtained
-    data = {
-        "grant_type": "client_credentials",
-        "client_id": client.client_id,
-        "client_secret": client.client_secret,
-        "scope": "openid",
-    }
-    response_tok = requests.post(client.token_url, data=data)
-    client.token = response_tok.json().get("access_token")
-
-    # Then the token should be valid
-    assert client.token is not None
-
-    # When an API request is made with the token
-    article = GetArticle(id="LEGIARTI000047362226")
-    headers = {
-        "Authorization": f"Bearer {client.token}",
-        "accept": "application/json",
-        "Content-Type": "application/json",
-    }
-    url = client.api_url + article.route
-    response = requests.post(url, headers=headers, json=article.model_dump(mode="json"))
-
-    # Then the request should be successful
     assert response.status_code == 200
 
 
@@ -143,11 +92,25 @@ def test_ping_success(api_client):
     """
     Test that the ping method correctly verifies API connectivity.
     """
-    # Given a configured client
-    client = api_client
-
     # When the ping method is called
-    success = client.ping()
+    success = api_client.ping()
 
     # Then it should return True for a valid connection
     assert success is True, "Ping should return True for a valid API connection."
+
+
+def test_session_context_manager():
+    """
+    Test the session context manager.
+    """
+    # Given a client configuration with real credentials
+    load_dotenv()
+    config = ApiConfig.from_env()
+
+    # When using the client with a context manager
+    with LegifranceClient(config=config).session_context() as client:
+        # Then the client should be usable for making API calls
+        assert client.ping()
+
+    # The session should be closed after the context manager exits
+    # (This is hard to test directly, but at least we can verify the context manager works)

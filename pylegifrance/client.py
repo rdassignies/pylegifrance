@@ -1,36 +1,45 @@
-import requests
-import time
-import logging
-from dotenv import load_dotenv
-from tenacity import retry, stop_after_attempt, wait_fixed, RetryError
-from pylegifrance.config import ApiConfig
+"""Client for interacting with the Legifrance API.
 
-load_dotenv()
+This module provides a client for making requests to the Legifrance API.
+The client handles request formatting, sending, and response processing.
+Authentication is handled by a separate AuthenticationManager.
+"""
+
+import logging
+import requests
+from typing import Optional, Any, Self
+from contextlib import contextmanager
+
+from pylegifrance.config import ApiConfig
+from pylegifrance.auth import AuthenticationManager
+from pylegifrance.utils import configure_session_timeouts
 
 logger = logging.getLogger(__name__)
 
 
 class LegifranceClient:
-    _instance = None
+    """
+    Client for interacting with the Legifrance API.
 
-    def __new__(cls, *args, **kwargs):
-        if cls._instance is None:
-            cls._instance = super().__new__(cls)
-            cls._instance._initialize(*args, **kwargs)
-        return cls._instance
+    This class provides methods for making requests to the API.
+    Authentication is handled by a separate AuthenticationManager.
 
-    def _initialize(self, config=None):
+    The client delegates all authentication concerns to the AuthenticationManager,
+    focusing solely on making API requests and processing responses.
+
+    Attributes:
+        api_url: The base URL for the Legifrance API.
+        session: The requests session used for making API calls.
+    """
+
+    def __init__(self, config: Optional[ApiConfig] = None):
         """
-        Initialisation interne de l'instance unique.
+        Initialize a new LegifranceClient instance.
 
         Parameters
         ----------
         config : ApiConfig, optional
             Configuration for the API client. If None, will attempt to load from environment variables.
-
-        Returns
-        -------
-        LegifranceClient.
 
         Raises
         ------
@@ -44,173 +53,162 @@ class LegifranceClient:
                 logger.error(f"Failed to initialize API client: {e}")
                 raise
 
-        self.client_id = config.client_id
-        self.client_secret = config.client_secret
-        self.token = ""
-        self.token_url = config.token_url
         self.api_url = config.api_url
-        self.time_token = None
-        self.expires_in = None
+        self._auth_manager = AuthenticationManager(config)
+        self.session = requests.Session()
 
-    def set_api_keys(self, client_id=None, client_secret=None):
+        configure_session_timeouts(self.session, config)
+
+    def set_api_keys(
+        self, client_id: Optional[str] = None, client_secret: Optional[str] = None
+    ) -> None:
         """
-        Définit ou met à jour les clés API pour l'instance.
+        Set or update the API keys for the client.
 
-        Si les clés sont fournies, elles remplacent les valeurs actuelles.
-        Si les clés ne sont pas fournies, la méthode tente de les récupérer
-        à partir des variables d'environnement.
+        If keys are provided, they replace the current values.
+        If keys are not provided, the method attempts to retrieve them
+        from environment variables.
 
         Parameters
         ----------
         client_id : str, optional
-            Clé API Legifrance. Si None, tente de la récupérer depuis
-            la variable d'environnement.
+            Legifrance API key. If None, attempts to retrieve from
+            environment variable.
         client_secret : str, optional
-            Secret API Legifrance. Si None, tente de le récupérer depuis
-            la variable d'environnement.
+            Legifrance API secret. If None, attempts to retrieve from
+            environment variable.
 
         Raises
         ------
         ValueError
-            Si les clés ne sont pas fournies et ne peuvent pas être récupérées
-            depuis les variables d'environnement.
+            If keys are not provided and cannot be retrieved
+            from environment variables.
         """
         if client_id is not None and client_secret is not None:
             # Use provided keys
-            new_config = ApiConfig(client_id=client_id, client_secret=client_secret)
+            self._auth_manager.update_credentials(client_id, client_secret)
         else:
             # Try to load from environment
             try:
                 new_config = ApiConfig.from_env()
+                self._auth_manager.update_credentials(
+                    new_config.client_id, new_config.client_secret
+                )
             except ValueError as e:
                 logger.error(f"Failed to set API keys: {e}")
                 raise
 
-        # Check if keys have changed
-        if (
-            self.client_id != new_config.client_id
-            or self.client_secret != new_config.client_secret
-        ):
-            self.client_id = new_config.client_id
-            self.client_secret = new_config.client_secret
-            self._get_access()  # Refresh token only if keys have changed
-
-    @retry(stop=stop_after_attempt(3), wait=wait_fixed(5), reraise=True)
-    def _get_access(self):
+    def call_api(self, route: str, data: Any) -> requests.Response:
         """
-        Obtention du jeton d'accès avec récupération et log des éventuelles erreurs.
-        Utilise la bibliothèque tenacity pour gérer les tentatives.
-        """
-        data = {
-            "grant_type": "client_credentials",
-            "client_id": self.client_id,
-            "client_secret": self.client_secret,
-            "scope": "openid",
-        }
-
-        response = requests.post(self.token_url, data=data)
-        if 200 <= response.status_code < 300:
-            token = response.json().get("access_token")
-            self.time_token = time.time()
-            self.token = token
-            self.expires_in = response.json().get("expires_in")
-            logger.info("Legifrance API connection successful.")
-        else:
-            logger.warning(
-                f"Failed to get token: {response.status_code} - {response.text}"
-            )
-            raise Exception(
-                f"Error obtaining token: {response.status_code} - {response.text}"
-            )
-
-    def _update_client(self):
-        """
-        Fonction qui renouvelle le token si besoin
-        """
-        if self.time_token is None or self.expires_in is None:
-            try:
-                self._get_access()
-            except RetryError as exc:
-                logger.error(f"Could not obtain access token after retries: {exc}")
-                raise
-            return
-
-        elapsed_time = time.time() - self.time_token
-        if elapsed_time >= self.expires_in:
-            logger.info("Token expired, renewing access token.")
-            try:
-                self._get_access()
-            except RetryError as exc:
-                logger.error(f"Could not refresh access token after retries: {exc}")
-                raise
-
-    def call_api(self, route: str, data: str):
-        """
-        Appel à l'API Legifrance avec gestion du token et journalisation des erreurs.
+        Call the Legifrance API with token management and error logging.
 
         Parameters
         ----------
         route : str
-            La route de l'API à utiliser.
-        data : str
-            Les données à envoyer au format JSON.
+            The API route to use.
+        data : Any
+            The data to send as JSON.
 
         Returns
         -------
         requests.Response
-            La réponse de l'API.
+            The API response.
+
+        Raises
+        ------
+        ValueError
+            If no data is provided.
+        Exception
+            If the API call fails or authentication fails.
         """
-        self._update_client()
+        if data is None:
+            logger.warning("No data provided to call_api; request not sent.")
+            raise ValueError("No data provided for API call.")
+
+        token = self._auth_manager.ensure_valid_token()
         headers = {
-            "Authorization": f"Bearer {self.token}",
+            "Authorization": f"Bearer {token}",
             "accept": "application/json",
             "Content-Type": "application/json",
         }
-        if data is not None:
-            response = requests.post(
-                f"{self.api_url}{route}", headers=headers, json=data
-            )
-        else:
-            logger.warning("No data provided to call_api; request not sent.")
-            raise ValueError("No data provided for API call.")
+
+        url = f"{self.api_url}{route}"
+        logger.info(f"POST request to URL: {url}")
+        response = self.session.post(url, headers=headers, json=data)
 
         if 400 <= response.status_code < 600:
             logger.error(
                 f"Client error {response.status_code} - {response.text} when calling the API."
             )
             raise Exception(
-                f"Erreur client {response.status_code} - {response.text} lors de l'appel à l'API :"
+                f"API client error {response.status_code} - {response.text}"
             )
 
         logger.info(f"API call to '{route}' successful.")
         return response
 
-    def ping(self, route: str = "consult/ping"):
+    def get(self, route: str) -> requests.Response:
         """
-        Vérifie la connectivité avec l'API Legifrance en envoyant une requête ping.
+        Perform a GET request on the given API route.
+
+        Parameters
+        ----------
+        route : str
+            The route to target.
+
+        Returns
+        -------
+        requests.Response
+            The API response.
+
+        Raises
+        ------
+        requests.exceptions.HTTPError
+            If the HTTP request returns an unsuccessful status code.
+        Exception
+            If authentication fails.
+        """
+        token = self._auth_manager.ensure_valid_token()
+        headers = {"Authorization": f"Bearer {token}"}
+        url = f"{self.api_url}{route}"
+
+        logger.info(f"GET request to URL: {url}")
+        response = self.session.get(url, headers=headers)
+        response.raise_for_status()
+
+        logger.info(f"GET request successful for URL: {url}")
+        return response
+
+    def ping(self, route: str = "consult/ping") -> bool:
+        """
+        Check connectivity with the Legifrance API by sending a ping request.
 
         Parameters
         ----------
         route : str, optional
-            Route à utiliser pour le ping (par défaut : "consult/ping").
+            Route to use for the ping (default: "consult/ping").
 
         Returns
         -------
         bool
-            True si la connexion est réussie, sinon False.
+            True if the connection is successful, otherwise False.
 
         Raises
         ------
         Exception
-            En cas d'erreur de connexion à l'API.
+            In case of API connection error or authentication failure.
         """
         try:
+            token = self._auth_manager.ensure_valid_token()
             headers = {
-                "Authorization": f"Bearer {self.token}",
+                "Authorization": f"Bearer {token}",
                 "Accept": "text/plain",
                 "Content-Type": "application/json",
             }
-            response = requests.get(f"{self.api_url}{route}", headers=headers)
+
+            url = f"{self.api_url}{route}"
+            response = self.session.get(url, headers=headers)
+
             if response.status_code == 200:
                 logger.info(
                     "Ping successful: connection to Legifrance API established."
@@ -223,28 +221,47 @@ class LegifranceClient:
                 return False
         except requests.exceptions.RequestException as e:
             logger.error(f"Error during Legifrance API ping: {str(e)}")
-            raise Exception(f"Échec du ping de l'API : {e}")
+            raise Exception(f"API ping failed: {e}")
 
-    def get(self, route: str):
+    @classmethod
+    def create(cls, config: Optional[ApiConfig] = None) -> Self:
         """
-        Effectue une requête GET sur la route donnée de l'API.
+        Factory method to create a new LegifranceClient instance.
 
         Parameters
         ----------
-        route : str
-            La route à cibler.
+        config : ApiConfig, optional
+            Configuration for the API client. If None, will attempt to load from environment variables.
 
         Returns
         -------
-        requests.Response
-            La réponse de l'API.
+        LegifranceClient
+            A new instance of LegifranceClient.
         """
-        self._update_client()
-        headers = {"Authorization": f"Bearer {self.token}"}
-        url = f"{self.api_url}{route}"
-        logger.info(f"GET request to URL: {url}")
-        response = requests.get(url, headers=headers)
-        response.raise_for_status()
-        self.data = response.json()
-        logger.info(f"GET request successful for URL: {url}")
-        return response
+        return cls(config=config)
+
+    @contextmanager
+    def session_context(self):
+        """
+        Context manager for using the client in a with statement.
+
+        This ensures that the session is properly closed after use.
+
+        Yields
+        ------
+        LegifranceClient
+            The client instance.
+        """
+        try:
+            yield self
+        finally:
+            self.close()
+
+    def close(self) -> None:
+        """
+        Close the client's session and authentication manager.
+
+        This should be called when the client is no longer needed to free up resources.
+        """
+        self.session.close()
+        self._auth_manager.close()
