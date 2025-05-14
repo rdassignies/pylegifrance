@@ -13,10 +13,11 @@ def api_client():
     load_dotenv()
     config = ApiConfig.from_env()
     client = LegifranceClient(config=config)
-    return client
+    yield client
+    client.close()  # Ensure the session is closed after the test
 
 
-def test_client_initialization_with_env_vars(monkeypatch):
+def test_client_initialization_with_env_vars():
     """
     Test that the client correctly initializes with environment variables.
     """
@@ -29,14 +30,6 @@ def test_client_initialization_with_env_vars(monkeypatch):
     client = LegifranceClient()  # Should load from environment variables by default
 
     # Then the client should have the correct API keys
-    assert client.client_id == client_id
-    assert client.client_secret == client_secret
-
-    # When environment variables are removed
-    monkeypatch.delenv("LEGIFRANCE_CLIENT_ID", raising=False)
-    monkeypatch.delenv("LEGIFRANCE_CLIENT_SECRET", raising=False)
-
-    # Then the client should still retain its keys (singleton pattern)
     assert client.client_id == client_id
     assert client.client_secret == client_secret
 
@@ -53,16 +46,11 @@ def test_client_initialization_with_explicit_config():
     config = ApiConfig(client_id=test_client_id, client_secret=test_client_secret)
 
     # When a client is created with the explicit configuration
-    # We need to reset the singleton for this test
-    LegifranceClient._instance = None
     client = LegifranceClient(config=config)
 
     # Then the client should have the correct API keys
     assert client.client_id == test_client_id
     assert client.client_secret == test_client_secret
-
-    # Reset the singleton for other tests
-    LegifranceClient._instance = None
 
 
 def test_client_initialization_without_env_vars(monkeypatch):
@@ -73,9 +61,6 @@ def test_client_initialization_without_env_vars(monkeypatch):
     monkeypatch.delenv("LEGIFRANCE_CLIENT_ID", raising=False)
     monkeypatch.delenv("LEGIFRANCE_CLIENT_SECRET", raising=False)
 
-    # Reset the singleton for this test
-    LegifranceClient._instance = None
-
     # When a client is created without explicit configuration
     # Then it should raise a ValueError
     with pytest.raises(ValueError) as excinfo:
@@ -83,9 +68,6 @@ def test_client_initialization_without_env_vars(monkeypatch):
 
     # Verify the error message
     assert "Required environment variables" in str(excinfo.value)
-
-    # Reset the singleton for other tests
-    LegifranceClient._instance = None
 
 
 def test_simple_api_request(api_client):
@@ -151,3 +133,63 @@ def test_ping_success(api_client):
 
     # Then it should return True for a valid connection
     assert success is True, "Ping should return True for a valid API connection."
+
+def test_multiple_client_instances():
+    """
+    Test that multiple client instances can be created with different configurations.
+    """
+    # Given two different configurations
+    config1 = ApiConfig(client_id="client1", client_secret="secret1")
+    config2 = ApiConfig(client_id="client2", client_secret="secret2")
+
+    # When two clients are created with different configurations
+    client1 = LegifranceClient(config=config1)
+    client2 = LegifranceClient(config=config2)
+
+    # Then they should have different configurations
+    assert client1.client_id == "client1"
+    assert client1.client_secret == "secret1"
+    assert client2.client_id == "client2"
+    assert client2.client_secret == "secret2"
+
+    # And they should be different instances
+    assert client1 is not client2
+
+    # Clean up
+    client1.close()
+    client2.close()
+
+
+def test_factory_method():
+    """
+    Test the factory method for creating client instances.
+    """
+    # Given a configuration
+    config = ApiConfig(client_id="test_client", client_secret="test_secret")
+
+    # When a client is created using the factory method
+    client = LegifranceClient.create(config=config)
+
+    # Then it should have the correct configuration
+    assert client.client_id == "test_client"
+    assert client.client_secret == "test_secret"
+
+    # Clean up
+    client.close()
+
+
+def test_session_context_manager():
+    """
+    Test the session context manager.
+    """
+    # Given a client
+    config = ApiConfig(client_id="test_client", client_secret="test_secret")
+
+    # When using the client with a context manager
+    with LegifranceClient(config=config).session_context() as client:
+        # Then the client should be usable
+        assert client.client_id == "test_client"
+        assert client.client_secret == "test_secret"
+
+    # The session should be closed after the context manager exits
+    # (This is hard to test directly, but at least we can verify the context manager works)

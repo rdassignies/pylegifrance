@@ -1,6 +1,8 @@
 import requests
 import time
 import logging
+from typing import Optional, ClassVar, Self
+from contextlib import contextmanager
 from dotenv import load_dotenv
 from tenacity import retry, stop_after_attempt, wait_fixed, RetryError
 from pylegifrance.config import ApiConfig
@@ -11,26 +13,33 @@ logger = logging.getLogger(__name__)
 
 
 class LegifranceClient:
-    _instance = None
+    """
+    Client for interacting with the Legifrance API.
 
-    def __new__(cls, *args, **kwargs):
-        if cls._instance is None:
-            cls._instance = super().__new__(cls)
-            cls._instance._initialize(*args, **kwargs)
-        return cls._instance
+    This class provides methods for authenticating with the API and making requests.
+    It can be instantiated directly or created using the factory methods.
 
-    def _initialize(self, config=None):
+    Attributes:
+        client_id: The client ID for the Legifrance API.
+        client_secret: The client secret for the Legifrance API.
+        token: The current access token.
+        token_url: The URL for obtaining access tokens.
+        api_url: The base URL for the Legifrance API.
+        time_token: The timestamp when the token was obtained.
+        expires_in: The token expiration time in seconds.
+        session: The requests session used for making API calls.
+    """
+    # Class variable to store the default instance for backward compatibility
+    _default_instance: ClassVar[Optional['LegifranceClient']] = None
+
+    def __init__(self, config=None):
         """
-        Initialisation interne de l'instance unique.
+        Initialize a new LegifranceClient instance.
 
         Parameters
         ----------
         config : ApiConfig, optional
             Configuration for the API client. If None, will attempt to load from environment variables.
-
-        Returns
-        -------
-        LegifranceClient.
 
         Raises
         ------
@@ -51,6 +60,7 @@ class LegifranceClient:
         self.api_url = config.api_url
         self.time_token = None
         self.expires_in = None
+        self.session = requests.Session()
 
     def set_api_keys(self, client_id=None, client_secret=None):
         """
@@ -108,7 +118,7 @@ class LegifranceClient:
             "scope": "openid",
         }
 
-        response = requests.post(self.token_url, data=data)
+        response = self.session.post(self.token_url, data=data)
         if 200 <= response.status_code < 300:
             token = response.json().get("access_token")
             self.time_token = time.time()
@@ -167,7 +177,7 @@ class LegifranceClient:
             "Content-Type": "application/json",
         }
         if data is not None:
-            response = requests.post(
+            response = self.session.post(
                 f"{self.api_url}{route}", headers=headers, json=data
             )
         else:
@@ -205,12 +215,14 @@ class LegifranceClient:
             En cas d'erreur de connexion à l'API.
         """
         try:
+            # Ensure we have a valid token before pinging
+            self._update_client()
             headers = {
                 "Authorization": f"Bearer {self.token}",
                 "Accept": "text/plain",
                 "Content-Type": "application/json",
             }
-            response = requests.get(f"{self.api_url}{route}", headers=headers)
+            response = self.session.get(f"{self.api_url}{route}", headers=headers)
             if response.status_code == 200:
                 logger.info(
                     "Ping successful: connection to Legifrance API established."
@@ -243,8 +255,51 @@ class LegifranceClient:
         headers = {"Authorization": f"Bearer {self.token}"}
         url = f"{self.api_url}{route}"
         logger.info(f"GET request to URL: {url}")
-        response = requests.get(url, headers=headers)
+        response = self.session.get(url, headers=headers)
         response.raise_for_status()
         self.data = response.json()
         logger.info(f"GET request successful for URL: {url}")
         return response
+
+    @classmethod
+    def create(cls, config: Optional[ApiConfig] = None) -> Self:
+        """
+        Factory method to create a new LegifranceClient instance.
+
+        Parameters
+        ----------
+        config : ApiConfig, optional
+            Configuration for the API client. If None, will attempt to load from environment variables.
+
+        Returns
+        -------
+        LegifranceClient
+            A new instance of LegifranceClient.
+        """
+        return cls(config=config)
+
+
+    @contextmanager
+    def session_context(self):
+        """
+        Context manager for using the client in a with statement.
+
+        This ensures that the session is properly closed after use.
+
+        Yields
+        ------
+        LegifranceClient
+            The client instance.
+        """
+        try:
+            yield self
+        finally:
+            self.session.close()
+
+    def close(self):
+        """
+        Close the client's session.
+
+        This should be called when the client is no longer needed to free up resources.
+        """
+        self.session.close()
