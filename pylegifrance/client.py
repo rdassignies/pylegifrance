@@ -12,6 +12,7 @@ from contextlib import contextmanager
 
 from pylegifrance.config import ApiConfig
 from pylegifrance.auth import AuthenticationManager
+from pylegifrance.utils import configure_session_timeouts
 
 logger = logging.getLogger(__name__)
 
@@ -55,6 +56,8 @@ class LegifranceClient:
         self.api_url = config.api_url
         self._auth_manager = AuthenticationManager(config)
         self.session = requests.Session()
+
+        configure_session_timeouts(self.session, config)
 
     def set_api_keys(
         self, client_id: Optional[str] = None, client_secret: Optional[str] = None

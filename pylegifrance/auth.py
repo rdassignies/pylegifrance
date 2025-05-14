@@ -8,9 +8,11 @@ import time
 import logging
 from dataclasses import dataclass
 import requests
+from contextlib import contextmanager
 from tenacity import retry, stop_after_attempt, wait_fixed, RetryError
 
 from pylegifrance.config import ApiConfig
+from pylegifrance.utils import configure_session_timeouts
 
 logger = logging.getLogger(__name__)
 
@@ -72,6 +74,8 @@ class AuthenticationManager:
         self._token_url = config.token_url
         self._token_info = TokenInfo(access_token="", issued_at=0, expires_in=0)
         self._session = requests.Session()
+
+        configure_session_timeouts(self._session, config)
 
     @retry(stop=stop_after_attempt(3), wait=wait_fixed(5), reraise=True)
     def _fetch_new_token(self) -> TokenInfo:
@@ -160,3 +164,20 @@ class AuthenticationManager:
         This should be called when the manager is no longer needed to free up resources.
         """
         self._session.close()
+
+    @contextmanager
+    def session_context(self):
+        """
+        Context manager for using the authentication manager in a with statement.
+
+        This ensures that the session is properly closed after use.
+
+        Yields
+        ------
+        AuthenticationManager
+            The authentication manager instance.
+        """
+        try:
+            yield self
+        finally:
+            self.close()

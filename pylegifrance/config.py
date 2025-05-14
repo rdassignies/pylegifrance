@@ -13,12 +13,16 @@ class ApiConfig:
         client_secret: The client secret for the Legifrance API.
         token_url: The URL for obtaining access tokens.
         api_url: The base URL for the Legifrance API.
+        connect_timeout: Timeout in seconds for establishing connection with server.
+        read_timeout: Timeout in seconds for receiving response after connection is established.
     """
 
     client_id: str
     client_secret: str
     token_url: str = "https://oauth.piste.gouv.fr/api/oauth/token"
     api_url: str = "https://api.piste.gouv.fr/dila/legifrance/lf-engine-app/"
+    connect_timeout: float = 3.05  # seconds
+    read_timeout: float = 27.0  # seconds
 
     @classmethod
     def from_env(cls) -> "ApiConfig":
