@@ -27,3 +27,4 @@ Voir le [guide officiel](https://piste.gouv.fr/en/help-center/guide) pour plus d
 
 - [GitHub](https://github.com/pylegifrance/pylegifrance)
 - [Issues](https://github.com/pylegifrance/pylegifrance/issues)
+- [Standards de Codage](https://github.com/pylegifrance/pylegifrance/blob/main/.github/CONTRIBUTING.md#standards-de-codage-pour-pylegifrance)
