@@ -63,10 +63,30 @@ Recherche dans la jurisprudence (en développement).
 
 ```python
 class LegifranceClient:
-    def set_api_keys(self, legifrance_api_key=None, legifrance_api_secret=None)
+    def __init__(config: Optional[ApiConfig] = None)
+    def update_api_keys(self, legifrance_api_key=None, legifrance_api_secret=None)
     def call_api(self, route: str, data: str)
     def ping(self, route: str = "consult/ping")
     def get(self, route: str)
 ```
 
 Gère l'authentification et les appels à l'API Legifrance.
+
+### ApiConfig
+
+```python
+class ApiConfig:
+    def __init__(
+        client_id: str,
+        client_secret: str,
+        token_url: str = "...",
+        api_url: str = "...",
+        connect_timeout: float = 3.05,
+        read_timeout: float = 27.0,
+    )
+
+    @classmethod
+    def from_env() -> "ApiConfig"
+```
+
+Gère la configuration d’accès à l’API (identifiants, URLs, timeouts).
