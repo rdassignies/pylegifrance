@@ -59,11 +59,11 @@ class LegifranceClient:
 
         configure_session_timeouts(self.session, config)
 
-    def set_api_keys(
+    def update_api_keys(
         self, client_id: Optional[str] = None, client_secret: Optional[str] = None
     ) -> None:
         """
-        Set or update the API keys for the client.
+        Update the API keys for the client.
 
         If keys are provided, they replace the current values.
         If keys are not provided, the method attempts to retrieve them
