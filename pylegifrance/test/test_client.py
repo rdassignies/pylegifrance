@@ -70,6 +70,31 @@ def test_client_initialization_without_env_vars(monkeypatch):
     assert "Required environment variables" in str(excinfo.value)
 
 
+def test_update_api_keys_with_valid_credentials(monkeypatch):
+    """
+    Test that update_api_keys replaces invalid credentials with valid ones from env.
+    """
+    # Given invalid credentials
+    bad_config = ApiConfig(client_id="fake_id", client_secret="fake_secret")
+    client = LegifranceClient(config=bad_config)
+
+    # The initial ping should fail
+    with pytest.raises(Exception):
+        client.ping()
+
+    # Simulate using other credentials
+    load_dotenv()
+    client_id = os.getenv("LEGIFRANCE_CLIENT_ID")
+    client_secret = os.getenv("LEGIFRANCE_CLIENT_SECRET")
+    
+    client.update_api_keys(client_id=client_id, client_secret=client_secret)
+
+    # Now ping should succeed
+    assert client.ping(), "Ping should succeed after updating with valid API keys"
+
+    client.close()
+
+
 def test_api_request(api_client):
     """
     Test that an API request works correctly.

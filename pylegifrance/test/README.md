@@ -24,6 +24,15 @@ LEGIFRANCE_CLIENT_ID=your_client_id
 LEGIFRANCE_CLIENT_SECRET=your_client_secret
 ```
 
+> 💡 Alternativement, vous pouvez passer les identifiants directement via `ApiConfig` dans votre code de test :
+
+```python
+from pylegifrance import LegifranceClient
+from pylegifrance.config import ApiConfig
+
+client = LegifranceClient(ApiConfig(client_id="your_client_id", client_secret="your_client_secret"))
+```
+
 Ces identifiants sont nécessaires pour que les tests API fonctionnent correctement.
 
 ## Exécution des Tests
