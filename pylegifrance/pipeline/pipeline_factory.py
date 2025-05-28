@@ -8,12 +8,13 @@ legifrance et autres.
 """
 
 import logging
-from typing import List
+from typing import List, Optional
 
 from dotenv import load_dotenv
 
 from pylegifrance.pipeline.pipeline import (
     Pipeline,
+    PipelineStep,
     CallApiStep,
     ExtractSearchResult,
     GetArticleId,
@@ -32,10 +33,11 @@ from pylegifrance.models.search import (
     NatureFiltre,
     DatesPeriod,
     DateSignatureFiltre,
-    Fond,
     Recherche,
     RechercheFinal,
 )
+from pylegifrance.models.constants import Fonds, TypeRecherche, Nature
+from pylegifrance.models.generic import Operateur, TypeChamp
 
 load_dotenv()
 
@@ -44,9 +46,9 @@ logger = logging.getLogger(__name__)
 
 def recherche_code(
     code_name: str,
-    search: str = None,
+    search: str | None = None,
     champ: str = "NUM_ARTICLE",
-    type_recherche: str = "EXACTE",
+    type_recherche: TypeRecherche = TypeRecherche.EXACTE,
     fond: str = "CODE_DATE",
     formatter: bool = False,
     page_number: int = 1,
@@ -99,14 +101,22 @@ def recherche_code(
     # Création des critères de recherche et des champs de recherche
     if search:
         criteres = [
-            Critere(valeur=search, typeRecherche=type_recherche, operateur="ET")
+            Critere(valeur=search, typeRecherche=type_recherche, operateur=Operateur.ET)
         ]
-        field = Champ(typeChamp=champ, criteres=criteres, operateur="ET")
+        field = Champ(
+            typeChamp=TypeChamp(champ), criteres=criteres, operateur=Operateur.ET
+        )
     else:
         # When search is None, use a search criterion that will match all articles
         # Using a space with the TITLE field and EXACTE type to retrieve the entire code
-        criteres = [Critere(valeur=" ", typeRecherche="EXACTE", operateur="ET")]
-        field = Champ(typeChamp="TITLE", criteres=criteres, operateur="ET")
+        criteres = [
+            Critere(
+                valeur=" ", typeRecherche=TypeRecherche.EXACTE, operateur=Operateur.ET
+            )
+        ]
+        field = Champ(
+            typeChamp=TypeChamp("TITLE"), criteres=criteres, operateur=Operateur.ET
+        )
 
     champs = [field]
 
@@ -129,9 +139,9 @@ def recherche_code(
     # Construction de la requête finale (payload)
 
     try:
-        # Astuce qui permet de valider le fond recherché
-        Fond(fond=fond)
-        initial_data = RechercheFinal(recherche=recherche, fond=fond)
+        # Convert string fond to Fonds enum
+        fonds_enum = Fonds(fond)
+        initial_data = RechercheFinal(recherche=recherche, fond=fonds_enum)
 
         logger.debug("---------- Payload -------------")
         logger.debug(initial_data.model_dump(mode="json"))
@@ -140,7 +150,7 @@ def recherche_code(
         return {"error": str(e)}
 
     # Initialisation des étapes du pipeline
-    pipeline_steps = [
+    pipeline_steps: List[PipelineStep] = [
         CallApiStep(client),
         ExtractSearchResult(),
         GetArticleId(),
@@ -165,12 +175,12 @@ def recherche_code(
 
 def recherche_LODA(
     text_id: str = "",
-    search: str = None,
+    search: str | None = None,
     champ: str = "NUM_ARTICLE",
     type_recherche: str = "EXACTE",
     fond: str = "LODA_DATE",
-    nature: List = ["LOI", "ORDONNANCE", "DECRET", "ARRETE"],
-    date_signature: List = None,
+    nature: List[str] = ["LOI", "ORDONNANCE", "DECRET", "ARRETE"],
+    date_signature: Optional[List[str]] = None,
     formatter: bool = False,
     page_number: int = 1,
     page_size: int = 10,
@@ -223,15 +233,31 @@ def recherche_LODA(
     client = LegifranceClient(config=config)
 
     # Création des critères de recherche
-    critere_text = [Critere(valeur=text_id, typeRecherche="EXACTE", operateur="ET")]
+    critere_text = [
+        Critere(
+            valeur=text_id, typeRecherche=TypeRecherche.EXACTE, operateur=Operateur.ET
+        )
+    ]
     # Création des champs de recherche
-    fields = [Champ(typeChamp="NUM", criteres=critere_text, operateur="ET")]
+    fields = [
+        Champ(typeChamp=TypeChamp("NUM"), criteres=critere_text, operateur=Operateur.ET)
+    ]
 
     # Création de champs supplémentaires si search non vide
 
     if search:
-        critere_art = [Critere(valeur=search, typeRecherche="EXACTE", operateur="ET")]
-        fields.append(Champ(typeChamp=champ, criteres=critere_art, operateur="ET"))
+        critere_art = [
+            Critere(
+                valeur=search,
+                typeRecherche=TypeRecherche.EXACTE,
+                operateur=Operateur.ET,
+            )
+        ]
+        fields.append(
+            Champ(
+                typeChamp=TypeChamp(champ), criteres=critere_art, operateur=Operateur.ET
+            )
+        )
 
     if args:
         print("ATTENTION : Traitement de *args pas encore implémenté.")
@@ -241,7 +267,9 @@ def recherche_LODA(
     filtre_date = DateVersionFiltre()
     filtre_etat_text = EtatTextFiltre()
     filtre_etat_art = EtatArticleFiltre()
-    filtre_nature = NatureFiltre(valeurs=nature)
+    # Convert string values to Nature enum values
+    nature_enum = [Nature(n) for n in nature]
+    filtre_nature = NatureFiltre(valeurs=nature_enum)
     filtres = [filtre_etat_text, filtre_etat_art, filtre_date, filtre_nature]
 
     if date_signature:
@@ -258,10 +286,9 @@ def recherche_LODA(
     # Construction de la requête finale (payload)
 
     try:
-        # Astuce qui permet de valider le fond recherché = lève erreur si pas valide
-        Fond(fond=fond)
-
-        initial_data = RechercheFinal(recherche=recherche, fond=fond)
+        # Convert string fond to Fonds enum
+        fonds_enum = Fonds(fond)
+        initial_data = RechercheFinal(recherche=recherche, fond=fonds_enum)
 
         logger.debug("---------- Payload -------------")
         logger.debug(initial_data.model_dump(mode="json"))
@@ -270,7 +297,7 @@ def recherche_LODA(
         return {"error": str(e)}
 
     # Initialisation des étapes du pipeline
-    pipeline_steps = [
+    pipeline_steps: List[PipelineStep] = [
         CallApiStep(client),
         ExtractSearchResult(),
         GetArticleId(),
@@ -295,7 +322,7 @@ def recherche_LODA(
 
 
 def recherche_JURI(
-    search: str = None,
+    search: str | None = None,
     champ: str = "ALL",
     type_recherche: str = "EXACTE",
     fond: str = "JURI",
@@ -311,9 +338,17 @@ def recherche_JURI(
     client = LegifranceClient(config=config)
 
     # Création des critères de recherche
-    critere = [Critere(valeur=search, typeRecherche="EXACTE", operateur="ET")]
+    critere = [
+        Critere(
+            valeur="" if search is None else search,
+            typeRecherche=TypeRecherche.EXACTE,
+            operateur=Operateur.ET,
+        )
+    ]
 
-    fields = [Champ(typeChamp=champ, criteres=critere, operateur="ET")]
+    fields = [
+        Champ(typeChamp=TypeChamp(champ), criteres=critere, operateur=Operateur.ET)
+    ]
 
     # Construction des paramètres de la recherche
     recherche = Recherche(
@@ -321,10 +356,9 @@ def recherche_JURI(
     )
 
     try:
-        # Astuce qui permet de valider le fond recherché
-        Fond(fond=fond)
-
-        initial_data = RechercheFinal(recherche=recherche, fond=fond)
+        # Convert string fond to Fonds enum
+        fonds_enum = Fonds(fond)
+        initial_data = RechercheFinal(recherche=recherche, fond=fonds_enum)
 
         logger.debug("---------- Payload -------------")
         logger.debug(initial_data.model_dump(mode="json"))
@@ -333,7 +367,7 @@ def recherche_JURI(
         return {"error": str(e)}
 
     # Initialisation des étapes du pipeline
-    pipeline_steps = [CallApiStep(client)]
+    pipeline_steps: List[PipelineStep] = [CallApiStep(client)]
 
     # Ajoute un formatter si True
     if formatter:

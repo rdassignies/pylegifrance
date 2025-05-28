@@ -1,7 +1,9 @@
 import pytest
 from pydantic import ValidationError
+
+from pylegifrance.models.generic import Operateur, TypeChamp
 from pylegifrance.pipeline.pipeline_factory import recherche_code
-from pylegifrance.models.constants import CodeNom
+from pylegifrance.models.constants import CodeNom, Fonds, TypeRecherche
 from pylegifrance.models.search import (
     NomCodeFiltre,
     DateVersionFiltre,
@@ -43,8 +45,12 @@ def test_recherche_final_direct_validation():
     Test that directly validates 'Code de commerce' in a complete RechercheFinal model.
     """
     # Given a basic search criteria and 'Code de commerce' as a code name
-    critere = Critere(valeur="1", typeRecherche="EXACTE", operateur="ET")
-    field = Champ(typeChamp="NUM_ARTICLE", criteres=[critere], operateur="ET")
+    critere = Critere(
+        valeur="1", typeRecherche=TypeRecherche.EXACTE, operateur=Operateur.ET
+    )
+    field = Champ(
+        typeChamp=TypeChamp.NUM_ARTICLE, criteres=[critere], operateur=Operateur.ET
+    )
     code_name = "Code de commerce"
     filtre_code = NomCodeFiltre(valeurs=[code_name])
     filtre_date = DateVersionFiltre()
@@ -59,7 +65,10 @@ def test_recherche_final_direct_validation():
 
     # Then it should not raise a validation error
     try:
-        recherche_final = RechercheFinal(recherche=recherche, fond="CODE_DATE")
+        recherche_final = RechercheFinal(recherche=recherche, fond=Fonds.CODE_DATE)
+        assert isinstance(recherche_final.recherche.filtres[0], NomCodeFiltre), (
+            "First filter should be NomCodeFiltre"
+        )
         assert recherche_final.recherche.filtres[0].valeurs[0] == CodeNom.CCOM
     except ValidationError as e:
         error_msg = str(e)

@@ -86,10 +86,9 @@ class Critere(BaseModel):
     Liste des critères/groupes de critères de recherche pour ce champ
     """
 
-    # criteres: Optional[List["Critere"]] = [] #Sous-critère/Sous-groupe de critères
-    typeRecherche: TypeRecherche = "EXACTE"
+    typeRecherche: TypeRecherche = TypeRecherche.EXACTE
     valeur: str  # " Mot(s)/expression recherchés"
-    operateur: Operateur = "ET"
+    operateur: Operateur = Operateur.ET
 
 
 class Champ(BaseModel):
@@ -100,7 +99,7 @@ class Champ(BaseModel):
 
     typeChamp: TypeChamp
     criteres: List[Critere]
-    operateur: Operateur = "ET"
+    operateur: Operateur = Operateur.ET
 
 
 # Modèle de filtres spécifiques
@@ -168,7 +167,12 @@ class NomCodeFiltre(BaseModel):
 
 class NatureFiltre(BaseModel):
     facette: TypeFacettes = TypeFacettes.NATURE
-    valeurs: List[Nature] = ["LOI", "ORDONNANCE", "DECRET", "ARRETE"]
+    valeurs: List[Nature] = [
+        Nature.LOI,
+        Nature.ORDONNANCE,
+        Nature.DECRET,
+        Nature.ARRETE,
+    ]
 
 
 class EtatTextFiltre(BaseModel):
@@ -236,12 +240,12 @@ class RechercheFinal(BaseModel):
 
     @field_validator("recherche")
     @classmethod
-    def validate_champs(cls, v, values):
+    def validate_champs(cls, v, info):
         """
         Validates the compatibility between the field type and the archive fonds.
         The test relies on an ENUM list of fields authorized for each fonds.
         """
-        fond = values.data["fond"]
+        fond = info.data.get("fond")
         for champ in v.champs:
             if fond in ["CODE_DATE", "CODE_ETAT"]:
                 if champ.typeChamp.value not in ChampsCODE.__members__:
@@ -262,13 +266,13 @@ class RechercheFinal(BaseModel):
 
     @field_validator("recherche")
     @classmethod
-    def validate_filtres(cls, v, values):
+    def validate_filtres(cls, v, info):
         """
         Validates the compatibility between the filter type (facet)
         and the archive fonds.The test is based on an ENUM list of facet names
         authorized for each fonds.
         """
-        fond = values.data["fond"]
+        fond = info.data.get("fond")
         for filtre in v.filtres:
             if fond in ["CODE_DATE", "CODE_ETAT"]:
                 if filtre.facette.value not in FacettesCODE.__members__:

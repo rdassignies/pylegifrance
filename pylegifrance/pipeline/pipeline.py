@@ -8,7 +8,7 @@ renvoyés par l'API Legifrance.
 """
 
 from pydantic import BaseModel
-from typing import List, Union, Dict
+from typing import List, Union, Dict, Any
 import logging
 import json
 
@@ -147,7 +147,7 @@ class GetTextId(PipelineStep):
     Une étape du pipeline pour récupérer les identifiants de textes LEGITEXT.
     """
 
-    def process(self, data, data_type="") -> Dict:
+    def process(self, data, data_type="") -> tuple[Any, str]:
         """
         Génère des modèles LegiPart à partir des données fournies.
 
@@ -221,7 +221,7 @@ class CallApiStep(PipelineStep):
                 "ou une liste de modèles Pydantic"
             )
 
-    def _call_api_single(self, model: BaseModel) -> Dict:
+    def _call_api_single(self, model: BaseModel) -> tuple[Any, Any | None]:
         """
         Appelle l'API avec une seule requête (modèles).
 
@@ -249,7 +249,9 @@ class CallApiStep(PipelineStep):
 
         return json.loads(response.content.decode("utf-8")), model_reponse
 
-    def _call_api_multiple(self, models: List[BaseModel]) -> List:
+    def _call_api_multiple(
+        self, models: List[BaseModel]
+    ) -> tuple[list[Any], Any | None]:
         """
         Appelle l'API avec une liste de requêtes (modèles).
 

@@ -6,7 +6,7 @@ Fonctions qui traite les résultats renvoyés par l'API legifrance
 @author: Raphaël d'Assignies
 """
 
-from typing import Union
+from typing import Union, Dict, Any
 import json
 import logging
 
@@ -15,7 +15,7 @@ from pylegifrance.models.consult import GetArticle, LegiPart
 logger = logging.getLogger(__name__)
 
 
-def search_response_DTO(results: Union[dict, str]):
+def search_response_DTO(results: Union[Dict[str, Any], str]):
     """
     Cette fonction extrait les données de SearchResponseDTO model
     (RechercheFinal).
@@ -35,11 +35,11 @@ def search_response_DTO(results: Union[dict, str]):
         except json.JSONDecodeError:
             raise ValueError("results must be a valid JSON.")
 
-    elif not isinstance(results, dict):
+    if not isinstance(results, dict):
         raise TypeError("results must be a valid dict")
 
-    logger.info(f"Nombre de résultats trouvés: {results['totalResultNumber']}")
-    logger.debug(f"Facets : {results['facets']}")
+    logger.info(f"Nombre de résultats trouvés: {results.get('totalResultNumber', 0)}")
+    logger.debug(f"Facets : {results.get('facets', {})}")
 
     def get_with_default(dictionary, key, default=""):
         value = dictionary.get(key)
@@ -88,8 +88,13 @@ def search_response_DTO(results: Union[dict, str]):
                         )
 
     # Appel initial sur les résultats
-    for result in results["results"]:
-        extract_recursive(result)
+    if (
+        isinstance(results, dict)
+        and "results" in results
+        and isinstance(results["results"], list)
+    ):
+        for result in results["results"]:
+            extract_recursive(result)
 
     return extracted_data
 
