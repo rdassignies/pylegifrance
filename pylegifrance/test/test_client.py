@@ -86,7 +86,7 @@ def test_update_api_keys_with_valid_credentials(monkeypatch):
     load_dotenv()
     client_id = os.getenv("LEGIFRANCE_CLIENT_ID")
     client_secret = os.getenv("LEGIFRANCE_CLIENT_SECRET")
-    
+
     client.update_api_keys(client_id=client_id, client_secret=client_secret)
 
     # Now ping should succeed
