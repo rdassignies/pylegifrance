@@ -60,3 +60,17 @@ dev = [
     "pre-commit>=3.4.0",
     "twine>=4.0.2"
 ]
+
+[tool.datamodel-codegen]
+input = "pylegifrance/models/generated/legifrance.json"
+input-file-type = "jsonschema"
+output = "pylegifrance/models/generated/model.py"
+output-model-type = "pydantic_v2.BaseModel"
+target-python-version = "3.12"
+
+field-constraints = true
+snake-case-field = true
+strip-default-none = false
+reuse-model = true
+use-standard-collections = true
+use-double-quotes = true
