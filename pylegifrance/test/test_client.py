@@ -36,8 +36,8 @@ def test_client_initialization(config_type, description):
     """
     # Given API credentials
     load_dotenv()
-    client_id = os.getenv("LEGIFRANCE_CLIENT_ID")
-    client_secret = os.getenv("LEGIFRANCE_CLIENT_SECRET")
+    client_id = os.getenv("LEGIFRANCE_CLIENT_ID", "test_client_id")
+    client_secret = os.getenv("LEGIFRANCE_CLIENT_SECRET", "test_client_secret")
 
     # When a client is created with the specified configuration
     if config_type == "env_vars":

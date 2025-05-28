@@ -11,8 +11,8 @@ def configure_session_timeouts(session: requests.Session, config: ApiConfig) -> 
     """
     Configure default timeouts for all requests in a session.
 
-    This function modifies the session's request method to include default timeouts
-    based on the provided configuration.
+    This function wraps the original request method to include default timeouts
+    for all requests based on the provided configuration.
 
     Parameters
     ----------
@@ -21,10 +21,15 @@ def configure_session_timeouts(session: requests.Session, config: ApiConfig) -> 
     config : ApiConfig
         The configuration containing timeout values.
     """
+    # Store the original request method
     original_request = session.request
-    session.request = lambda method, url, **kwargs: original_request(
-        method=method,
-        url=url,
-        timeout=kwargs.pop("timeout", (config.connect_timeout, config.read_timeout)),
-        **kwargs,
-    )
+
+    # Define a wrapper function that adds the timeout
+    def request_with_timeout(*args, **kwargs):
+        # Add default timeout if not provided
+        if "timeout" not in kwargs:
+            kwargs["timeout"] = (config.connect_timeout, config.read_timeout)
+        return original_request(*args, **kwargs)
+
+    # Replace the request method with our wrapper
+    session.request = request_with_timeout

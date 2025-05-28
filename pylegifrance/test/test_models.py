@@ -18,7 +18,8 @@ from pylegifrance.models.consult import (
     LegiSommaireConsult,
 )
 
-from pylegifrance.models.constants import CodeNom
+from pylegifrance.models.constants import CodeNom, Fonds, Nature
+from pylegifrance.models.generic import TypeChamp
 
 
 @pytest.fixture
@@ -38,7 +39,7 @@ def test_field_with_valid_criteria(basic_criteria):
     criteria = basic_criteria
 
     # When a field is created with the criteria
-    field = Champ(typeChamp="VISA", criteres=[criteria], operateur=Operateur.ET)
+    field = Champ(typeChamp=TypeChamp.VISA, criteres=[criteria], operateur=Operateur.ET)
 
     # Then the field should have the correct properties
     assert field.typeChamp.value == "VISA"
@@ -52,18 +53,23 @@ def test_recherche_final_with_valid_field_and_fond(basic_criteria):
     Test that a RechercheFinal with valid field and fond is correctly constructed.
     """
     # Given a valid field and filter
-    field = Champ(typeChamp="VISA", criteres=[basic_criteria], operateur=Operateur.ET)
-    filtre = NatureFiltre(valeurs=["LOI", "DECRET"])
+    field = Champ(
+        typeChamp=TypeChamp.VISA, criteres=[basic_criteria], operateur=Operateur.ET
+    )
+    filtre = NatureFiltre(valeurs=[Nature.LOI, Nature.DECRET])
 
     # When a search and final search are created
     search = Recherche(champs=[field], filtres=[filtre])
-    final = RechercheFinal(recherche=search, fond="LODA_DATE")
+    final = RechercheFinal(recherche=search, fond=Fonds.LODA_DATE)
 
     # Then the final search should have the correct properties
     assert final.fond == "LODA_DATE"
     assert len(final.recherche.champs) == 1
     assert final.recherche.champs[0].typeChamp.value == "VISA"
-    assert final.recherche.filtres[0].valeurs == ["LOI", "DECRET"]
+    assert isinstance(final.recherche.filtres[0], NatureFiltre), (
+        "First filter should be NatureFiltre"
+    )
+    assert final.recherche.filtres[0].valeurs == [Nature.LOI, Nature.DECRET]
 
 
 @pytest.mark.parametrize(
@@ -71,7 +77,7 @@ def test_recherche_final_with_valid_field_and_fond(basic_criteria):
     [
         # Invalid field type for CODE_DATE fond
         (
-            "VISA",
+            TypeChamp.VISA,
             "CODE_DATE",
             "TypeChamp TypeChamp.VISA is not valid for the fond Fonds.CODE_DATE",
         ),
@@ -102,13 +108,17 @@ def test_recherche_final_with_valid_filters(basic_criteria):
     Test that a RechercheFinal with valid filters is correctly constructed.
     """
     # Given valid field and filters
-    field = Champ(typeChamp="NUM_ARTICLE", criteres=[basic_criteria], operateur="ET")
+    field = Champ(
+        typeChamp=TypeChamp.NUM_ARTICLE,
+        criteres=[basic_criteria],
+        operateur=Operateur.ET,
+    )
     filtre1 = NomCodeFiltre(valeurs=["Code civil"])
     filtre2 = DateVersionFiltre()
 
     # When a search and final search are created with the filters
     search = Recherche(champs=[field], filtres=[filtre1, filtre2])
-    final = RechercheFinal(recherche=search, fond="CODE_DATE")
+    final = RechercheFinal(recherche=search, fond=Fonds.CODE_DATE)
 
     # Then the final search should have the correct filter properties
     assert final.fond == "CODE_DATE"
@@ -137,7 +147,9 @@ def test_recherche_final_with_invalid_facet_type(
     """
     # Given a field and a filter with an invalid facet type for the specified fond
     field = Champ(
-        typeChamp="NUM_ARTICLE", criteres=[basic_criteria], operateur=Operateur.ET
+        typeChamp=TypeChamp.NUM_ARTICLE,
+        criteres=[basic_criteria],
+        operateur=Operateur.ET,
     )
     filtre1 = NomCodeFiltre(valeurs=["Code civil"])
     filtre2 = DateVersionFiltre()
@@ -221,7 +233,9 @@ def test_nom_code_filtre_with_code_de_commerce_in_recherche():
     critere = Critere(
         valeur="7", typeRecherche=TypeRecherche.EXACTE, operateur=Operateur.ET
     )
-    field = Champ(typeChamp="NUM_ARTICLE", criteres=[critere], operateur=Operateur.ET)
+    field = Champ(
+        typeChamp=TypeChamp.NUM_ARTICLE, criteres=[critere], operateur=Operateur.ET
+    )
 
     # And 'Code de commerce' as a code name
     code_name = "Code de commerce"
@@ -238,6 +252,9 @@ def test_nom_code_filtre_with_code_de_commerce_in_recherche():
             pageSize=10,
         )
         assert len(recherche.filtres) == 2
+        assert isinstance(recherche.filtres[0], NomCodeFiltre), (
+            "First filter should be NomCodeFiltre"
+        )
         assert recherche.filtres[0].valeurs[0] == CodeNom.CCOM
     except ValidationError as e:
         pytest.fail(f"Recherche validation failed for 'Code de commerce': {e}")
@@ -251,7 +268,9 @@ def test_nom_code_filtre_with_code_de_commerce_in_recherche_final():
     critere = Critere(
         valeur="7", typeRecherche=TypeRecherche.EXACTE, operateur=Operateur.ET
     )
-    field = Champ(typeChamp="NUM_ARTICLE", criteres=[critere], operateur=Operateur.ET)
+    field = Champ(
+        typeChamp=TypeChamp.NUM_ARTICLE, criteres=[critere], operateur=Operateur.ET
+    )
 
     # And 'Code de commerce' as a code name
     code_name = "Code de commerce"
@@ -267,7 +286,10 @@ def test_nom_code_filtre_with_code_de_commerce_in_recherche_final():
             pageNumber=1,
             pageSize=10,
         )
-        recherche_final = RechercheFinal(recherche=recherche, fond="CODE_DATE")
+        recherche_final = RechercheFinal(recherche=recherche, fond=Fonds.CODE_DATE)
+        assert isinstance(
+            recherche_final.recherche.filtres[0], NomCodeFiltre
+        )  # Make sure it's the right type
         assert recherche_final.recherche.filtres[0].valeurs[0] == CodeNom.CCOM
     except ValidationError as e:
         pytest.fail(f"RechercheFinal validation failed for 'Code de commerce': {e}")

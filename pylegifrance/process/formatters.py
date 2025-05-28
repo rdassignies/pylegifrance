@@ -14,13 +14,16 @@ from pylegifrance.config import ARTICLE_KEYS, ROOT_KEYS, SECTION_KEYS
 
 
 def formate_text_response(
-    data, root_keys=ROOT_KEYS, section_keys=SECTION_KEYS, article_keys=ARTICLE_KEYS
-):
+    data: Union[List[Dict[str, Any]], Dict[str, Any]],
+    root_keys=ROOT_KEYS,
+    section_keys=SECTION_KEYS,
+    article_keys=ARTICLE_KEYS,
+) -> Dict[str, Any]:
     """
     Extrait les données de ConsultTextResponse model (LegiPart).
 
     Args:
-        data (dict): dict contenant le texte et les méta données recherchés
+        data (Union[List[Dict], Dict]): Liste de dictionnaires ou dictionnaire contenant le texte et les méta données recherchés
         root_keys (Tuple): Liste des clés de la racine
         section_keys (Tuple): Liste des clés pour la section
         article_keys (Tuple): Liste des clés pour les articles.
@@ -37,7 +40,7 @@ def formate_text_response(
         raise TypeError("Data must be a list or a list with a single item")
 
     # Fonction interne pour traiter récursivement les sections et articles
-    def process_section(section_data):
+    def process_section(section_data: Dict[str, Any]) -> Dict[str, Any]:
         section_result = {}
 
         # Extraire les données des articles dans la section
@@ -65,7 +68,7 @@ def formate_text_response(
 
     # Traitement du contenu principal (sections à la racine)
     content = []
-    if "sections" in data:
+    if isinstance(data, dict) and "sections" in data:
         content = [process_section(section) for section in data["sections"]]
 
     # Assembler le résultat final

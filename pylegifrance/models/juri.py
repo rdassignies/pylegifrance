@@ -159,7 +159,7 @@ class Publication(str, Enum):
 class PublicationBulletinFiltre(BaseModel):
     facette: str = FacettesJURI.CASSATION_TYPE_PUBLICATION_BULLETIN
     valeurs: List[Publication] = Field(
-        default=["T"]
+        default=[Publication.T]
     )  # Soit 'T' publié au bulletin soit 'F'
 
 
@@ -188,29 +188,30 @@ class SortJURI(str, Enum):
 
 
 class TexteLien(BaseModel):
-    cidTexte: str = Field(..., description="Identifiant du texte")
+    cidTexte: str = Field(description="Identifiant du texte")
     datePubliTexte: Optional[str] = Field(
-        None, description="Date de publication du texte", example="YYYY-MM-DD"
+        default=None,
+        description="Date de publication du texte",
+        examples=["YYYY-MM-DD"],
     )
     dateSignaTexte: Optional[str] = Field(
-        None, description="Date de signature du texte", example="YYYY-MM-DD"
+        default=None, description="Date de signature du texte", examples=["YYYY-MM-DD"]
     )
-    id: str = Field(..., description="Identifiant unique du lien")
-    natureTexte: str = Field(..., description="Nature du texte")
-    norTexte: str = Field(..., description="Numéro NOR du texte")
-    num: str = Field(..., description="Numéro du texte")
+    id: str = Field(description="Identifiant unique du lien")
+    natureTexte: str = Field(description="Nature du texte")
+    norTexte: str = Field(description="Numéro NOR du texte")
+    num: str = Field(description="Numéro du texte")
     numTexte: str = Field(
-        ...,
-        description="Numéro du texte dans une autre nomenclature ou système de référencement",
+        description="Numéro du texte dans une autre nomenclature ou système de référencement"
     )
     sens: str = Field(
-        ..., description="Sens du lien, par exemple 'source'", example="source"
+        description="Sens du lien, par exemple 'source'", examples=["source"]
     )
     typeLien: str = Field(
-        ..., description="Type de lien, par exemple 'CITATION'", example="CITATION"
+        description="Type de lien, par exemple 'CITATION'", examples=["CITATION"]
     )
-    title: Optional[Union[int, str, None]] = Field(
-        ..., description="Titre du texte lié, peut inclure des références législatives"
+    title: Union[int, str, None] = Field(
+        description="Titre du texte lié, peut inclure des références législatives"
     )
 
 
@@ -220,17 +221,17 @@ class DecisionAttaquee(BaseModel):
 
 
 class Decision(BaseModel):
-    id: str = None
+    id: Optional[str] = None
     idEli: Optional[str] = None
     idEliAlias: Optional[str] = None
-    origine: str = None
+    origine: Optional[str] = None
     nature: Optional[Union[int, str, None]] = None
     cid: Optional[str] = None
     num: Optional[str] = None
     numeroBo: Optional[str] = None
     numParution: Optional[str] = None
-    juridiction: str = None
-    natureJuridiction: str = None
+    juridiction: Optional[str] = None
+    natureJuridiction: Optional[str] = None
     solution: Optional[Union[int, str, None]] = None
     numeroAffaire: List[str]
     numsequence: Optional[str] = None
@@ -243,9 +244,9 @@ class Decision(BaseModel):
     dateTexteComputed: Optional[Union[int, str, None]]
     dateDerniereModif: Optional[str] = None
     originePubli: Optional[Union[str, int]] = None
-    publicationRecueil: str = None
+    publicationRecueil: Optional[str] = None
     formation: Optional[Union[int, str, None]] = None
-    provenance: str = None
+    provenance: Optional[str] = None
     decisionAttaquee: DecisionAttaquee
     siegeAppel: Optional[str] = None
     president: Optional[str] = None
@@ -255,8 +256,8 @@ class Decision(BaseModel):
     commissaire: Optional[str] = None
     ecli: Optional[str] = None
     version: Optional[str] = None
-    titre: str = None
-    titreLong: str = None
+    titre: Optional[str] = None
+    titreLong: Optional[str] = None
     titreJo: Optional[str] = None
     lienJo: Optional[str] = None
     numTexteJo: Optional[str] = None
@@ -283,8 +284,8 @@ class Decision(BaseModel):
     travauxPreparatoiresHtml: Optional[str] = None
     nota: Optional[str] = None
     notaHtml: Optional[str] = None
-    texte: str = None
-    texteHtml: str = None
+    texte: Optional[str] = None
+    texteHtml: Optional[str] = None
     sommaire: List[dict] = []
     titrages: List[str] = []
     titragesKey: Optional[Union[List, None]] = []
@@ -309,11 +310,11 @@ class Decision(BaseModel):
     numLoiDef: Optional[str] = None
     dateLoiDef: Optional[str] = None
     titreLoiDef: Optional[str] = None
-    juridictionJudiciaire: str
+    juridictionJudiciaire: Optional[str] = None
     conditionDiffere: Optional[str] = None
     conteneurs: List[str] = []
-    refInjection: str = None
-    idTechInjection: str = None
+    refInjection: Optional[str] = None
+    idTechInjection: Optional[str] = None
     resume: Optional[str] = None
     resumeHtml: Optional[str] = None
     rectificatif: Optional[str] = None
@@ -328,7 +329,7 @@ class Decision(BaseModel):
     infosComplementaires: Optional[str] = None
     infosComplementairesHtml: Optional[str] = None
     notaSectionsAafficher: Optional[str] = None
-    embedding: List[float] = None
+    embedding: Optional[List[float]] = None
     """
     def create_embeddings(self ,model="text-embedding-ada-002") -> List[float]:
 
@@ -400,14 +401,21 @@ class SearchJURI(BaseModel):
             field_type = field.annotation
 
             lines.append(f"- Champ : {name}")
-            lines.append(
-                f"  Type : {field_type.__name__ if hasattr(field_type, '__name__') else str(field_type)}"
-            )
+            if field_type is None:
+                lines.append("  Type : None")
+            else:
+                lines.append(
+                    f"  Type : {field_type.__name__ if hasattr(field_type, '__name__') else str(field_type)}"
+                )
             lines.append(f"  Description : {description}")
 
             import inspect
 
-            if inspect.isclass(field_type) and issubclass(field_type, Enum):
+            if (
+                field_type is not None
+                and inspect.isclass(field_type)
+                and issubclass(field_type, Enum)
+            ):
                 enum_vals = ", ".join(e.value for e in field_type)
                 lines.append(f"  Valeurs possibles : {enum_vals}")
 

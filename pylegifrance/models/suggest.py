@@ -1,11 +1,6 @@
 from typing import List, ClassVar
 from pylegifrance.models.constants import SupplyEnum
-
-
 from pydantic import BaseModel, Field
-
-
-# SUGGEST CONTROLLER
 
 
 class SuggestSupplyRequest(BaseModel):
@@ -13,11 +8,11 @@ class SuggestSupplyRequest(BaseModel):
     plusieurs fonds
     """
 
-    searchText: str = Field(..., example="mariage", description="Texte à rechercher")
+    searchText: str = Field(..., description="Texte à rechercher", examples=["mariage"])
     supplies: List[SupplyEnum] = Field(
-        ...,
-        example=["JORF", "JURI"],
+        default_factory=list,
         description="Liste des fonds dans lesquels exécuter la recherche pour la suggestion",
+        examples=[[SupplyEnum.JORF, SupplyEnum.JURI]],
     )
     documentsDits: bool = Field(
         True, description="Indicateur de la présence de documents dits"
