@@ -63,18 +63,6 @@ class TypeChamp(Enum):
     IDCC = "IDCC"
 
 
-class TypeRecherche(Enum):
-    """Type de recherche effectuée"""
-
-    EXACTE = "EXACTE"
-    UN_DES_MOTS = "UN_DES_MOTS"
-    TOUS_LES_MOTS_DANS_UN_CHAMP = "TOUS_LES_MOTS_DANS_UN_CHAMP"
-    AUCUN_DES_MOTS = "AUCUN_DES_MOTS"
-    AUCUNE_CORRESPONDANCE_A_CETTE_EXPRESSION = (
-        "AUCUNE_CORRESPONDANCE_A_CETTE_EXPRESSION"
-    )
-
-
 class Fonds(str, Enum):
     """Liste des fonds disponibles pour la recherche
     Fonds sur lequel appliquer la recherche. Pour rechercher dans tous les
