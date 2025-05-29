@@ -46,7 +46,6 @@ pythonpath = "."
 
 [tool.setuptools.packages.find]
 include = ["pylegifrance", "pylegifrance.*"]
-exclude = ["pylegifrance.test", "pylegifrance.test.*"]
 
 [tool.setuptools.package-data]
 pylegifrance = ["py.typed"]
