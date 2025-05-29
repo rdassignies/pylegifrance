@@ -40,7 +40,7 @@ Ces identifiants sont nécessaires pour que les tests API fonctionnent correctem
 Pour exécuter tous les tests :
 
 ```bash
-  uv run pytest pylegifrance/test
+  uv run pytest
 ```
 
 ## Approche de Test

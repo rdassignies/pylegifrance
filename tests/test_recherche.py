@@ -106,7 +106,7 @@ def test_search_loda_without_text_id_raises_error():
 
 def test_search_loda_with_invalid_field_raises_error(privacy_law):
     """
-    Test that searching with an invalid field raises a validation error.
+    Test that searching with an invalid field raises a ValueError.
     """
     # Given a valid law ID but an invalid field
     text_id = privacy_law
@@ -114,8 +114,8 @@ def test_search_loda_with_invalid_field_raises_error(privacy_law):
     invalid_field = "RAISON SOCIALE"
 
     # When searching with an invalid field
-    # Then a validation error should be raised
-    with pytest.raises(ValidationError):
+    # Then a ValueError should be raised because the field is not a valid TypeChamp
+    with pytest.raises(ValueError):
         recherche_LODA(text_id=text_id, search=search_term, champ=invalid_field)
 
 
