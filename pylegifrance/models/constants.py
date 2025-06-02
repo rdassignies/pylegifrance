@@ -5,6 +5,9 @@ This module centralizes all shared constants and enumerations to avoid duplicati
 and ensure consistency across the codebase.
 """
 
+from pylegifrance.models.generated.model import Operateur as _Operateur
+
+
 from enum import Enum
 from typing import Dict, List, Tuple
 
@@ -223,6 +226,36 @@ class TypeRecherche(Enum):
     AUCUNE_CORRESPONDANCE_A_CETTE_EXPRESSION = (
         "AUCUNE_CORRESPONDANCE_A_CETTE_EXPRESSION"
     )
+    APPROXIMATIVE = "APPROXIMATIVE"
+    TOUS_LES_MOTS = "TOUS_LES_MOTS"
+    EXPRESSION = "EXPRESSION"
+    CHAMP_VIDE = "CHAMP_VIDE"
+
+    @classmethod
+    def _missing_(cls, value):
+        """Handle missing values by trying to match them to existing enum members."""
+        if isinstance(value, _TypeRecherche):
+            # If we get a generated enum instance, convert it to its string value
+            return cls(value.value)
+        return None
+
+
+class Operateur(str, Enum):
+    """Opérateur entre les champs de recherche.
+
+    This enum is compatible with the generated Operateur enum.
+    Using str as a base class ensures type compatibility with string literals.
+    """
+
+    ET = _Operateur.et.value
+    OU = _Operateur.ou.value
+
+    @classmethod
+    def _missing_(cls, value):
+        """Handle missing values by trying to match them to existing enum members."""
+        if isinstance(value, _Operateur):
+            return cls(value.value)
+        return None
 
 
 # List of deprecated routes and their replacements

@@ -13,16 +13,6 @@ from enum import Enum
 # from pydantic import BaseModel, field_validator
 
 
-# Enums génériques
-class Operateur(Enum):
-    """
-    Opérateur entre les champs de recherche
-    """
-
-    ET = "ET"
-    OU = "OU"
-
-
 class TypeChamp(Enum):
     """
     Type de champ. Il est possible d'utiliser la valeur ALL pour
