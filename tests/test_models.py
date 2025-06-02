@@ -18,8 +18,7 @@ from pylegifrance.models.consult import (
     LegiSommaireConsult,
 )
 
-from pylegifrance.models.constants import CodeNom, Fonds, Nature
-from pylegifrance.models.generic import TypeChamp
+from pylegifrance.models.constants import CodeNom, Fonds, Nature, TypeChamp
 
 
 @pytest.fixture

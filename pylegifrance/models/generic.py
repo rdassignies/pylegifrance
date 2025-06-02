@@ -10,49 +10,6 @@ Modèles génériques de l'API legifrance
 from enum import Enum
 
 
-# from pydantic import BaseModel, field_validator
-
-
-class TypeChamp(Enum):
-    """
-    Type de champ. Il est possible d'utiliser la valeur ALL pour
-    rechercher dans tous les champs.
-    """
-
-    ALL = "ALL"
-    TITLE = "TITLE"
-    TABLE = "TABLE"
-    NOR = "NOR"
-    NUM = "NUM"
-    ADVANCED_TEXTE_ID = "ADVANCED_TEXTE_ID"
-    NUM_DELIB = "NUM_DELIB"
-    NUM_DEC = "NUM_DEC"
-    NUM_ARTICLE = "NUM_ARTICLE"
-    ARTICLE = "ARTICLE"
-    MINISTERE = "MINISTERE"
-    VISA = "VISA"
-    NOTICE = "NOTICE"
-    VISA_NOTICE = "VISA_NOTICE"
-    TRAVAUX_PREP = "TRAVAUX_PREP"
-    SIGNATURE = "SIGNATURE"
-    NOTA = "NOTA"
-    NUM_AFFAIRE = "NUM_AFFAIRE"
-    ABSTRATS = "ABSTRATS"
-    RESUMES = "RESUMES"
-    TEXTE = "TEXTE"
-    ECLI = "ECLI"
-    NUM_LOI_DEF = "NUM_LOI_DEF"
-    TYPE_DECISION = "TYPE_DECISION"
-    NUMERO_INTERNE = "NUMERO_INTERNE"
-    REF_PUBLI = "REF_PUBLI"
-    RESUME_CIRC = "RESUME_CIRC"
-    TEXTE_REF = "TEXTE_REF"
-    TITRE_LOI_DEF = "TITRE_LOI_DEF"
-    RAISON_SOCIALE = "RAISON_SOCIALE"
-    MOTS_CLES = "MOTS_CLES"
-    IDCC = "IDCC"
-
-
 class Fonds(str, Enum):
     """Liste des fonds disponibles pour la recherche
     Fonds sur lequel appliquer la recherche. Pour rechercher dans tous les

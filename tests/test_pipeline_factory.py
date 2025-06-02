@@ -7,6 +7,7 @@ from pylegifrance.models.constants import (
     Fonds,
     TypeRecherche,
     Operateur,
+    TypeChamp,
 )
 from pylegifrance.models.search import (
     NomCodeFiltre,
