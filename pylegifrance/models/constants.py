@@ -5,7 +5,8 @@ This module centralizes all shared constants and enumerations to avoid duplicati
 and ensure consistency across the codebase.
 """
 
-from pylegifrance.models.generated.model import Operateur as _Operateur
+from pylegifrance.models.generated.model import TypeRecherche as _TypeRecherche
+from pylegifrance.models.generated.model import TypeChamp as _TypeChamp
 
 
 from enum import Enum
@@ -239,7 +240,6 @@ class TypeRecherche(Enum):
             return cls(value.value)
         return None
 
-
 class Operateur(str, Enum):
     """Opérateur entre les champs de recherche.
 
@@ -254,6 +254,55 @@ class Operateur(str, Enum):
     def _missing_(cls, value):
         """Handle missing values by trying to match them to existing enum members."""
         if isinstance(value, _Operateur):
+            return cls(value.value)
+        return None
+
+
+class TypeChamp(str, Enum):
+    """Type de champ.
+
+    This enum is compatible with the generated TypeChamp enum.
+    Using str as a base class ensures type compatibility with string literals.
+    """
+
+    ALL = _TypeChamp.all.value
+    TITLE = _TypeChamp.title.value
+    TABLE = _TypeChamp.table.value
+    NOR = _TypeChamp.nor.value
+    NUM = _TypeChamp.num.value
+    ADVANCED_TEXTE_ID = _TypeChamp.advanced_texte_id.value
+    NUM_DELIB = _TypeChamp.num_delib.value
+    NUM_DEC = _TypeChamp.num_dec.value
+    NUM_ARTICLE = _TypeChamp.num_article.value
+    ARTICLE = _TypeChamp.article.value
+    MINISTERE = _TypeChamp.ministere.value
+    VISA = _TypeChamp.visa.value
+    NOTICE = _TypeChamp.notice.value
+    VISA_NOTICE = _TypeChamp.visa_notice.value
+    TRAVAUX_PREP = _TypeChamp.travaux_prep.value
+    SIGNATURE = _TypeChamp.signature.value
+    NOTA = _TypeChamp.nota.value
+    NUM_AFFAIRE = _TypeChamp.num_affaire.value
+    ABSTRATS = _TypeChamp.abstrats.value
+    RESUMES = _TypeChamp.resumes.value
+    TEXTE = _TypeChamp.texte.value
+    ECLI = _TypeChamp.ecli.value
+    NUM_LOI_DEF = _TypeChamp.num_loi_def.value
+    TYPE_DECISION = _TypeChamp.type_decision.value
+    NUMERO_INTERNE = _TypeChamp.numero_interne.value
+    REF_PUBLI = _TypeChamp.ref_publi.value
+    RESUME_CIRC = _TypeChamp.resume_circ.value
+    TEXTE_REF = _TypeChamp.texte_ref.value
+    TITRE_LOI_DEF = _TypeChamp.titre_loi_def.value
+    RAISON_SOCIALE = _TypeChamp.raison_sociale.value
+    MOTS_CLES = _TypeChamp.mots_cles.value
+    IDCC = _TypeChamp.idcc.value
+
+    @classmethod
+    def _missing_(cls, value):
+        """Handle missing values by trying to match them to existing enum members."""
+        if isinstance(value, _TypeChamp):
+            # If we get a generated enum instance, convert it to its string value
             return cls(value.value)
         return None
 

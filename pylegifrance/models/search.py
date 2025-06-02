@@ -19,10 +19,8 @@ from pylegifrance.models.constants import (
     CodeNom,
     Nature,
 )
-from pylegifrance.models.generic import (
-    TypeChamp,
-)
-from pylegifrance.models.constants import Operateur
+
+from pylegifrance.models.constants import Operateur, TypeChamp
 
 
 # Champs autorisés pour CODE, LODA, JURI,...
