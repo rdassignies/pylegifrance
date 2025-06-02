@@ -37,7 +37,13 @@ from pylegifrance.models.search import (
     RechercheFinal,
 )
 from pylegifrance.models.constants import Fonds, TypeRecherche, Nature
-from pylegifrance.models.generic import Operateur, TypeChamp
+from pylegifrance.models.generic import TypeChamp
+from pylegifrance.models.constants import (
+    Fonds,
+    TypeRecherche,
+    Nature,
+    Operateur,
+)
 
 load_dotenv()
 

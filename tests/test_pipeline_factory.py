@@ -1,9 +1,13 @@
 import pytest
 from pydantic import ValidationError
 
-from pylegifrance.models.generic import Operateur, TypeChamp
 from pylegifrance.pipeline.pipeline_factory import recherche_code
-from pylegifrance.models.constants import CodeNom, Fonds, TypeRecherche
+from pylegifrance.models.constants import (
+    CodeNom,
+    Fonds,
+    TypeRecherche,
+    Operateur,
+)
 from pylegifrance.models.search import (
     NomCodeFiltre,
     DateVersionFiltre,

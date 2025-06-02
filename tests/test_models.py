@@ -10,8 +10,8 @@ from pylegifrance.models.search import (
     Recherche,
     RechercheFinal,
     TypeRecherche,
-    Operateur,
 )
+from pylegifrance.models.constants import Operateur
 
 from pylegifrance.models.consult import (
     CodeTableMatieres,
