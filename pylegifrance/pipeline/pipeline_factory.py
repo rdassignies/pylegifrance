@@ -338,67 +338,6 @@ def recherche_LODA(
     return result
 
 
-def recherche_JURI(
-    search: str | None = None,
-    champ: str = "ALL",
-    type_recherche: str = "EXACTE",
-    fond: str = "JURI",
-    formatter: bool = False,
-    page_number: int = 1,
-    page_size: int = 10,
-    *args,
-):
-    # TODO: à implémenter
-
-    # Initialisation du client (singleton)
-    config = ApiConfig.from_env()
-    client = LegifranceClient(config=config)
-
-    # Création des critères de recherche
-    critere = [
-        Critere(
-            valeur="" if search is None else search,
-            typeRecherche=TypeRecherche.EXACTE,
-            operateur=Operateur.ET,
-        )
-    ]
-
-    fields = [
-        Champ(typeChamp=TypeChamp(champ), criteres=critere, operateur=Operateur.ET)
-    ]
-
-    # Construction des paramètres de la recherche
-    recherche = Recherche(
-        champs=fields, filtres=[], pageNumber=page_number, pageSize=page_size
-    )
-
-    try:
-        # Convert string fond to Fonds enum
-        fonds_enum = Fonds(fond)
-        initial_data = RechercheFinal(recherche=recherche, fond=fonds_enum)
-
-        logger.debug("---------- Payload -------------")
-        logger.debug(initial_data.model_dump(mode="json"))
-    except Exception as e:
-        logger.error(f"Error creating search request: {e}")
-        return {"error": str(e)}
-
-    # Initialisation des étapes du pipeline
-    pipeline_steps: List[PipelineStep] = [CallApiStep(client)]
-
-    # Ajoute un formatter si True
-    if formatter:
-        pipeline_steps.append(Formatters())
-
-    # Instanciation de Pipeline
-    pl = Pipeline(pipeline_steps)
-
-    # Exécution du pipeline
-    result = pl.execute(data=initial_data, data_type="")
-
-    return result
-
-
 def recherche_CETAT():
     # TODO: à implémenter
     pass
