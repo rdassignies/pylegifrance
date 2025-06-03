@@ -43,6 +43,7 @@ from pylegifrance.models.constants import (
     Operateur,
     TypeChamp,
 )
+from pylegifrance.process.processors import GetArticleIdError
 
 load_dotenv()
 
@@ -194,6 +195,9 @@ def recherche_LODA(
     """Recherche dans le fond LODA (LODA_DATE, LODA_ETAT) un texte par son numéro,
     un article dans un texte spécifique, ou un terme de recherche dans les champs d'un texte.
 
+    Raises:
+        GetArticleIdError: If search is provided but text_id is empty.
+
     Cette fonction ne récupère que les textes en vigueur à la date actuelle.
     Par défaut, la facette "DATE_VERSION" est définie sur la date du jour, et les facettes
     "TEXT_LEGAL_STATUS" et "ARTICLE_LEGAL_STATUTS" sont définies sur "VIGEUR",
@@ -232,6 +236,14 @@ def recherche_LODA(
     Returns:
         Dict: Soit un texte intégral soit un ou plusieurs articles correspondant à la recherche.
     """
+
+    # Check if text_id is empty and search is provided
+    if not text_id and search is not None:
+        raise GetArticleIdError(
+            "La liste GetArticle est vide !"
+            "- Pas d'identifiant LEGIARTI trouvé."
+            "Vérifier vos critères de recherche."
+        )
 
     # Initialisation du client (singleton)
     config = ApiConfig.from_env()

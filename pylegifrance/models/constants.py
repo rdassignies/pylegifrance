@@ -6,8 +6,9 @@ and ensure consistency across the codebase.
 """
 
 from pylegifrance.models.generated.model import TypeRecherche as _TypeRecherche
+from pylegifrance.models.generated.model import Operateur as _Operateur
 from pylegifrance.models.generated.model import TypeChamp as _TypeChamp
-
+from pylegifrance.models.generated.model import Fond as _Fond
 
 from enum import Enum
 from typing import Dict, List, Tuple
@@ -164,25 +165,28 @@ class SupplyEnum(str, Enum):
 
 
 class Fonds(str, Enum):
-    """
-    Enumeration of data sources/collections.
-    Used to specify which data sources to query.
+    """Liste des fonds disponibles pour la recherche
+    Fonds sur lequel appliquer la recherche. Pour rechercher dans tous les
+    fonds, il faut définir la valeur ALL.
+    Pour les fonds LODA et CODE, il existe deux types de recherche :
+    la recherche par date (_DATE) den version ou la recherche par état
+    juridique (_ETAT)
     """
 
-    JORF = "JORF"
-    CNIL = "CNIL"
-    CETAT = "CETAT"
-    JURI = "JURI"
-    JUFI = "JUFI"
-    CONSTIT = "CONSTIT"
-    KALI = "KALI"
-    CODE_DATE = "CODE_DATE"
-    CODE_ETAT = "CODE_ETAT"
-    LODA_DATE = "LODA_DATE"
-    LODA_ETAT = "LODA_ETAT"
-    ALL = "ALL"
-    CIRC = "CIRC"
-    ACCO = "ACCO"
+    JORF = _Fond.jorf
+    CNIL = _Fond.cnil
+    CETAT = _Fond.cetat
+    JURI = _Fond.juri
+    JUFI = _Fond.jufi
+    CONSTIT = _Fond.constit
+    KALI = _Fond.kali
+    CODE_DATE = _Fond.code_date
+    CODE_ETAT = _Fond.code_etat
+    LODA_DATE = _Fond.loda_date
+    LODA_ETAT = _Fond.loda_etat
+    ALL = _Fond.all
+    CIRC = _Fond.circ
+    ACCO = _Fond.acco
 
 
 class Nature(str, Enum):
@@ -227,10 +231,6 @@ class TypeRecherche(Enum):
     AUCUNE_CORRESPONDANCE_A_CETTE_EXPRESSION = (
         "AUCUNE_CORRESPONDANCE_A_CETTE_EXPRESSION"
     )
-    APPROXIMATIVE = "APPROXIMATIVE"
-    TOUS_LES_MOTS = "TOUS_LES_MOTS"
-    EXPRESSION = "EXPRESSION"
-    CHAMP_VIDE = "CHAMP_VIDE"
 
     @classmethod
     def _missing_(cls, value):
@@ -239,6 +239,7 @@ class TypeRecherche(Enum):
             # If we get a generated enum instance, convert it to its string value
             return cls(value.value)
         return None
+
 
 class Operateur(str, Enum):
     """Opérateur entre les champs de recherche.
