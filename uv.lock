@@ -733,7 +733,7 @@ wheels = [
 
 [[package]]
 name = "pylegifrance"
-version = "0.0.3a5"
+version = "0.1.0b1"
 source = { editable = "." }
 dependencies = [
     { name = "dotenv" },
