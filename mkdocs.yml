@@ -9,12 +9,13 @@ edit_uri: edit/main/docs/
 theme:
   name: material
   language: fr
+  logo: assets/images/logo.svg
+  favicon: assets/images/logo.svg
   features:
-    - navigation.instant
-    - navigation.tracking
-    - navigation.expand
+    - navigation.tabs
     - navigation.indexes
-    - content.code.copy
+    - toc.integrate
+    - content.code.annotate
   palette:
     - media: "(prefers-color-scheme: light)"
       scheme: default
@@ -33,17 +34,6 @@ theme:
   icon:
     repo: fontawesome/brands/github
 
-nav:
-  - Accueil: index.md
-  - Tutoriels:
-      - Tutoriels: tutorials/index.md
-  - Guides Pratiques:
-      - Guides: how-to/index.md
-  - Référence:
-      - Référence API: reference/index.md
-  - Explication:
-      - Concepts: explanation/index.md
-
 markdown_extensions:
   - meta
   - admonition
@@ -53,11 +43,23 @@ markdown_extensions:
       anchor_linenums: true
   - pymdownx.tabbed:
       alternate_style: true
+  - attr_list
+  - md_in_html
+  - admonition
+  - pymdownx.blocks.tab:
+      alternate_style: true
+      slugify: !!python/object/apply:pymdownx.slugs.slugify
+        kwds:
+          case: lower
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
 
 plugins:
   - search:
       lang: fr
   - tags:
+  - awesome-pages
   - minify:
       minify_html: true
       minify_js: true
@@ -77,3 +79,6 @@ extra:
     image: assets/images/social-card.png
     url: https://pylegifrance.github.io/pylegifrance/
     type: website
+
+extra_css:
+  - assets/stylesheets/extra.css
