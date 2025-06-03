@@ -1,4 +1,4 @@
-# Documentation PyLegifrance
+# À Propos
 
 PyLegifrance simplifie l'accès aux données juridiques françaises via l'API Legifrance.
 
@@ -6,10 +6,10 @@ PyLegifrance simplifie l'accès aux données juridiques françaises via l'API Le
 
 Cette documentation suit le framework [Diátaxis](https://diataxis.fr/), qui organise la documentation technique en quatre quadrants distincts :
 
-- [Tutoriels](tutorials/index.md) - Apprentissage guidé pour les débutants
-- [Guides pratiques](how-to/index.md) - Instructions pratiques pour résoudre des problèmes spécifiques
+- [Tutoriels](tutoriels/index.md) - Apprentissage guidé pour les débutants
+- [Guides pratiques](guides-pratiques/index.md) - Instructions pratiques pour résoudre des problèmes spécifiques
 - [Référence API](reference/index.md) - Information technique détaillée
-- [Explications](explanation/index.md) - Clarification des concepts et contexte
+- [Explications](explication/index.md) - Clarification des concepts et contexte
 
 ## Installation
 
