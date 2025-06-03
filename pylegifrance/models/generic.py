@@ -10,31 +10,6 @@ Modèles génériques de l'API legifrance
 from enum import Enum
 
 
-class Fonds(str, Enum):
-    """Liste des fonds disponibles pour la recherche
-    Fonds sur lequel appliquer la recherche. Pour rechercher dans tous les
-    fonds, il faut définir la valeur ALL.
-    Pour les fonds LODA et CODE, il existe deux types de recherche :
-    la recherche par date (_DATE) den version ou la recherche par état
-    juridique (_ETAT)
-    """
-
-    JORF = "JORF"
-    CNIL = "CNIL"
-    CETAT = "CETAT"
-    JURI = "JURI"
-    JUFI = "JUFI"
-    CONSTIT = "CONSTIT"
-    KALI = "KALI"
-    CODE_DATE = "CODE_DATE"
-    CODE_ETAT = "CODE_ETAT"
-    LODA_DATE = "LODA_DATE"
-    LODA_ETAT = "LODA_ETAT"
-    ALL = "ALL"
-    CIRC = "CIRC"
-    ACCO = "ACCO"
-
-
 class TypeFacettes(str, Enum):
     NOM_CODE = "NOM_CODE"
     DATE_SIGNATURE = "DATE_SIGNATURE"

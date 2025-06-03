@@ -62,7 +62,7 @@ def test_recherche_final_with_valid_field_and_fond(basic_criteria):
     final = RechercheFinal(recherche=search, fond=Fonds.LODA_DATE)
 
     # Then the final search should have the correct properties
-    assert final.fond == "LODA_DATE"
+    assert final.fond == Fonds.LODA_DATE
     assert len(final.recherche.champs) == 1
     assert final.recherche.champs[0].typeChamp.value == "VISA"
     assert isinstance(final.recherche.filtres[0], NatureFiltre), (
@@ -77,8 +77,8 @@ def test_recherche_final_with_valid_field_and_fond(basic_criteria):
         # Invalid field type for CODE_DATE fond
         (
             TypeChamp.VISA,
-            "CODE_DATE",
-            "TypeChamp TypeChamp.VISA is not valid for the fond Fonds.CODE_DATE",
+            Fonds.CODE_DATE,
+            r"TypeChamp TypeChamp.VISA is not valid for the fond Fonds.CODE_DATE",
         ),
         # Add more invalid combinations as needed
     ],
@@ -120,7 +120,7 @@ def test_recherche_final_with_valid_filters(basic_criteria):
     final = RechercheFinal(recherche=search, fond=Fonds.CODE_DATE)
 
     # Then the final search should have the correct filter properties
-    assert final.fond == "CODE_DATE"
+    assert final.fond == Fonds.CODE_DATE
     assert len(final.recherche.filtres) == 2
     assert isinstance(final.recherche.filtres[0], NomCodeFiltre)
     assert isinstance(final.recherche.filtres[1], DateVersionFiltre)
@@ -132,8 +132,8 @@ def test_recherche_final_with_valid_filters(basic_criteria):
         # Invalid facet type for LODA_DATE fond
         (
             "NOM_CODE",
-            "LODA_DATE",
-            "Facet TypeFacettes.NOM_CODE is not valid for the fond Fonds.LODA_DATE",
+            Fonds.LODA_DATE,
+            r"Facet TypeFacettes.NOM_CODE is not valid for the fond Fonds.LODA_DATE",
         ),
         # Add more invalid combinations as needed
     ],

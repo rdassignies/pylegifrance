@@ -93,7 +93,6 @@ class Critere(BaseModel):
 class Champ(BaseModel):
     """
     Modèle décrivant une recherche dans un champ spécifique
-
     """
 
     typeChamp: TypeChamp
@@ -246,17 +245,17 @@ class RechercheFinal(BaseModel):
         """
         fond = info.data.get("fond")
         for champ in v.champs:
-            if fond in ["CODE_DATE", "CODE_ETAT"]:
+            if fond in [Fonds.CODE_DATE, Fonds.CODE_ETAT]:
                 if champ.typeChamp.value not in ChampsCODE.__members__:
                     raise ValueError(
                         f"TypeChamp {champ.typeChamp} is not valid for the fond {fond}"
                     )
-            if fond in ["LODA_DATE", "LODA_ETAT"]:
+            if fond in [Fonds.LODA_DATE, Fonds.LODA_ETAT]:
                 if champ.typeChamp.value not in ChampsLODA.__members__:
                     raise ValueError(
                         f"TypeChamp {champ.typeChamp} is not valid for the fond {fond}"
                     )
-            if fond in ["JURI"]:
+            if fond in [Fonds.JURI]:
                 if champ.typeChamp.value not in ChampsJURI.__members__:
                     raise ValueError(
                         f"TypeChamp {champ.typeChamp} is not valid for the fond {fond}"
@@ -273,14 +272,14 @@ class RechercheFinal(BaseModel):
         """
         fond = info.data.get("fond")
         for filtre in v.filtres:
-            if fond in ["CODE_DATE", "CODE_ETAT"]:
+            if fond in [Fonds.CODE_DATE, Fonds.CODE_ETAT]:
                 if filtre.facette.value not in FacettesCODE.__members__:
                     raise ValueError(
                         f"Facet {filtre.facette} "
                         f"is not valid for the fond {fond}"
                         f" - allowed facets : {FacettesCODE.__members__}"
                     )
-            if fond in ["LODA_DATE", "LODA_ETAT"]:
+            if fond in [Fonds.LODA_DATE, Fonds.LODA_ETAT]:
                 if filtre.facette.value not in FacettesLODA.__members__:
                     raise ValueError(
                         f"Facet {filtre.facette} "
