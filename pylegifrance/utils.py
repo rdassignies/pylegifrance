@@ -3,8 +3,19 @@
 This module provides utility functions used across the package.
 """
 
+import json
+import enum
 import requests
 from pylegifrance.config import ApiConfig
+
+
+class EnumEncoder(json.JSONEncoder):
+    """JSON encoder that can handle Enum objects."""
+
+    def default(self, obj):
+        if isinstance(obj, enum.Enum):
+            return obj.value
+        return super().default(obj)
 
 
 def configure_session_timeouts(session: requests.Session, config: ApiConfig) -> None:
