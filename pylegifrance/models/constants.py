@@ -165,12 +165,55 @@ class SupplyEnum(str, Enum):
 
 
 class Fonds(str, Enum):
-    """Liste des fonds disponibles pour la recherche
-    Fonds sur lequel appliquer la recherche. Pour rechercher dans tous les
-    fonds, il faut définir la valeur ALL.
-    Pour les fonds LODA et CODE, il existe deux types de recherche :
-    la recherche par date (_DATE) den version ou la recherche par état
-    juridique (_ETAT)
+    """Fonds de données juridiques disponibles pour la recherche Légifrance.
+
+    Spécifie la base de données juridique dans laquelle effectuer la recherche.
+    Utilisez ALL pour rechercher simultanément dans tous les fonds disponibles.
+
+    Types de recherche spécialisés :
+        Pour les fonds LODA et CODE, deux modes de recherche sont proposés :
+        • _DATE : Recherche par date de version spécifique
+        • _ETAT : Recherche par état juridique (en vigueur, abrogé, modifié)
+
+    Fonds officiels disponibles :
+        JORF : Journal officiel de la République française
+               Textes officiels publiés au JO (lois, décrets, arrêtés, avis)
+
+        LODA_DATE/LODA_ETAT : Base LEGI - Lois et décrets
+                              Textes consolidés avec historique des versions
+
+        CODE_DATE/CODE_ETAT : Codes juridiques
+                             Codes en vigueur avec gestion des versions
+
+        CNIL : Commission nationale de l'informatique et des libertés
+               Délibérations, avis et sanctions de la CNIL
+
+        CETAT : Conseil d'État
+                Arrêts et ordonnances de la haute juridiction administrative
+
+        JURI : Jurisprudence administrative (base JADE)
+               Décisions des tribunaux et cours administratives
+
+        JUFI : Jurisprudence judiciaire (bases CASS et INCA)
+               Arrêts de la Cour de cassation et cours d'appel
+
+        CONSTIT : Conseil constitutionnel
+                  Décisions, avis et commentaires constitutionnels
+
+        KALI : Conventions collectives nationales
+               Accords et conventions du travail étendus
+
+        CIRC : Circulaires et instructions
+               Textes d'application et d'interprétation administrative
+
+        ACCO : Accords collectifs
+               Accords d'entreprise et accords de branche
+
+        ALL : Recherche transversale
+              Interrogation simultanée de tous les fonds disponibles
+
+    Note : Les données sont mises à disposition par la DILA (Direction de
+    l'information légale et administrative) via l'API Légifrance.
     """
 
     JORF = _Fond.jorf
