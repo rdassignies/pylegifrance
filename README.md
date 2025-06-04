@@ -17,8 +17,8 @@ Pour un serveur MCP Legifrance, c'est par ici : [https://github.com/rdassignies/
 La documentation complète est disponible ici : [https://pylegifrance.github.io/pylegifrance/](https://pylegifrance.github.io/pylegifrance/)
 
 Elle inclut :
-- [Tutoriels](https://pylegifrance.github.io/pylegifrance/tutorials/) - Apprentissage guidé pour les débutants
-- [Guides pratiques](https://pylegifrance.github.io/pylegifrance/how-to/) - Instructions d'installation et d'utilisation
+- [Tutoriels](https://pylegifrance.github.io/pylegifrance/tutoriels/) - Apprentissage guidé pour les débutants
+- [Guides pratiques](https://pylegifrance.github.io/pylegifrance/#installation) - Instructions d'installation et d'utilisation
 - [Référence API](https://pylegifrance.github.io/pylegifrance/reference/) - Documentation technique détaillée
 - [Explications](https://pylegifrance.github.io/pylegifrance/explanation/) - Concepts et roadmap
 
@@ -26,8 +26,9 @@ Elle inclut :
 
 - Recherche dans les codes français
 - Recherche dans les lois, ordonnances, décrets et arrêtés
+- Recherche dans la jurisprudence judiciaire 
 
-Pour des exemples d'utilisation, consultez la [documentation](https://pylegifrance.github.io/pylegifrance/how-to/).
+Pour des exemples d'utilisation, consultez la [documentation](https://pylegifrance.github.io/pylegifrance/guides-pratiques/)).
 
 ## Contact
 
