@@ -27,27 +27,48 @@ from pylegifrance.process.formatters import (
 logger = logging.getLogger(__name__)
 
 
+class PipelineStep:
+    """
+    Classe de base pour une étape dans le pipeline de traitement.
+    """
+
+    def process(self, data, data_type=""):
+        """
+        Méthode de traitement des données à implémenter par chaque sous-classe.
+
+        Args:
+            data: Données à traiter.
+            data_type: Type des données à traiter.
+
+        Returns:
+            Tuple[Any, str]: Données transformées et leur type.
+        """
+        raise NotImplementedError
+
+
 class Pipeline:
     """
     Classe représentant un pipeline de traitement de données.
-    Attributs :
-        steps (List[PipelineStep]) : Liste des étapes du pipeline.
+
+    Attributs:
+        steps (List[PipelineStep]): Liste des étapes du pipeline.
     """
 
-    def __init__(self, steps):
+    def __init__(self, steps: List[PipelineStep]):
         self.steps = steps
 
-    def execute(self, data, data_type=""):
+    def execute(self, data: Any, data_type: str = "") -> Any:
         """
         Exécute chaque étape du pipeline, en faisant passer les données
         à travers chacune d'entre elles.
 
         Args:
-            data: Données à traiter par le pipeline.
+            data (Any): Données à traiter par le pipeline.
+            data_type (str): Type initial des données.
 
         Returns:
-            Données transformées après être passées à travers
-            toutes les étapes du pipeline.
+            Any: Données transformées après être passées à travers
+                 toutes les étapes du pipeline.
         """
         for step in self.steps:
             # Si on a déjà une erreur, on arrête le pipeline et on retourne l'erreur
@@ -66,49 +87,27 @@ class Pipeline:
         return data
 
 
-class PipelineStep:
-    """
-    Classe de base pour une étape dans le pipeline de traitement.
-    """
-
-    def process(self, data, data_type=""):
-        """
-        Méthode de traitement des données à implémenter par chaque sous-classe.
-
-        Args:
-            data: Données à traiter.
-
-        Returns:
-            Données transformées.
-        """
-        raise NotImplementedError
-
-
 class ExtractSearchResult(PipelineStep):
     """
     Une étape du pipeline pour l'extraction des résultats de recherche.
     """
-
-    # TODO : implémenter l'utilisation de data_type à partir du modèle de réponse
 
     def process(self, data, data_type=""):
         """
         Extrait les résultats de recherche d'une réponse d'API.
 
         Args:
-            data (requests.models.Response):
-            La réponse de l'API contenant les résultats de recherche.
+            data (requests.models.Response): La réponse de l'API contenant les résultats de recherche.
+            data_type (str): Type des données d'entrée (non utilisé dans cette étape).
 
         Returns:
-            Résultats de recherche extraits.
+            Tuple[Any, str]: Résultats de recherche extraits et leur type.
 
         Raises:
             ValueError: Si la clé 'results' n'est pas trouvée dans la réponse.
         """
-        # TODO : vérifier que data soit une instance de requests.models.Response
-        # TODO : gérer l'erreur si la clé results n'est pas présente
-        data = search_response_DTO(data)
-        return data, "ExtractSearchResult"
+        extracted_data = search_response_DTO(data)
+        return extracted_data, "ExtractSearchResult"
 
 
 class GetArticleId(PipelineStep):
@@ -122,23 +121,22 @@ class GetArticleId(PipelineStep):
 
         Args:
             data (List[dict]): Une liste de résultats avec des identifiants.
+            data_type (str): Type des données d'entrée, doit être "ExtractSearchResult".
 
         Returns:
-            Une liste d'objets GetArticle (voir models.models).
+            Tuple[List[GetArticle], str]: Une liste d'objets GetArticle et le nom du type.
 
         Raises:
-            TypeError: Si les données fournies ne sont pas
-            dans le format correct pour extraire les identifiants d'articles.
+            TypeError: Si les données fournies ne sont pas dans le format correct
+                      pour extraire les identifiants d'articles.
         """
-
-        if data_type == "ExtractSearchResult":
-            article_ids = get_article_id(data)
-        else:
+        if data_type != "ExtractSearchResult":
             raise TypeError(
                 "Les données pour extraire les identifiants d'articles"
                 " ne sont pas dans le format correct"
             )
 
+        article_ids = get_article_id(data)
         return article_ids, GetArticle.__name__
 
 
@@ -153,24 +151,22 @@ class GetTextId(PipelineStep):
 
         Args:
             data (List[dict]): Une liste de résultats avec des identifiants.
+            data_type (str): Type des données d'entrée, doit être "ExtractSearchResult".
 
         Returns:
-            Une liste d'objets LegiPart (voir models.models).
+            Tuple[List[LegiPart], str]: Une liste d'objets LegiPart et le nom du type.
 
         Raises:
             TypeError: Si les données fournies ne sont pas dans le format correct
-            pour extraire les identifiants de textes.
-
+                      pour extraire les identifiants de textes.
         """
-
-        if data_type == "ExtractSearchResult":
-            text_id = get_text_id(data)
-        else:
+        if data_type != "ExtractSearchResult":
             raise TypeError(
                 "Les données pour extraire les identifiants de textes ne sont "
                 "pas dans le format correct"
             )
 
+        text_id = get_text_id(data)
         return text_id, LegiPart.__name__
 
 
@@ -223,31 +219,27 @@ class CallApiStep(PipelineStep):
 
     def _call_api_single(self, model: BaseModel) -> tuple[Any, Any | None]:
         """
-        Appelle l'API avec une seule requête (modèles).
+        Appelle l'API avec une seule requête (modèle).
 
         Args:
-            models (List[BaseModel]): Liste de modèles Pydantic utilisés
-            pour générer le payload.
+            model (BaseModel): Modèle Pydantic utilisé pour générer le payload.
 
         Returns:
-            response.content jsonifié du module requests.
+            Tuple[Any, Any | None]: Contenu de la réponse JSON et le type de modèle de réponse.
         """
-        # Logique pour appeler l'API avec un seul modèle
         route = getattr(model, "route", None)
+        payload = model.model_dump(mode="json")
 
-        response = self.client.call_api(route=route, data=model.model_dump(mode="json"))
+        response = self.client.call_api(route=route, data=payload)
 
-        # Log des informations de la réponse
-        logger.debug("---------- call_api_SINGLE -------------")
         logger.debug(
-            f"Appel API vers {route} retourné code de statut {{response.status_code}}"
+            f"Appel API vers {route} retourné code de statut {response.status_code}"
         )
-        # logger.debug(f"En-têtes de réponse: {response.headers}")
-        logger.debug(f"Corps de réponse: {response.text}")
 
         model_reponse = getattr(model, "model_reponse", None)
+        response_content = json.loads(response.content.decode("utf-8"))
 
-        return json.loads(response.content.decode("utf-8")), model_reponse
+        return response_content, model_reponse
 
     def _call_api_multiple(
         self, models: List[BaseModel]
@@ -257,33 +249,27 @@ class CallApiStep(PipelineStep):
 
         Args:
             models (List[BaseModel]): Liste de modèles Pydantic utilisés
-            pour générer le payload.
+                                      pour générer les payloads.
 
         Returns:
-            List[requests.models.Response]: Renvoie une liste d'objets Response
-            du module requests.
+            Tuple[List[Any], Any | None]: Liste des contenus de réponses JSON
+                                         et le type de modèle de réponse.
         """
-
-        # Logique pour appeler l'API avec plusieurs modèles
         responses = []
+
         for model in models:
             route = getattr(model, "route", None)
+            payload = model.model_dump(mode="json")
 
-            response = self.client.call_api(
-                route=route, data=model.model_dump(mode="json")
-            )
-            responses.append(json.loads(response.content.decode("utf-8")))
+            response = self.client.call_api(route=route, data=payload)
+            response_content = json.loads(response.content.decode("utf-8"))
+            responses.append(response_content)
 
-            # Log des informations de la réponse
-            logger.debug("---------- call_api_MULTIPLE -------------")
             logger.debug(
-                f"Appel API vers {route} retourné "
-                "code de statut {response.status_code}"
+                f"Appel API vers {route} retourné code de statut {response.status_code}"
             )
-            # logger.debug(f"En-têtes de réponse: {response.headers}")
-            # logger.debug(f"Corps de réponse: {response.text}")
 
-        # Get model_reponse from the first model
+        # Utilise le model_reponse du premier modèle pour tous les résultats
         model_reponse = getattr(models[0], "model_reponse", None)
 
         return responses, model_reponse
@@ -291,31 +277,30 @@ class CallApiStep(PipelineStep):
 
 class Formatters(PipelineStep):
     """
-    Etape de formattage des résultats
+    Étape de formattage des résultats de l'API.
     """
 
-    def __init__(self, model="default"):
-        self.model = "default"
+    def __init__(self, model: str = "default"):
+        self.model = model
 
-    def process(self, data, data_type=""):
+    def process(self, data: Dict[str, Any], data_type: str = "") -> tuple[Any, str]:
         """
-        Fonction qui appelle une fonction qui formatte un texte ou un article
+        Formate un texte ou un article selon le type de données.
 
         Args:
-           data (Dict): GetArticleResponse ou ConsultTextResponse.
-           data_type (String, optional): GetArticleResponse ou ConsultTextResponse.
+           data (Dict[str, Any]): Données de réponse (GetArticleResponse ou ConsultTextResponse).
+           data_type (str): Type des données d'entrée ("GetArticleResponse" ou "ConsultTextResponse").
 
         Returns:
-           Dict: Dictionnaire des résultats reformattés
+           Tuple[Any, str]: Résultats reformattés et leur type.
         """
-
         if data_type == "GetArticleResponse":
             articles = formate_article_response(data)
             return articles, str(type(articles))
 
         if data_type == "ConsultTextResponse":
-            text = formate_text_response(
-                data,
-            )
+            text = formate_text_response(data)
             return text, str(type(text))
-        return None
+
+        # Si le type de données n'est pas reconnu, retourne None
+        return None, "None"
