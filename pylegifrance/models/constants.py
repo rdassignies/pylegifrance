@@ -191,14 +191,14 @@ class Fonds(str, Enum):
         CETAT : Conseil d'État
                 Arrêts et ordonnances de la haute juridiction administrative
 
-        JURI : Jurisprudence administrative (base JADE)
-               Décisions des tribunaux et cours administratives
+        JURI : Jurisprudence judiciaire
+               Arrêts de la Cour de cassation et cours d'appel
 
-        JUFI : Jurisprudence judiciaire (bases CASS et INCA)
+        JUFI : Jurisprudence financière (bases CASS et INCA)
                Arrêts de la Cour de cassation et cours d'appel
 
         CONSTIT : Conseil constitutionnel
-                  Décisions, avis et commentaires constitutionnels
+                  Décisions, avis et commentaires
 
         KALI : Conventions collectives nationales
                Accords et conventions du travail étendus
