@@ -2,6 +2,7 @@
 
 Cette section contient la documentation technique détaillée de l'API PyLegifrance.
 
+
 ## Fonctions principales
 
 - [recherche_code](fonctions/recherche_code.md) - Recherche dans les codes français
