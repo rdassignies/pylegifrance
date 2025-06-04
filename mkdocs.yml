@@ -38,14 +38,20 @@ markdown_extensions:
   - meta
   - admonition
   - pymdownx.details
-  - pymdownx.superfences
   - pymdownx.highlight:
       anchor_linenums: true
   - pymdownx.tabbed:
       alternate_style: true
   - attr_list
   - md_in_html
-  - admonition
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:mermaid2.fence_mermaid_custom
+        - name: plantuml
+          class: plantuml
+          format: !!python/name:pymdownx.superfences.fence_code_format
   - pymdownx.blocks.tab:
       alternate_style: true
       slugify: !!python/object/apply:pymdownx.slugs.slugify
@@ -54,6 +60,13 @@ markdown_extensions:
   - pymdownx.emoji:
       emoji_index: !!python/name:material.extensions.emoji.twemoji
       emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - plantuml_markdown:
+      server: https://www.plantuml.com/plantuml
+      format: svg
+      classes: [diagram]
+      cachedir: .cache/plantuml
+      server_include_whitelist:
+        - "^C4.*$"
 
 plugins:
   - search:
@@ -66,7 +79,8 @@ plugins:
       minify_css: true
       htmlmin_opts:
         remove_comments: true
-
+  - mermaid2:
+      version: 11.6.0
 extra:
   social:
     - icon: fontawesome/brands/github

@@ -2,6 +2,10 @@
 
 Cette section contient la documentation technique détaillée de l'API PyLegifrance.
 
+## Architecture
+
+- [Architecture du projet](architecture.md) - Explication de l'architecture de PyLegifrance, notamment la structure `fonds/juri.py` et `models/juri/`
+
 ## Fonctions principales
 
 - [recherche_code](fonctions/recherche_code.md) - Recherche dans les codes français
