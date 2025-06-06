@@ -55,7 +55,7 @@ def recherche_code(
     search: str | None = None,
     champ: str = "NUM_ARTICLE",
     type_recherche: TypeRecherche = TypeRecherche.EXACTE,
-    fond: str = "CODE_DATE",
+    fond: str | Fonds = Fonds.CODE_DATE,
     formatter: bool = False,
     page_number: int = 1,
     page_size: int = 10,

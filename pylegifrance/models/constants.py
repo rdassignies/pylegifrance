@@ -216,20 +216,20 @@ class Fonds(str, Enum):
     l'information légale et administrative) via l'API Légifrance.
     """
 
-    JORF = _Fond.jorf
-    CNIL = _Fond.cnil
-    CETAT = _Fond.cetat
-    JURI = _Fond.juri
-    JUFI = _Fond.jufi
-    CONSTIT = _Fond.constit
-    KALI = _Fond.kali
-    CODE_DATE = _Fond.code_date
-    CODE_ETAT = _Fond.code_etat
-    LODA_DATE = _Fond.loda_date
-    LODA_ETAT = _Fond.loda_etat
-    ALL = _Fond.all
-    CIRC = _Fond.circ
-    ACCO = _Fond.acco
+    JORF = _Fond.jorf.value
+    CNIL = _Fond.cnil.value
+    CETAT = _Fond.cetat.value
+    JURI = _Fond.juri.value
+    JUFI = _Fond.jufi.value
+    CONSTIT = _Fond.constit.value
+    KALI = _Fond.kali.value
+    CODE_DATE = _Fond.code_date.value
+    CODE_ETAT = _Fond.code_etat.value
+    LODA_DATE = _Fond.loda_date.value
+    LODA_ETAT = _Fond.loda_etat.value
+    ALL = _Fond.all.value
+    CIRC = _Fond.circ.value
+    ACCO = _Fond.acco.value
 
 
 class Nature(str, Enum):
