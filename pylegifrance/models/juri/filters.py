@@ -3,7 +3,7 @@
 from typing import List
 from pydantic import Field
 
-from pylegifrance.models.juri.base import JuriBaseModel
+from pylegifrance.models.base import PyLegifranceBaseModel
 from pylegifrance.models.juri.constants import (
     FilterTypes,
     JuridictionJudiciaire,
@@ -13,7 +13,7 @@ from pylegifrance.models.juri.constants import (
 )
 
 
-class BaseFilter(JuriBaseModel):
+class BaseFilter(PyLegifranceBaseModel):
     """Base filter with common structure."""
 
     facette: FilterTypes
