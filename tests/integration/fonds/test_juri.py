@@ -1,7 +1,5 @@
 import pytest
 
-from pylegifrance.client import LegifranceClient
-from pylegifrance.config import ApiConfig
 from pylegifrance.fonds.juri import JuriAPI, JuriDecision, SearchRequest
 from pylegifrance.models.juri.constants import (
     JuridictionJudiciaire,
@@ -9,16 +7,9 @@ from pylegifrance.models.juri.constants import (
 
 
 @pytest.fixture(scope="module")
-def client() -> LegifranceClient:
-    """Create a real Legifrance client for integration tests."""
-    config = ApiConfig.from_env()
-    return LegifranceClient(config=config)
-
-
-@pytest.fixture(scope="module")
-def juri_api(client: LegifranceClient) -> JuriAPI:
+def juri_api(api_client) -> JuriAPI:
     """Create a JURI API instance."""
-    return JuriAPI(client)
+    return JuriAPI(api_client)
 
 
 @pytest.mark.timeout(30)

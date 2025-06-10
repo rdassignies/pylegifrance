@@ -6,16 +6,6 @@ from pylegifrance.models.consult import GetArticle
 from pylegifrance.config import ApiConfig
 
 
-@pytest.fixture
-def api_client():
-    """Fixture to provide a configured LegifranceClient client."""
-    load_dotenv()
-    config = ApiConfig.from_env()
-    client = LegifranceClient(config=config)
-    yield client
-    client.close()
-
-
 @pytest.mark.parametrize(
     "config_type,description",
     [

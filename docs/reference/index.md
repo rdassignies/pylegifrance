@@ -1,16 +1,27 @@
 # Référence API
 
-Cette section contient la documentation technique détaillée de l'API PyLegifrance.
+Cette section contient la documentation technique détaillée de la bibliothèque PyLegifrance. Elle est organisée par catégories pour faciliter la navigation et la recherche d'informations.
 
+## Client et Configuration
 
-## Fonctions principales
+Ces classes permettent d'initialiser et de configurer l'accès à l'API Legifrance.
 
-- [recherche_code](fonctions/recherche_code.md) - Recherche dans les codes français
-- [recherche_LODA](fonctions/recherche_loda.md) - Recherche dans les lois, ordonnances, décrets et arrêtés
+- [LegifranceClient](classes/legifrance_client.md) - Client principal pour interagir avec l'API Legifrance
+- [ApiConfig](classes/api_config.md) - Configuration d'accès à l'API (identifiants, URLs, timeouts)
 
-## Classes principales
+## Recherche et Consultation
 
-- [LegifranceClient](classes/legifrance_client.md) - Gère l'authentification et les appels à l'API Legifrance
-- [ApiConfig](classes/api_config.md) - Gère la configuration d'accès à l'API (identifiants, URLs, timeouts)
-- [JuriAPI](classes/juri_api.md) - Fournit des méthodes pour récupérer et rechercher des décisions de jurisprudence
-- [JuriDecision](classes/juri_decision.md) - Représente une décision de jurisprudence avec des méthodes pour accéder à ses propriétés et versions
+Ces fonctions permettent d'effectuer des recherches dans les différentes bases de données juridiques.
+
+### Codes
+
+- [recherche_code](fonctions/recherche_code.md) - Recherche dans les codes français (Code civil, Code pénal, etc.)
+
+### Lois, Ordonnances, Décrets et Arrêtés (LODA)
+
+- [Loda](fonctions/recherche_loda.md) - Recherche dans les lois, ordonnances, décrets et arrêtés
+
+### Jurisprudence
+
+- [JuriAPI](Fond/juri_api.md) - API pour récupérer et rechercher des décisions de jurisprudence
+- [JuriDecision](classes/juri_decision.md) - Représentation d'une décision de jurisprudence

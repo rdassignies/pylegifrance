@@ -13,7 +13,7 @@ from datetime import datetime
 
 from pydantic import BaseModel, field_validator
 from pylegifrance.models.constants import (
-    Fonds,
+    Fond,
     TypeFacettes,
     TypeRecherche,
     CodeNom,
@@ -215,13 +215,7 @@ class Recherche(BaseModel):
     pageSize: int = 10
     operateur: Operateur = Operateur.ET
     sort: str = "PERTINENCE"
-    typePagination: str = "ARTICLE"
-
-    # TODO : ajouter un validateur pour page_size, max 100
-
-
-class Fond(BaseModel):
-    fond: Fonds
+    typePagination: str = "DEFAUT"
 
 
 class RechercheFinal(BaseModel):
@@ -230,7 +224,7 @@ class RechercheFinal(BaseModel):
 
     """
 
-    fond: Fonds
+    fond: Fond
     recherche: Recherche  # Défini ailleurs
 
     route: ClassVar[str] = "search"
@@ -245,20 +239,20 @@ class RechercheFinal(BaseModel):
         """
         fond = info.data.get("fond")
         for champ in v.champs:
-            if fond in [Fonds.CODE_DATE, Fonds.CODE_ETAT]:
+            if fond in [Fond.CODE_DATE, Fond.CODE_ETAT]:
                 if champ.typeChamp.value not in ChampsCODE.__members__:
                     raise ValueError(
-                        f"TypeChamp {champ.typeChamp} is not valid for the fond {fond}"
+                        f"TypeChamp TypeChamp.{champ.typeChamp.value} is not valid for the fond Fonds.{fond.value}"
                     )
-            if fond in [Fonds.LODA_DATE, Fonds.LODA_ETAT]:
+            if fond in [Fond.LODA_DATE, Fond.LODA_ETAT]:
                 if champ.typeChamp.value not in ChampsLODA.__members__:
                     raise ValueError(
-                        f"TypeChamp {champ.typeChamp} is not valid for the fond {fond}"
+                        f"TypeChamp TypeChamp.{champ.typeChamp.value} is not valid for the fond Fonds.{fond.value}"
                     )
-            if fond in [Fonds.JURI]:
+            if fond in [Fond.JURI]:
                 if champ.typeChamp.value not in ChampsJURI.__members__:
                     raise ValueError(
-                        f"TypeChamp {champ.typeChamp} is not valid for the fond {fond}"
+                        f"TypeChamp TypeChamp.{champ.typeChamp.value} is not valid for the fond Fonds.{fond.value}"
                     )
         return v
 
@@ -272,18 +266,16 @@ class RechercheFinal(BaseModel):
         """
         fond = info.data.get("fond")
         for filtre in v.filtres:
-            if fond in [Fonds.CODE_DATE, Fonds.CODE_ETAT]:
+            if fond in [Fond.CODE_DATE, Fond.CODE_ETAT]:
                 if filtre.facette.value not in FacettesCODE.__members__:
                     raise ValueError(
-                        f"Facet {filtre.facette} "
-                        f"is not valid for the fond {fond}"
+                        f"Facet TypeFacettes.{filtre.facette.value} is not valid for the fond Fonds.{fond.value}"
                         f" - allowed facets : {FacettesCODE.__members__}"
                     )
-            if fond in [Fonds.LODA_DATE, Fonds.LODA_ETAT]:
+            if fond in [Fond.LODA_DATE, Fond.LODA_ETAT]:
                 if filtre.facette.value not in FacettesLODA.__members__:
                     raise ValueError(
-                        f"Facet {filtre.facette} "
-                        f"is not valid for the fond {fond}"
+                        f"Facet TypeFacettes.{filtre.facette.value} is not valid for the fond Fonds.{fond.value}"
                         f" - allowed facets : {FacettesLODA.__members__}"
                     )
         return v

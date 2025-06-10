@@ -8,10 +8,10 @@ from pylegifrance.models.generated.model import (
     JuriConsultWithAncienId,
     TexteSimple,
 )
-from pylegifrance.models.juri.base import JuriBaseModel
+from pylegifrance.models.base import PyLegifranceBaseModel
 
 
-class ConsultRequest(JuriBaseModel):
+class ConsultRequest(PyLegifranceBaseModel):
     """Request to consult a JURI text."""
 
     searched_string: Optional[str] = Field(
@@ -24,7 +24,7 @@ class ConsultRequest(JuriBaseModel):
         return JuriConsultRequest(**self.model_dump(by_alias=True))
 
 
-class ConsultByAncienIdRequest(JuriBaseModel):
+class ConsultByAncienIdRequest(PyLegifranceBaseModel):
     """Request to consult by ancien ID."""
 
     ancien_id: Optional[str] = Field(
@@ -36,7 +36,7 @@ class ConsultByAncienIdRequest(JuriBaseModel):
         return JuriConsultWithAncienId(**self.model_dump(by_alias=True))
 
 
-class ConsultResponse(JuriBaseModel):
+class ConsultResponse(PyLegifranceBaseModel):
     """Response from text consultation."""
 
     text: Optional[TexteSimple] = Field(None, description="Text content")

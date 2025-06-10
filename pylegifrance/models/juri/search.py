@@ -3,7 +3,7 @@
 from typing import List, Optional
 from pydantic import Field
 
-from pylegifrance.models.juri.base import JuriBaseModel
+from pylegifrance.models.base import PyLegifranceBaseModel
 from pylegifrance.models.juri.constants import (
     SortOptions,
     PublicationStatus,
@@ -23,7 +23,7 @@ from pylegifrance.models.generated.model import (
 )
 
 
-class SearchRequest(JuriBaseModel):
+class SearchRequest(PyLegifranceBaseModel):
     """JURI search request model."""
 
     search: str = Field("", description="Search text or keywords")
@@ -125,7 +125,7 @@ class SearchRequest(JuriBaseModel):
         )
 
 
-class SearchResponse(JuriBaseModel):
+class SearchResponse(PyLegifranceBaseModel):
     """JURI search response model."""
 
     total_results: int = Field(alias="totalNbResult")

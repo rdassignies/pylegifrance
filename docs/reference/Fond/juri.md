@@ -1,4 +1,4 @@
-# JuriAPI
+# JURI
 
 ```python
 class JuriAPI:

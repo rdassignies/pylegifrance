@@ -18,7 +18,7 @@ from pylegifrance.models.consult import (
     LegiSommaireConsult,
 )
 
-from pylegifrance.models.constants import CodeNom, Fonds, Nature, TypeChamp
+from pylegifrance.models.constants import CodeNom, Fond, Nature, TypeChamp
 
 
 @pytest.fixture
@@ -59,10 +59,10 @@ def test_recherche_final_with_valid_field_and_fond(basic_criteria):
 
     # When a search and final search are created
     search = Recherche(champs=[field], filtres=[filtre])
-    final = RechercheFinal(recherche=search, fond=Fonds.LODA_DATE)
+    final = RechercheFinal(recherche=search, fond=Fond.LODA_DATE)
 
     # Then the final search should have the correct properties
-    assert final.fond == Fonds.LODA_DATE
+    assert final.fond == Fond.LODA_DATE
     assert len(final.recherche.champs) == 1
     assert final.recherche.champs[0].typeChamp.value == "VISA"
     assert isinstance(final.recherche.filtres[0], NatureFiltre), (
@@ -77,7 +77,7 @@ def test_recherche_final_with_valid_field_and_fond(basic_criteria):
         # Invalid field type for CODE_DATE fond
         (
             TypeChamp.VISA,
-            Fonds.CODE_DATE,
+            Fond.CODE_DATE,
             r"TypeChamp TypeChamp.VISA is not valid for the fond Fonds.CODE_DATE",
         ),
         # Add more invalid combinations as needed
@@ -117,10 +117,10 @@ def test_recherche_final_with_valid_filters(basic_criteria):
 
     # When a search and final search are created with the filters
     search = Recherche(champs=[field], filtres=[filtre1, filtre2])
-    final = RechercheFinal(recherche=search, fond=Fonds.CODE_DATE)
+    final = RechercheFinal(recherche=search, fond=Fond.CODE_DATE)
 
     # Then the final search should have the correct filter properties
-    assert final.fond == Fonds.CODE_DATE
+    assert final.fond == Fond.CODE_DATE
     assert len(final.recherche.filtres) == 2
     assert isinstance(final.recherche.filtres[0], NomCodeFiltre)
     assert isinstance(final.recherche.filtres[1], DateVersionFiltre)
@@ -132,7 +132,7 @@ def test_recherche_final_with_valid_filters(basic_criteria):
         # Invalid facet type for LODA_DATE fond
         (
             "NOM_CODE",
-            Fonds.LODA_DATE,
+            Fond.LODA_DATE,
             r"Facet TypeFacettes.NOM_CODE is not valid for the fond Fonds.LODA_DATE",
         ),
         # Add more invalid combinations as needed
@@ -285,7 +285,7 @@ def test_nom_code_filtre_with_code_de_commerce_in_recherche_final():
             pageNumber=1,
             pageSize=10,
         )
-        recherche_final = RechercheFinal(recherche=recherche, fond=Fonds.CODE_DATE)
+        recherche_final = RechercheFinal(recherche=recherche, fond=Fond.CODE_DATE)
         assert isinstance(
             recherche_final.recherche.filtres[0], NomCodeFiltre
         )  # Make sure it's the right type
