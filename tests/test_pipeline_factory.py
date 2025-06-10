@@ -4,10 +4,10 @@ from pydantic import ValidationError
 from pylegifrance.pipeline.pipeline_factory import recherche_code
 from pylegifrance.models.constants import (
     CodeNom,
-    Fonds,
     TypeRecherche,
     Operateur,
     TypeChamp,
+    Fond,
 )
 from pylegifrance.models.search import (
     NomCodeFiltre,
@@ -70,7 +70,7 @@ def test_recherche_final_direct_validation():
 
     # Then it should not raise a validation error
     try:
-        recherche_final = RechercheFinal(recherche=recherche, fond=Fonds.CODE_DATE)
+        recherche_final = RechercheFinal(recherche=recherche, fond=Fond.CODE_DATE)
         assert isinstance(recherche_final.recherche.filtres[0], NomCodeFiltre), (
             "First filter should be NomCodeFiltre"
         )
