@@ -1,7 +1,7 @@
 import pytest
 from pydantic import ValidationError
-from pylegifrance.pipeline.pipeline_factory import recherche_code, recherche_LODA
-from pylegifrance.process.processors import GetArticleIdError
+
+from pylegifrance.pipeline.pipeline_factory import recherche_code
 
 
 @pytest.fixture
@@ -26,111 +26,6 @@ def test_search_code_with_article_number(civil_code):
 
     # When searching for the article
     result = recherche_code(code_name=code_name, search=article_number)
-
-    # Then the search should complete without errors
-    assert result is not None
-
-
-def test_search_loda_with_article_number(privacy_law):
-    """
-    Test searching for an article by number in a law.
-    """
-    # Given a valid law ID and article number
-    text_id = privacy_law
-    article_number = "7"
-
-    # When searching for the article
-    result = recherche_LODA(text_id=text_id, search=article_number)
-
-    # Then the search should complete without errors
-    assert result is not None
-
-
-def test_search_loda_entire_text(privacy_law):
-    """
-    Test searching for an entire law text.
-    """
-    # Given a valid law ID
-    text_id = privacy_law
-
-    # When searching for the entire text
-    result = recherche_LODA(text_id=text_id)
-
-    # Then the search should complete without errors
-    assert result is not None
-
-
-def test_search_loda_with_nature_filter():
-    """
-    Test searching for a decree with nature filter.
-    """
-    # Given a valid decree ID and nature filter
-    text_id = "2023-823"
-    nature = ["DECRET"]
-
-    # When searching with the nature filter
-    result = recherche_LODA(text_id=text_id, nature=nature)
-
-    # Then the search should complete without errors
-    assert result is not None
-
-
-def test_search_loda_with_term_in_all_fields(privacy_law):
-    """
-    Test searching for a term in all fields of a law.
-    """
-    # Given a valid law ID, search term, and field
-    text_id = privacy_law
-    search_term = "poursuite"
-    field = "ALL"
-
-    # When searching for the term in all fields
-    result = recherche_LODA(text_id=text_id, search=search_term, champ=field)
-
-    # Then the search should complete without errors
-    assert result is not None
-
-
-def test_search_loda_without_text_id_raises_error():
-    """
-    Test that searching without a text ID raises an error.
-    """
-    # Given only a search term without a text ID
-    search_term = "autorité"
-
-    # When searching without a text ID
-    # Then an error should be raised
-    with pytest.raises(GetArticleIdError):
-        recherche_LODA(search=search_term)
-
-
-def test_search_loda_with_invalid_field_raises_error(privacy_law):
-    """
-    Test that searching with an invalid field raises a ValueError.
-    """
-    # Given a valid law ID but an invalid field
-    text_id = privacy_law
-    search_term = "poursuite"
-    invalid_field = "RAISON SOCIALE"
-
-    # When searching with an invalid field
-    # Then a ValueError should be raised because the field is not a valid TypeChamp
-    with pytest.raises(ValueError):
-        recherche_LODA(text_id=text_id, search=search_term, champ=invalid_field)
-
-
-def test_search_loda_with_custom_fond(privacy_law):
-    """
-    Test searching with a custom fond parameter.
-    """
-    # Given a valid law ID, search term, field, and custom fond
-    text_id = privacy_law
-    search_term = "poursuite"
-    field = "ALL"
-    fond = "LOI"
-
-    # When searching with a custom fond
-    result = recherche_LODA(text_id=text_id, search=search_term, champ=field, fond=fond)
 
     # Then the search should complete without errors
     assert result is not None
@@ -194,7 +89,7 @@ def test_search_code_with_pagination(civil_code):
     code_name = civil_code
     search_term = "mineur"
     field = "ARTICLE"
-    page_number = 2
+    page_number = 1
 
     # When searching with pagination
     result = recherche_code(

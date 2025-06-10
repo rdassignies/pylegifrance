@@ -9,7 +9,7 @@ from pylegifrance.models.generated.model import TypeRecherche as _TypeRecherche
 from pylegifrance.models.generated.model import Operateur as _Operateur
 from pylegifrance.models.generated.model import TypeChamp as _TypeChamp
 from pylegifrance.models.generated.model import Fond as _Fond
-
+from pylegifrance.models.generated.model import Nature2 as _Nature2
 from enum import Enum
 from typing import Dict, List, Tuple
 
@@ -164,7 +164,7 @@ class SupplyEnum(str, Enum):
     PDF = "PDF"
 
 
-class Fonds(str, Enum):
+class Fond(str, Enum):
     """Fonds de données juridiques disponibles pour la recherche Légifrance.
 
     Spécifie la base de données juridique dans laquelle effectuer la recherche.
@@ -237,10 +237,16 @@ class Nature(str, Enum):
     Enumeration of document nature types.
     """
 
-    LOI = "LOI"
-    ORDONNANCE = "ORDONNANCE"
-    DECRET = "DECRET"
-    ARRETE = "ARRETE"
+    LOI = _Nature2.loi.value
+    ORDONNANCE = _Nature2.ordonnance.value
+    DECRET = _Nature2.decret.value
+    ARRETE = _Nature2.arrete.value
+    DECRET_LOI = _Nature2.decret_loi.value
+    CONSTITUTION = _Nature2.constitution.value
+    DECISION = _Nature2.decision.value
+    CONVENTION = _Nature2.convention.value
+    DECLARATION = _Nature2.declaration.value
+    ACCORD_FONCTION_PUBLIQUE = _Nature2.accord_fonction_publique.value
 
 
 class TypeFacettes(str, Enum):
@@ -295,7 +301,7 @@ class Operateur(str, Enum):
     OU = _Operateur.ou.value
 
     @classmethod
-    def _missing_(cls, value):
+    def _missing_(cls, value) -> str | None:
         """Handle missing values by trying to match them to existing enum members."""
         if isinstance(value, _Operateur):
             return cls(value.value)

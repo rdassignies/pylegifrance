@@ -215,11 +215,7 @@ class Recherche(BaseModel):
     pageSize: int = 10
     operateur: Operateur = Operateur.ET
     sort: str = "PERTINENCE"
-    typePagination: str = "ARTICLE"
-
-    # TODO : ajouter un validateur pour page_size, max 100
-
-
+    typePagination: str = "DEFAUT"
 
 
 class RechercheFinal(BaseModel):
@@ -246,17 +242,17 @@ class RechercheFinal(BaseModel):
             if fond in [Fond.CODE_DATE, Fond.CODE_ETAT]:
                 if champ.typeChamp.value not in ChampsCODE.__members__:
                     raise ValueError(
-                        f"TypeChamp {champ.typeChamp} is not valid for the fond {fond}"
+                        f"TypeChamp TypeChamp.{champ.typeChamp.value} is not valid for the fond Fonds.{fond.value}"
                     )
             if fond in [Fond.LODA_DATE, Fond.LODA_ETAT]:
                 if champ.typeChamp.value not in ChampsLODA.__members__:
                     raise ValueError(
-                        f"TypeChamp {champ.typeChamp} is not valid for the fond {fond}"
+                        f"TypeChamp TypeChamp.{champ.typeChamp.value} is not valid for the fond Fonds.{fond.value}"
                     )
             if fond in [Fond.JURI]:
                 if champ.typeChamp.value not in ChampsJURI.__members__:
                     raise ValueError(
-                        f"TypeChamp {champ.typeChamp} is not valid for the fond {fond}"
+                        f"TypeChamp TypeChamp.{champ.typeChamp.value} is not valid for the fond Fonds.{fond.value}"
                     )
         return v
 
@@ -273,15 +269,13 @@ class RechercheFinal(BaseModel):
             if fond in [Fond.CODE_DATE, Fond.CODE_ETAT]:
                 if filtre.facette.value not in FacettesCODE.__members__:
                     raise ValueError(
-                        f"Facet {filtre.facette} "
-                        f"is not valid for the fond {fond}"
+                        f"Facet TypeFacettes.{filtre.facette.value} is not valid for the fond Fonds.{fond.value}"
                         f" - allowed facets : {FacettesCODE.__members__}"
                     )
             if fond in [Fond.LODA_DATE, Fond.LODA_ETAT]:
                 if filtre.facette.value not in FacettesLODA.__members__:
                     raise ValueError(
-                        f"Facet {filtre.facette} "
-                        f"is not valid for the fond {fond}"
+                        f"Facet TypeFacettes.{filtre.facette.value} is not valid for the fond Fonds.{fond.value}"
                         f" - allowed facets : {FacettesLODA.__members__}"
                     )
         return v

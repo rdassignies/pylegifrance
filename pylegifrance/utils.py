@@ -6,15 +6,18 @@ This module provides utility functions used across the package.
 import json
 import enum
 import requests
+from datetime import datetime
 from pylegifrance.config import ApiConfig
 
 
 class EnumEncoder(json.JSONEncoder):
-    """JSON encoder that can handle Enum objects."""
+    """JSON encoder that can handle Enum objects and datetime objects."""
 
     def default(self, obj):
         if isinstance(obj, enum.Enum):
             return obj.value
+        elif isinstance(obj, datetime):
+            return obj.isoformat()
         return super().default(obj)
 
 
